@@ -22,12 +22,18 @@ after(cleanup);
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 const EXPECTED = [
+  'review_site',
+  'explain_rule',
+  'learning_path',
   'init_site',
+  'palette_from_subject',
   'palette_from_image',
   'check_responsive',
+  'check_copy',
   'check_honesty',
   'check_assets',
-  'check_single_source'
+  'check_single_source',
+  'doctor'
 ].sort();
 
 test('the SDK version this server is written against is the one installed', async () => {
@@ -38,7 +44,7 @@ test('the SDK version this server is written against is the one installed', asyn
   assert.equal(major, '1', `registerTool's contract is a v1 API; installed ${pkg.version}`);
 });
 
-test('all six tools are advertised, and nothing else', async () => {
+test('every tool is advertised, and nothing else', async () => {
   const kit = await connect();
   const { tools: listed } = await kit.client.listTools();
   await kit.close();
@@ -55,8 +61,10 @@ test('every tool is usable by a model: a title, a description, and a typed input
     assert.ok(tool.title || tool.annotations?.title, `${tool.name} has no title`);
     assert.ok(tool.description?.length > 80, `${tool.name} has no useful description`);
     assert.equal(tool.inputSchema.type, 'object', `${tool.name} has no object input schema`);
+    // doctor takes no arguments on purpose: it is the one tool a beginner
+    // must be able to run without knowing anything at all.
     assert.ok(
-      Object.keys(tool.inputSchema.properties ?? {}).length > 0,
+      tool.name === 'doctor' || Object.keys(tool.inputSchema.properties ?? {}).length > 0,
       `${tool.name} takes no arguments`
     );
     assert.ok(tool.outputSchema, `${tool.name} does not declare what it returns`);

@@ -30,7 +30,8 @@ import { z } from 'zod';
 
 import { STATUS, failure, guard, table, toolResult } from '../lib/report.js';
 import { buildPalette, paletteCss, BANNED_HEXES } from '../lib/palette_rules.js';
-import { readLedger, usedOn, seedFrom, appendLedger } from '../lib/ledger.js';
+import { readLedger } from '../../rules/ledger.js';
+import { seedFrom, spreadHue } from '../lib/variety.js';
 import { commonOutput } from './common.js';
 
 const TOOL = 'palette_from_subject';
@@ -79,8 +80,7 @@ export const config = {
   inputSchema: {
     subject: z.string().min(2).describe('What the site is about, in a few words. For example: "chess lessons, Brooklyn".'),
     hue: z.number().min(0).max(360).optional().describe('Force an anchor hue in OKLCH degrees, 0-360, if you already know the colour you want.'),
-    accent_chroma: z.number().min(0.05).max(0.25).optional().describe('How loud the accent is. The corpus band is 0.12-0.22; the default is 0.16.'),
-    record: z.boolean().optional().describe('Record the chosen hue in the local variety ledger so the next subject gets a different one. Default true.')
+    accent_chroma: z.number().min(0.05).max(0.25).optional().describe('How loud the accent is. The corpus band is 0.12-0.22; the default is 0.16.')
   },
   outputSchema: {
     ...commonOutput,
@@ -110,7 +110,9 @@ export const config = {
     audit: z.array(z.object({ token: z.string(), hex: z.string(), problem: z.string(), measured: z.string() })).optional(),
     notes: z.array(z.string()).optional()
   },
-  annotations: { readOnlyHint: false, openWorldHint: false, idempotentHint: false }
+  // Reads the variety ledger, writes nothing. The ledger is written by
+  // init_site, which is the tool that actually emits a site.
+  annotations: { readOnlyHint: true, openWorldHint: false, idempotentHint: true }
 };
 
 export const handler = guard(TOOL, async (args) => {
@@ -125,8 +127,12 @@ export const handler = guard(TOOL, async (args) => {
     });
   }
 
-  const ledger = await readLedger();
-  const usedHues = usedOn(ledger, 'hue').map(Number).filter(Number.isFinite);
+  // The rulebook's own ledger: what hues the last builds actually used.
+  const ledger = readLedger();
+  const usedHues = [...ledger.entries]
+    .reverse()
+    .map((e) => Number(e?.declared?.hue))
+    .filter(Number.isFinite);
 
   let hue;
   let hueSource;
@@ -146,7 +152,7 @@ export const handler = guard(TOOL, async (args) => {
       // No physical referent. Spread the hash across the circle, then push it
       // away from anything used recently so two subjects do not collide.
       const base = seedFrom(subject.toLowerCase()) % 360;
-      hue = spreadFrom(base, usedHues);
+      hue = spreadHue(base, usedHues);
       hueSource = `a hash of the words "${subject}" — which is NOT deriving the colour from anything real`;
       real = false;
     }
@@ -158,13 +164,6 @@ export const handler = guard(TOOL, async (args) => {
     provenance: hueSource
   });
 
-  if (args.record !== false) {
-    await appendLedger({
-      subject,
-      choices: { hue: String(Math.round(palette.anchor_hue)) },
-      kind: 'palette'
-    });
-  }
 
   const failing = palette.contrast.filter((c) => !c.passes);
 
@@ -264,16 +263,3 @@ export const handler = guard(TOOL, async (args) => {
   });
 });
 
-/** Push a hue away from ones used recently, so consecutive subjects do not collide. */
-function spreadFrom(base, used, minimumGap = 40) {
-  let hue = base % 360;
-  for (let attempt = 0; attempt < 9; attempt++) {
-    const clash = used.find((u) => {
-      const gap = Math.abs(((hue - u + 540) % 360) - 180);
-      return 180 - gap < minimumGap;
-    });
-    if (clash === undefined) return hue;
-    hue = (hue + 47) % 360;
-  }
-  return hue;
-}

@@ -208,7 +208,7 @@ shipped Sonner and Vaul CSS where you can check he follows his own numbers), Jos
 transitions, shadows and reduced motion, Gesso Build's deterministic anti-slop detectors, Adrian
 Krebs's empirical scoring of 1,590 landing pages, Nutlope's Hallmark catalogue, Rauno Freiberg's
 90/10 novelty rule, CodeStitch's audited local-business practice, the GOV.UK type scale, and
-WCAG 2.2 AA. It also credits the [Impeccable](https://github.com/) plugin where a rule overlaps
+WCAG 2.2 AA. It also credits the Impeccable design plugin (v4.3.1) where a rule overlaps
 with its craft floor, and deliberately does not restate what that plugin's editor hook already
 enforces while you type.
 

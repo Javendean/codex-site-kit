@@ -13,7 +13,9 @@ import { z } from 'zod';
 
 import { failure, guard, toolResult } from '../lib/report.js';
 import { STOPS, render, validate } from '../lib/learning-path.js';
-import { RULEBOOK } from '../rules/index.js';
+import { rulebook } from '../lib/rulebook.js';
+
+const RULEBOOK = rulebook().rules;
 import { commonOutput } from './common.js';
 
 const TOOL = 'learning_path';

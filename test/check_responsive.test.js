@@ -364,7 +364,7 @@ test('the scaffold that init_site writes passes this check at every width', asyn
   await kit.close();
 
   assert.equal(data.status, 'pass', 'the scaffold must pass the measurement, not only the static checks');
-  assert.equal(data.measurements_taken, 32, '4 pages x 8 widths');
+  assert.equal(data.measurements_taken, 8, 'one page x 8 widths');
   assert.equal(data.overflow_count, 0);
   assert.deepEqual(data.page_errors, [], 'the scaffold must load with nothing missing');
 });

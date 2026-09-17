@@ -1,7 +1,7 @@
 {
   "name": "codex-site-kit",
   "version": "2.0.0",
-  "description": "An MCP server for Codex that builds small, honest, framework-free websites and teaches the craft while you build. Every finding carries what it found, why it matters, who says so, and the better move.",
+  "description": "An MCP server for Codex that criticises a website against a sourced rulebook and explains every finding: what, why, who says so, and the better move.",
   "license": "MIT",
   "type": "module",
   "engines": {
@@ -19,6 +19,7 @@
   "files": [
     "bin",
     "src",
+    "rules",
     "scripts",
     "README.md",
     "LEARNING-PATH.md",

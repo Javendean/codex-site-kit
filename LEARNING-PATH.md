@@ -45,147 +45,189 @@ There is a short list of faults that make a page look BROKEN rather than cheap, 
 - Fix them before you look at anything else. Nothing further on this list matters while one of these is live.
 - Then run check_responsive, which loads the page in a real browser at four phone widths and MEASURES it. The rules below are read out of the source text; only a browser can tell you whether the page actually scrolls sideways.
 
-**The rules that carry this** — 10 of them:
+**The rules that carry this** — 11 of them:
 
-### `missing-viewport` ? No viewport tag
-
-*The floor — what makes a page look broken rather than cheap · confidence DEMONSTRATED*
-
-**What it looks for.** An HTML page with no <meta name="viewport"> in its head, or one with a fixed pixel width, or one that disables scaling.
-
-**Why it matters.** research/04-design-language.md calls this the strongest single signal of technical age, and the reason is mechanical rather than aesthetic: without the tag a phone renders the page at desktop width and then shrinks the whole thing, so every line of body text arrives at about four pixels tall. The visitor pinches to read one sentence. Google has been mobile-first-indexing all new sites for years, so it is also the cheapest SEO failure available. `user-scalable=no` and `maximum-scale=1` are a different failure with the same fingerprint: they take away a visitor's ability to zoom, which for anyone over fifty is the difference between reading the page and leaving it.
-
-**The better move.** Put `<meta name="viewport" content="width=device-width, initial-scale=1">` in the head. Nothing more — no maximum-scale, no user-scalable.
-
-**Who says so.** research/04-design-language.md
-
-### `missing-lang` ? No language on the html element
+### `F-VIEWPORT-META` ?? No viewport meta tag
 
 *The floor — what makes a page look broken rather than cheap · confidence DEMONSTRATED*
 
-**What it looks for.** An <html> element with no `lang` attribute.
+**What it looks for.** No `<meta name="viewport">` in the document.
 
-**Why it matters.** A screen reader chooses its pronunciation rules from this attribute. Without it, an English page may be read in the voice of whatever language the visitor's reader defaults to, which makes it unintelligible rather than merely accented. It is one attribute and it is WCAG 3.1.1.
+**Why it matters.** Without it a phone renders the page at desktop width and shrinks it, so every word is unreadable until the visitor pinches. The corpus names this the strongest single signal of a dated site, which is exactly why shipping it yourself is unforgivable.
 
-**The better move.** Write `<html lang="en">`.
+**The better move.** Add the tag to the <head>. Exactly this, with nothing else in the content attribute -- no fixed width, no maximum-scale, no user-scalable=no.
 
-**Who says so.** WCAG 2.2, success criterion 1.4.3
+**What it teaches.** This one line tells a phone to use its own width instead of pretending to be a desktop monitor. Without it, your page opens zoomed out to unreadable size. It is the single most consequential line in the head of the document.
 
-### `overflow-hidden` ? overflow-x: hidden on html or body
+**Who says so.** local-site-forge research/04-design-language.md
 
-*The floor — what makes a page look broken rather than cheap · confidence DEMONSTRATED*
+> ⚠ **undefined** — Its §3 'what reads as modern' list (bento, kinetic type, glassmorphism) is directional secondary-source consensus, and research/08 §4 later records that in 2026 'reads as 2026' and 'reads as AI-generated' are the same set. Where 04 and 08 conflict, 08 wins and the rule says so.
 
-**What it looks for.** `overflow-x: hidden` (or `overflow: hidden`) on `html` or `body`.
-
-**Why it matters.** This is almost always a patch over sideways scroll rather than a fix for it, and the patch has a cost that is easy to miss. research/08-craft.md §7.2 check 1 is specific: use `clip`, not `hidden`, because `hidden` CREATES A SCROLL CONTAINER. That breaks `position: sticky` on everything inside it, and it can trap keyboard focus — a visitor tabbing through the page reaches an element that is scrolled out of view inside a container nobody can scroll. `clip` cuts the overflow without making a scroll container.
-
-**The better move.** Use `overflow-x: clip` on BOTH html and body. Then find what was actually overflowing: `check_responsive` names the element and reports how many pixels past the edge it goes.
-
-**Who says so.** research/08-craft.md
-
-> ⚠ **research/08-craft.md** — The file is explicit that the TIERING ITSELF is asserted: the sweep found no study of what non-technical business owners notice. Treat the ordering as a testable hypothesis, not a finding.
-
-### `bare-fr-grid` ? A grid track that an image can push off the screen
+### `F-VIEWPORT-LOCKED` ?? Zooming disabled
 
 *The floor — what makes a page look broken rather than cheap · confidence DEMONSTRATED*
 
-**What it looks for.** A `grid-template-columns` containing a bare `1fr` track, on a project that contains <img> elements.
+**What it looks for.** `user-scalable=no`, `maximum-scale=1`, or a numeric `width=` in the viewport meta.
 
-**Why it matters.** research/08-craft.md §7.2 check 3 calls this "the sneakiest bug in the list" and it deserves the title. A bare `1fr` resolves to `minmax(auto, 1fr)`, and that `auto` minimum is the content's INTRINSIC width. Put a 1024px photograph in the track and the track now has a 1024px minimum, which pushes the layout off a 375px screen. It looks perfect on a desktop. It fails only on a phone, and only when an image is present, so it survives every casual test. One character fixes it.
+**Why it matters.** It takes zoom away from people who need it, which is an accessibility harm rather than a style choice, and it is a dated practice besides. A fixed width forces a desktop layout onto a phone.
 
-**The better move.** Write `minmax(0, 1fr)` instead of `1fr`. Same layout on desktop, and the track can now actually shrink.
+**The better move.** Use `width=device-width, initial-scale=1` and nothing else.
 
-**Who says so.** research/08-craft.md
+**What it teaches.** Pinch-to-zoom is how a lot of people read anything small, including most people over fifty. Turning it off removes their only workaround. There is no good reason to.
 
-> ⚠ **research/08-craft.md** — The file is explicit that the TIERING ITSELF is asserted: the sweep found no study of what non-technical business owners notice. Treat the ordering as a testable hypothesis, not a finding.
+**Who says so.** local-site-forge research/04-design-language.md · WCAG 2.1 / 2.2 AA
 
-### `input-font-size` ? A form field iOS will zoom into
+> ⚠ **undefined** — Its §3 'what reads as modern' list (bento, kinetic type, glassmorphism) is directional secondary-source consensus, and research/08 §4 later records that in 2026 'reads as 2026' and 'reads as AI-generated' are the same set. Where 04 and 08 conflict, 08 wins and the rule says so.
 
-*The floor — what makes a page look broken rather than cheap · confidence DEMONSTRATED*
-
-**What it looks for.** A font-size below 16px in a rule whose selector names input, select or textarea.
-
-**Why it matters.** Below 16px, iOS Safari zooms the page when the field takes focus. It does not zoom back out. So the visitor taps your contact field, the page jumps to 150%, they type their email address without being able to see the rest of the form, and then they are stranded at the wrong zoom for the remainder of the visit. research/08-craft.md §7.2 check 6 calls it a hard floor, not a suggestion, and gives the exact threshold — below 15px triggers it, so 16px is the safe number.
-
-**The better move.** Set `font-size: 16px` on input, select and textarea. If the design wants smaller fields, make the field shorter, not the text.
-
-**Who says so.** research/08-craft.md · Rauno Freiberg, Web Interface Guidelines
-
-> ⚠ **research/08-craft.md** — The file is explicit that the TIERING ITSELF is asserted: the sweep found no study of what non-technical business owners notice. Treat the ordering as a testable hypothesis, not a finding.
-
-### `tap-target` ? No minimum tap target on touch
+### `F-OVERFLOW-CLIP` ? No horizontal-overflow guard, or the wrong one
 
 *The floor — what makes a page look broken rather than cheap · confidence DEMONSTRATED*
 
-**What it looks for.** The project has buttons or links, and no `@media (pointer: coarse)` rule setting a min-height of 48px or more.
+**What it looks for.** `overflow-x: clip` absent from `html` or from `body`. `overflow-x: hidden` on either is reported as the wrong fix rather than as a missing one.
 
-**Why it matters.** Hallmark ships this as a gate and the CodeStitch practice agrees: 48px minimum on a coarse pointer. The number is not arbitrary — it is roughly the width of an adult fingertip, and below it a tap lands on whatever is next to the thing you aimed at. For a page whose primary action is a phone number or a contact link, a mis-tap is the visit ending.
+**Why it matters.** Two separate points. The guard catches sideways scroll, which reads as broken. And the choice between `clip` and `hidden` is not cosmetic: `hidden` creates a scroll container, which breaks `position: sticky` inside it and can trap keyboard focus. `clip` does not.
 
-**The better move.** Add `@media (pointer: coarse) { .btn, a.button, button { min-height: 48px; } }`. That is the whole fix.
+**The better move.** Add it to both. And treat it as a belt, not a solution — find the element that is actually too wide as well.
 
-**Who says so.** Hallmark (Hassan El Mghari / Nutlope) · Ryan / u/Citrous_Oyster, CodeStitch
+**What it teaches.** This stops the page sliding sideways when something on it is too wide. There are two ways to write it and only one is safe: `clip` simply cuts the overflow off, while `hidden` secretly turns the page into a scrolling box, which breaks anything that is supposed to stick to the top and can trap keyboard users.
 
-> ⚠ **Hallmark (Hassan El Mghari / Nutlope)** — Design opinion with a commercial context. Its CORE tells match Krebs’s independent empirical count, which is why the core is trusted here; its elaborate prescriptions (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever this kit uses them.
+**Who says so.** local-site-forge research/08-craft.md
 
-> ⚠ **Ryan / u/Citrous_Oyster, CodeStitch** — His revenue claims are self-reported with no ledger. And his accessibility advice contains an error nobody in the corpus corrected: he says contrast "should be at least 3:1", which is the LARGE-text threshold. WCAG AA requires 4.5:1 for body text. This kit follows WCAG, not him.
+> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
-### `full-viewport-hero` ? A hero the height of the screen
-
-*Tier 2 — felt rather than named, but decisive · confidence DEMONSTRATED*
-
-**What it looks for.** A height or min-height of 100vh (or 100dvh/100svh) on any element, and separately on a hero-named element.
-
-**Why it matters.** Two problems stacked. The aesthetic one: Hallmark auto-fails a 100vh hero with everything centred, and research/08-craft.md §5.2 says what it costs a local business — on a 375×667 phone the first screen should carry the name, what you do, where you are, and a tappable number; a full-height centred statement spends all of it on a slogan. The technical one is worse and is independent of taste: browser chrome makes 100vh TALLER than the visible viewport on a phone, so content at the bottom of a 100vh block is cut off. `dvh` helps and is not universally reliable.
-
-**The better move.** Let the hero be the height of its content. If it needs breathing room, use padding. research/08-craft.md adds one measured detail worth keeping: hero `padding-block-end` should be at least 1.3× `padding-block-start`, so the hero sits ON the page rather than floating in the middle of it.
-
-**Who says so.** Hallmark (Hassan El Mghari / Nutlope) · Adrian Krebs, "Design Slop" · research/08-craft.md
-
-> ⚠ **Hallmark (Hassan El Mghari / Nutlope)** — Design opinion with a commercial context. Its CORE tells match Krebs’s independent empirical count, which is why the core is trusted here; its elaborate prescriptions (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever this kit uses them.
-
-> ⚠ **Adrian Krebs, "Design Slop"** — Krebs self-reports a 5-10% false-positive rate. He is also honest against his own thesis — an HN commenter caught his own blog post wearing the cream/beige escape hatch he was documenting.
-
-> ⚠ **research/08-craft.md** — The file is explicit that the TIERING ITSELF is asserted: the sweep found no study of what non-technical business owners notice. Treat the ordering as a testable hypothesis, not a finding.
-
-### `fixed-width-box` ?? A box wider than a phone
-
-*Tier 1 — clocked in five seconds, no design vocabulary needed · confidence INFERENCE*
-
-**What it looks for.** A `width`, `min-width` or `flex-basis` declaration of 361px or more that is not inside a min-width media query. 360px is the narrowest common phone once you allow for a scrollbar.
-
-**Why it matters.** research/08-craft.md §4 Tier 1 puts "anything that scrolls sideways" at the top of the list, and gives the reason it outranks prettier problems: sideways scroll reads as BROKEN, not as cheap, and broken is worse. A hard pixel width above the viewport is the commonest cause. This particular check is INFERENCE, not a measurement: a static read of the stylesheet cannot know whether the box is inside a container that scrolls on purpose, so it can be wrong. `check_responsive` settles it by loading the page in a real browser and reading document.scrollWidth against window.innerWidth at six widths. Run that before you believe this one.
-
-**The better move.** Replace the fixed width with `max-width` plus `width: 100%`, so the box is at most that wide and shrinks below it. If the element genuinely must be that wide — a data table, a board diagram — put it in its own `overflow-x: auto` container so it scrolls inside its box instead of pushing the page.
-
-**Who says so.** research/08-craft.md · Hallmark (Hassan El Mghari / Nutlope)
-
-> ⚠ **research/08-craft.md** — The file is explicit that the TIERING ITSELF is asserted: the sweep found no study of what non-technical business owners notice. Treat the ordering as a testable hypothesis, not a finding.
-
-> ⚠ **Hallmark (Hassan El Mghari / Nutlope)** — Design opinion with a commercial context. Its CORE tells match Krebs’s independent empirical count, which is why the core is trusted here; its elaborate prescriptions (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever this kit uses them.
-
-### `layout-table` ? A table used for layout
+### `F-BARE-1FR` ? Grid tracks written as bare 1fr
 
 *The floor — what makes a page look broken rather than cheap · confidence DEMONSTRATED*
 
-**What it looks for.** A <table> with no <th>, <thead>, <tfoot>, <caption>, scope, headers or abbr anywhere inside it — PowerMapper's heuristic for telling a layout table from a data table.
+**What it looks for.** A `fr` track in `grid-template-columns` or `grid-auto-columns` not wrapped in `minmax(0, ...)`. `repeat(n, 1fr)` counts.
 
-**Why it matters.** research/04-design-language.md lists this among its Tier 1 technical-age signals, with the detection rule quoted above. A table with no header structure is not describing data, it is positioning boxes — a 2004 technique that the HTML specification now expressly forbids. A screen reader announces it as a table and then reads the layout aloud, cell by cell.
+**Why it matters.** The corpus calls this the sneakiest bug in its list, and it is right. Bare `1fr` means `minmax(auto, 1fr)`, and that `auto` minimum is the content's intrinsic width — for an image, its natural pixel width. A 1024px photo forces a 1024px minimum track and pushes the layout off a 375px screen. It looks perfect on a desktop, fails only on a phone, and only when an image is present, so it survives casual testing. One character fixes it.
 
-**The better move.** Use CSS grid or flexbox for layout. Keep tables for data, and when you do, give them a <caption> and <th scope="…"> headers.
+**The better move.** Wrap every fr track.
 
-**Who says so.** research/04-design-language.md
+**What it teaches.** Grid columns written as `1fr` promise to share space equally, but they quietly refuse to shrink below the natural width of whatever is inside them. Put a photo in one and the column refuses to go below the photo's real size, and your layout falls off the side of the phone. Writing `minmax(0, 1fr)` says the column really may shrink.
 
-### `stale-copyright` ? An out-of-date year in the footer
+**Who says so.** local-site-forge research/08-craft.md
 
-*The floor — what makes a page look broken rather than cheap · confidence MEASURED*
+> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
-**What it looks for.** A four-digit year in a copyright line that is earlier than the current year, with no later year beside it.
+### `F-INPUT-16PX` ?? Form input text below 16px
 
-**Why it matters.** research/04-design-language.md lists this first among dated signals and calls it "the single cheapest, most legible signal" — free to check and devastating when someone points at it. A stale year does not say the site is old. It says nobody has looked at it since, which for a teaching practice is the same as saying nobody is home.
+*The floor — what makes a page look broken rather than cheap · confidence DEMONSTRATED*
 
-**The better move.** Write the year once, from the machine, rather than typing it: `<script>document.querySelector("#year").textContent = new Date().getFullYear()</script>` with a `<span id="year">` fallback holding the current year in the markup so it is correct even with JavaScript off. Or simply drop the year — a copyright notice is valid without one.
+**What it looks for.** `font-size` below 16px on an input, select or textarea selector.
 
-**Who says so.** research/04-design-language.md
+**Why it matters.** Below 15px, iOS zooms the page when the field receives focus, and it does not zoom back out. It is a hard floor, not a suggestion.
+
+**The better move.** Set inputs to 16px or larger. If the design needs smaller-looking fields, reduce the padding rather than the text.
+
+**What it teaches.** If text inside a form field is smaller than 16 pixels, iPhones zoom in the moment someone taps it, and they do not zoom back out. The visitor is now looking at a page that is too big for the screen and has to fix it themselves.
+
+**Who says so.** local-site-forge research/08-craft.md · Rauno Freiberg — design engineer at Vercel; Web Interface Guidelines
+
+> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+
+> ⚠ **undefined** — He says himself: 'This essay is not a tutorial nor a collection of guidelines.'
+
+### `F-TAP-TARGET` ? No minimum tap target on touch devices
+
+*The floor — what makes a page look broken rather than cheap · confidence DEMONSTRATED*
+
+**What it looks for.** No rule inside `@media (pointer: coarse)` setting `min-height` of 48px or more on an interactive selector.
+
+**Why it matters.** A finger is not a mouse pointer. 48px is the practitioner floor and it costs two lines. On a page whose entire purpose is that someone taps the call button, the call button has to be tappable.
+
+**The better move.** Two lines.
+
+**What it teaches.** Buttons that are comfortable to click with a mouse are often too small to hit with a thumb, especially for older hands. Setting a minimum height that only applies on touch screens fixes it without changing the desktop design at all.
+
+**Who says so.** local-site-forge research/08-craft.md · WCAG 2.1 / 2.2 AA
+
+> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+
+### `T2-HERO-100VH` ? The full-screen centred hero
+
+*Tier 2 — felt rather than named, but decisive · confidence ASSERTED*
+
+**What it looks for.** `height: 100vh` or `min-height: 100vh` on a hero-like selector. `dvh` and `svh` are reported at lower severity — they help but are not universally reliable.
+
+**Why it matters.** Two separate problems. Aesthetically it is a named auto-fail: a 100vh hero with everything centred, or any hero where the label, headline, lede and button share one centred axis. Structurally, `100vh` on a phone is its own bug — browser chrome makes 100vh taller than the visible area, so content gets cut off. And a full-screen statement wastes the entire first screen on a page whose job is to show a business name, a trade, a neighbourhood and a tappable number.
+
+**The better move.** Let the hero be the height of its content. If it needs breathing room, use asymmetric padding — bottom at least 1.3 times the top.
+
+**What it teaches.** Making the first screen exactly as tall as the window sounds tidy, but phones lie about how tall the window is — the address bar moves — so content gets clipped. Letting the section be as tall as what is in it always works, and gets the useful information higher up the page.
+
+**Who says so.** Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents · local-site-forge research/08-craft.md
+
+> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
+
+> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+
+### `T1-HSCROLL` ?? The page scrolls sideways
+
+*Tier 1 — clocked in five seconds, no design vocabulary needed · confidence DEMONSTRATED*
+
+**What it looks for.** `document.scrollWidth` exceeds `window.innerWidth` by more than 1 CSS pixel at any of 320 / 375 / 414 / 768 / 1024 / 1440 / 1920.
+
+**Why it matters.** It reads as BROKEN, not as cheap, which is worse. And it is measurable rather than arguable: compare `document.scrollWidth` against `window.innerWidth` at each width.
+
+**The better move.** First find the element that is too wide — it is usually an image without `max-width`, a grid track that is `1fr` instead of `minmax(0, 1fr)` (see F-BARE-1FR), or a long unbroken word. Then set `overflow-x: clip` on both `html` and `body` as a belt — `clip`, never `hidden`.
+
+**What it teaches.** A page should only ever scroll up and down. If it also slides sideways, something on it is wider than the phone, and to anyone looking it simply looks broken. This one is measured rather than judged: the tool compares how wide the page is against how wide the screen is, at seven widths.
+
+**Who says so.** Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents · chess-tee-forge storefront — DESIGN-SYSTEM.md and store/
+
+> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
+
+> ⚠ **undefined** — Its own font delivery links fonts.googleapis.com, which research/11 §5.4 rejects. Take the honesty rules; do not take the font route.
+
+### `T1-BUTTON-WRAP` ?? A button label wrapping to two lines
+
+*Tier 1 — clocked in five seconds, no design vocabulary needed · confidence DEMONSTRATED*
+
+**What it looks for.** Any element matching `button, [role=button], a[class*=btn]` whose text node occupies more than one client rect at 320 / 375 / 414 / 768.
+
+**Why it matters.** Same family as sideways scroll: it reads as a fault rather than as a style. And the primary call-to-action is the one element on a local business page that has to survive every width, because tapping it is the entire point.
+
+**The better move.** Shorten the label first. `white-space: nowrap` is the second choice, not the first — it hides the problem rather than solving it, and can then push the button off the screen.
+
+**What it teaches.** If the words inside a button spill onto a second line, the button stops looking like a button. Shorten the words. 'Call us' beats 'Get in touch with our team today' on a phone, and it is also the truer instruction.
+
+**Who says so.** Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents
+
+> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
+
+### `A-IMG-ALT` ?? An image with no alt attribute
+
+*The floor — what makes a page look broken rather than cheap · confidence DEMONSTRATED*
+
+**What it looks for.** Any `<img>` with no `alt` attribute. `alt=""` passes and is the correct value for a purely decorative image.
+
+**Why it matters.** `alt` is mandatory. A missing attribute makes a screen reader announce the filename; an empty one correctly says nothing, which is right for decoration. The two are different and the difference matters.
+
+**The better move.** Write what the image shows, in a sentence. If it shows nothing a reader needs, write `alt=""` deliberately.
+
+**What it teaches.** Every image needs an alt attribute — a short description for people who cannot see it. If the image is purely decorative, give it an empty one on purpose: that tells the screen reader to skip it. Leaving the attribute off entirely makes it read out the filename instead.
+
+**Who says so.** local-site-forge research/08-craft.md · WCAG 2.1 / 2.2 AA
+
+> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+
+### `W-STALE-COPYRIGHT` ? An out-of-date copyright year
+
+*Tier 3 — copy, which for a teaching practice may matter most of all · confidence DEMONSTRATED*
+
+**What it looks for.** A copyright year earlier than the current year. A year RANGE ending in the current year passes.
+
+**Why it matters.** Named in the corpus as the single cheapest, most legible signal that a site is abandoned. It costs nothing to check and nothing to fix, and it is the first thing a suspicious visitor looks at.
+
+**The better move.** Render the year from the build date rather than typing it. One line at build time and it can never go stale.
+
+**What it teaches.** A copyright line with last year's date is the clearest possible sign that nobody has touched the site since. Generate the year rather than typing it, so it can never be wrong.
+
+**Who says so.** local-site-forge research/04-design-language.md
+
+> ⚠ **undefined** — Its §3 'what reads as modern' list (bento, kinetic type, glassmorphism) is directional secondary-source consensus, and research/08 §4 later records that in 2026 'reads as 2026' and 'reads as AI-generated' are the same set. Where 04 and 08 conflict, 08 wins and the rule says so.
 
 ---
 
@@ -199,117 +241,183 @@ Every palette on every page was either derived from something real or picked off
 - Run palette_from_image on that photograph. It quantises the image and hands back real values plus a contrast matrix.
 - Pass those colours to init_site. Now the page is the colour of the thing it is about, and you can say so out loud to anyone who asks.
 
-**The rules that carry this** — 7 of them:
+**The rules that carry this** — 10 of them:
 
-### `indigo-accent` ?? The indigo nobody chose
-
-*Tier 1 — clocked in five seconds, no design vocabulary needed · confidence DEMONSTRATED*
-
-**What it looks for.** Any of ten exact Tailwind hexes — #6366f1 #818cf8 #4f46e5 #4338ca #3730a3 #8b5cf6 #7c3aed #6d28d9 #a78bfa #5b21b6 — in any colour form: hex, rgb(), hsl() or oklch() resolving to the same pixel.
-
-**Why it matters.** These ten values are the default accent of every generator that ships with Tailwind installed. Krebs scored 1,590 Show HN landing pages and this was the single most common signature; his designers had a name for it before anyone measured it — "VibeCode Purple". Three independent sources agree, which is rare in this corpus and is why the rule is DEMONSTRATED rather than asserted. The colour is not ugly. The problem is that it was not chosen: it is what you get when nobody made a decision, and a viewer who has seen three of these pages this month reads it as exactly that.
-
-**The better move.** Derive the accent from something real about the subject — the colour of a board, a jacket, a sign, a room. research/08-craft.md §4 calls this simultaneously the anti-slop fix and the most persuasive thing on the page, "because it proves you looked". Use palette_from_image on a photograph, or palette_from_subject if there is no photograph yet. Both refuse to return these ten.
-
-**Also worth knowing.** The detector matches on the pixel, not the spelling, so rewriting #6366f1 as rgb(99 102 241) does not get past it. That is deliberate: the aim is not to make you hide the colour, it is to make you pick a different one.
-
-**Who says so.** Gesso Build, @gessobuild/anti-slop · Adrian Krebs, "Design Slop" · Hallmark (Hassan El Mghari / Nutlope)
-
-> ⚠ **Adrian Krebs, "Design Slop"** — Krebs self-reports a 5-10% false-positive rate. He is also honest against his own thesis — an HN commenter caught his own blog post wearing the cream/beige escape hatch he was documenting.
-
-> ⚠ **Hallmark (Hassan El Mghari / Nutlope)** — Design opinion with a commercial context. Its CORE tells match Krebs’s independent empirical count, which is why the core is trusted here; its elaborate prescriptions (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever this kit uses them.
-
-### `three-stop-gradient` ?? A gradient with a third colour in it
+### `T1-INDIGO-HEX` ?? The indigo nobody chose
 
 *Tier 1 — clocked in five seconds, no design vocabulary needed · confidence DEMONSTRATED*
 
-**What it looks for.** Any linear-, radial- or conic-gradient whose argument list contains three or more colour stops.
+**What it looks for.** Any of those ten hex values appearing anywhere in the CSS or markup. Exact match, case-insensitive, 3- and 6-digit forms.
 
-**Why it matters.** research/08-craft.md bans all three-stop gradients in one phrase: "the third stop is vanity". Two stops is a direction — light to dark, warm to cool, a surface catching light. A third stop is a decision nobody needed to make, and it is the decision a model makes when it has no reason to stop. research/08-craft.md §6.4 sets the hard rule: two stops maximum.
+**Why it matters.** Nobody picked this colour. It is what you get when you do not pick one. Krebs's designers named it 'VibeCode Purple' after counting it across 1,590 landing pages; three independent sources flag the same ten values. It is the single fastest way to tell a viewer that a machine chose the palette.
 
-**The better move.** Delete the middle stop. If the gradient then looks flat, the problem was never the number of stops — it is that the two ends are too close together in lightness. Push them apart instead of adding a third.
+**The better move.** Derive the accent from something real about the business — the awning, the van, the sign, the tile, the product. Failing that, pick any hue outside 255-305 degrees and commit to it. The fix is not 'a different purple'.
 
-**Who says so.** Gesso Build, @gessobuild/anti-slop · research/08-craft.md
+**What it teaches.** Purple-blue is the colour a design tool gives you when you never chose one, so it now reads as 'nobody was here'. Pick your colour from something that physically exists in the business — a photo of the shopfront will hand it to you. That one move is both the fix for this and the most persuasive thing on the page, because it proves you looked.
 
-> ⚠ **research/08-craft.md** — The file is explicit that the TIERING ITSELF is asserted: the sweep found no study of what non-technical business owners notice. Treat the ordering as a testable hypothesis, not a finding.
+**Who says so.** Gesso Build — @gessobuild/anti-slop · Adrian Krebs — Design Slop · Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents
 
-### `banned-gradient-pair` ?? The gradient everyone else is using
+> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
+
+> ⚠ **undefined** — An HN commenter caught his own blog post wearing the cream/warm-oat trap. The study is sound; the author is not outside the trend he measured.
+
+> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
+
+### `T1-INDIGO-NEAR` ? An indigo that dodged the list
+
+*Tier 1 — clocked in five seconds, no design vocabulary needed · confidence MEASURED_HERE*
+
+**What it looks for.** A hex whose OKLCH hue is 255-305 degrees, chroma >= 0.09, lightness 0.30-0.80, used as an accent (assigned to a custom property matching /accent|brand|primary/, or used as a background/border/fill on an interactive element). Greys are excluded by the chroma floor.
+
+**Why it matters.** A hex allowlist is trivially evaded by nudging one digit, and a generator nudges digits constantly. The viewer does not see hex codes; they see purple. Detecting the colour rather than the string is the difference between a rule and a lookup table.
+
+**The better move.** Same as T1-INDIGO-HEX. If the violet is a deliberate brand decision made by a human with a reason, record it and silence this rule for the project — but write the reason down, because 'it looked nice' is what the generator would have said.
+
+**What it teaches.** Colours can be compared by how they LOOK rather than by how they are spelled. This check converts every colour on your page into a form where 'how purple is it' is a number, then flags anything sitting where the tell-tale purples sit. It catches the near-misses a fixed list of colours would wave through.
+
+**Who says so.** Measured in this rulebook, 2026-09-17
+
+> ⚠ **undefined** — Thirteen pages from one generator across two verticals (tax/accounting and law) is a narrow sample. A threshold calibrated only against it is calibrated against one failure mode.
+
+### `T1-GRADIENT-3STOP` ?? The third gradient stop
 
 *Tier 1 — clocked in five seconds, no design vocabulary needed · confidence DEMONSTRATED*
 
-**What it looks for.** A two-stop gradient whose ends fall in one of three named hue pairs: purple→cyan, purple→blue, orange→pink. Hue read in OKLCH.
+**What it looks for.** Any gradient function whose argument list contains 3 or more colour stops, counting a bare colour or a colour with a position as one stop. Direction keywords, `in oklch` interpolation hints and `transparent` endpoints are not counted as stops.
 
-**Why it matters.** These three pairs are banned outright by Gesso and were counted by Krebs across 1,590 pages. They are not bad colour combinations in the abstract; they are the three that the generation of tools that produced most of the web's landing pages in 2025 and 2026 reached for by default. Using one is not a taste failure, it is a fingerprint.
+**Why it matters.** Two stops is a transition. Three is a decision to be interesting, and it is the decision a generator makes because more stops look like more effort. The corpus's phrasing is exact: the third stop is vanity.
 
-**The better move.** If the gradient is doing real work — a scrim over a photograph, a surface catching light — keep the gradient and change the hues so both stops sit near the subject's own anchor hue, one lighter and one darker. If it is decoration, delete it: a flat ground with a considered colour reads more expensive than a gradient.
+**The better move.** Cut to two stops, or replace the gradient with a flat colour. If you need depth, layer two very close off-whites rather than sweeping through three hues.
 
-**Who says so.** Gesso Build, @gessobuild/anti-slop · Adrian Krebs, "Design Slop"
+**What it teaches.** A gradient blends one colour into another. Adding a third colour rarely adds meaning — it adds decoration, and decoration is the thing that reads as filler. Two colours, or none.
 
-> ⚠ **Adrian Krebs, "Design Slop"** — Krebs self-reports a 5-10% false-positive rate. He is also honest against his own thesis — an HN commenter caught his own blog post wearing the cream/beige escape hatch he was documenting.
+**Who says so.** Gesso Build — @gessobuild/anti-slop · local-site-forge research/08-craft.md
 
-### `gradient-text` !? A gradient poured into the headline
+> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
 
-*The trap tier — reads as sophisticated today, will read as generated soon · confidence DEMONSTRATED*
+> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
-**What it looks for.** `background-clip: text` or `-webkit-background-clip: text` combined with a transparent text colour.
+### `T1-GRADIENT-CLICHE` ?? The three cliché gradient pairs
 
-**Why it matters.** Gesso ships `gradient-text`; the impeccable craft floor refuses it in four words — "Gradient text. Emphasis comes from weight or size." It is the most legible single marker of the 2023-2026 generated-landing-page house style. It also costs real legibility: the lighter end of the gradient always has less contrast against the page than the darker end, so part of every headline fails a contrast check even when the average passes.
+*Tier 1 — clocked in five seconds, no design vocabulary needed · confidence DEMONSTRATED*
 
-**The better move.** Set the headline in one colour and get the emphasis from weight, size, or the space around it.
+**What it looks for.** A two-or-more stop gradient whose first and last stops fall in one of the three named hue pairs, either direction, with both stops at chroma >= 0.07.
 
-**Who says so.** Gesso Build, @gessobuild/anti-slop · impeccable 4.3.1, craft-floor.md
+**Why it matters.** These three pairs are named outright in the corpus as banned. Purple-to-blue on the diagonal is called the universal generated-site signature; it is what every AI image header and every default hero glow has used since 2023.
 
-> ⚠ **impeccable 4.3.1, craft-floor.md** — It runs as an editor hook inside Claude Code, Codex, Cursor and Copilot, not as an MCP server. Where a rule here overlaps, this kit says so and credits it rather than claiming the ground.
+**The better move.** Pull both stops from one hue family and vary only lightness, or use a flat colour. If the gradient is carrying meaning, it is probably a chart and belongs in a chart.
 
-### `pure-black-white` ? Pure black, pure white, and greys with no colour in them
+**What it teaches.** Three specific colour pairings have been used so heavily by AI image and site generators that they now read as a watermark. Purple into blue is the worst of them. If you want a gradient, keep both ends in the same colour family and change only how light they are.
+
+**Who says so.** Gesso Build — @gessobuild/anti-slop · local-site-forge research/11-reference-tier.md
+
+> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
+
+> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
+
+### `T1-GRADIENT-TEXT` ?? Gradient text
+
+*Tier 1 — clocked in five seconds, no design vocabulary needed · confidence DEMONSTRATED*
+
+**What it looks for.** Any `background-clip: text` or `-webkit-background-clip: text` declaration.
+
+**Why it matters.** Two independent sources ban it outright: Gesso as a detector rule, impeccable as a flat refusal. Emphasis in typography comes from weight and size. A gradient headline also breaks text selection, fails to inherit a readable colour when the background fails to paint, and is invisible to a high-contrast mode user.
+
+**The better move.** Delete the gradient and the clip. If the headline needs more presence, raise its size or its weight — but see TY-DISPLAY-WEIGHT before reaching for weight.
+
+**What it teaches.** Filling letters with a colour fade is one of the most copied effects on the web and it does not make a headline say more. It also breaks in ordinary ways: you cannot select the text cleanly, and readers who need high contrast lose it entirely. Size and weight are the honest controls.
+
+**Who says so.** Gesso Build — @gessobuild/anti-slop · impeccable 4.3.1 — design skill and PostToolUse detector hook
+
+> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
+
+> ⚠ **undefined** — Its detector is a compiled binary, so its exact thresholds were not readable. Rules credited here are transcribed from the craft floor's prose, which states bans and defaults without numbers. Where this rulebook attaches a number to an impeccable ban, the number comes from Gesso or from measurement here, and says so.
+
+### `T2-PURE-BW` ? Pure black on pure white
+
+*Tier 2 — felt rather than named, but decisive · confidence MEASURED_HERE*
+
+**What it looks for.** `#000`/`#000000` as a colour, or `#fff`/`#ffffff` as a background or page ground. Pure white as the label colour ON a saturated button is a separate, milder case and is reported at lower severity.
+
+**Why it matters.** This is the most counted rule in the corpus and one of the least visible to a non-designer, which is exactly why it is safe to apply: it raises perceived quality without ever registering as expense. Twelve of thirteen measured reference sites avoid both. Legora runs #0D1016 on #ECECE7; Anthropic #141413 on #F0EEE6; a single bakery in San Francisco on a hosted theme with no design budget runs #4A494A on #F7F1EE.
+
+**The better move.** Move both ends a step inward and give each a trace of the page's hue. Off-black around OKLCH lightness 0.16-0.22, off-white around 0.96-0.98, both carrying 0.005-0.015 chroma of the anchor hue.
+
+**What it teaches.** Pure black text on pure white is harsher than anything you see on paper, and almost every well-made site quietly avoids it. Nudging both ends slightly — a very dark brown-grey, a very slightly warm white — is invisible to the reader and makes the whole page feel considered. It costs two values.
+
+**Who says so.** local-site-forge research/11-reference-tier.md · Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents
+
+> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
+
+> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
+
+### `T2-ZERO-CHROMA-GREY` ? Greys with no colour in them at all
 
 *Tier 2 — felt rather than named, but decisive · confidence ASSERTED*
 
-**What it looks for.** A colour used as a page ground or as body ink that is exactly #000 or #fff, or any neutral whose OKLCH chroma is below 0.005. The corpus band is 0.005-0.015 chroma of the anchor hue; the floor is 0.005 and it is never 0.
+**What it looks for.** A colour used as a neutral (chroma < 0.04) whose chroma is below 0.005. Chroma between 0.015 and 0.04 is reported as `info` — over-tinted rather than untinted.
 
-**Why it matters.** Hallmark's colour guidance gives the band, and research/08-craft.md §6.4 quotes the sentence that explains why it matters: "A page with a warm accent and cool grey body copy looks wrong and most people can't name why." That is the whole mechanism. Nobody sees the chroma. Everybody sees that the page does not hang together. Pure white is also a physical claim no real surface makes — paper, board, cloth all carry a cast, and a page that does not is why screens feel like screens. The reference storefront made this concrete: its page is bone #F3EDE1, not white, because the ink it prints with is bone, and its type colour is the garment colour.
+**Why it matters.** A page with a warm accent and cool grey body copy looks wrong and most people cannot name why. Every neutral should carry a trace of the page's anchor hue. This is confirmed by a production number rather than asserted: Oxide's page ground is `oklch(0.162 0.01 260)` — chroma 0.01, deliberately not 0.
 
-**The better move.** Pick the anchor hue first — from a photograph, or from palette_from_subject. Then build every neutral at that hue with chroma between 0.005 and 0.015: paper at OKLCH L 0.96-0.98, ink at L 0.16-0.22. The difference is invisible one colour at a time and obvious across a page. This rule is tagged ASSERTED: it is Hallmark's design opinion, corroborated by practice but not by a study.
+**The better move.** Rebuild the neutral ramp in OKLCH from the accent's hue, at chroma 0.005-0.015, then emit hex. Do not ship `oklch()` literals to an unknown phone — see C-OKLCH-LITERAL.
 
-**Who says so.** Hallmark (Hassan El Mghari / Nutlope) · research/08-craft.md · chess-tee-forge/store, DESIGN-SYSTEM.md
+**What it teaches.** Grey does not have to be colourless. Adding a tiny amount of your main colour into every grey — so little that nobody could name it — makes the greys belong to the page instead of sitting on top of it. Pure grey next to a warm colour is the mismatch people feel and cannot explain.
 
-> ⚠ **Hallmark (Hassan El Mghari / Nutlope)** — Design opinion with a commercial context. Its CORE tells match Krebs’s independent empirical count, which is why the core is trusted here; its elaborate prescriptions (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever this kit uses them.
+**Who says so.** Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents · local-site-forge research/11-reference-tier.md
 
-> ⚠ **research/08-craft.md** — The file is explicit that the TIERING ITSELF is asserted: the sweep found no study of what non-technical business owners notice. Treat the ordering as a testable hypothesis, not a finding.
+> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
 
-> ⚠ **chess-tee-forge/store, DESIGN-SYSTEM.md** — Two of its rules are here because that project shipped the bug first. It advertised one price and charged another, from a second copy of the figure. And it set a name under a quotation, which is an attribution even with no "said" and no dash.
+> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
 
-### `contrast` ? Text too close in lightness to what is behind it
-
-*The floor — what makes a page look broken rather than cheap · confidence MEASURED*
-
-**What it looks for.** WCAG 2.2 1.4.3: 4.5:1 for body text, 3:1 for large text (>=24px, or >=18.66px bold). Computed from the resolved colours in each rule, falling back to the page ground where a rule sets a colour and no background.
-
-**Why it matters.** This is the one rule here with a legal standard behind it rather than a practitioner opinion, and the corpus contains a correction worth knowing: CodeStitch's own accessibility advice says contrast "should be at least 3:1", and that is wrong for body text. 3:1 is the LARGE-text threshold. Emitting 3:1 body text fails an audit. research/08-craft.md §6.4 adds the reason to bias higher still, which is about where the page is actually read: a phone screen in daylight. "Low-contrast tinted greys that look refined indoors vanish outdoors." A page reviewed on a bright laptop in a dim room is being reviewed under the best possible conditions, which are not the conditions it will be read in.
-
-**The better move.** Darken the text or lighten the ground until the ratio clears 4.5:1. Keep the hue — move the lightness. In OKLCH that is one number, and it is why the palette tools in this kit return a full contrast matrix rather than a list of colours: a pair that fails should be impossible to choose by accident.
-
-**Who says so.** WCAG 2.2, success criterion 1.4.3 · research/08-craft.md · Ryan / u/Citrous_Oyster, CodeStitch · impeccable 4.3.1, craft-floor.md
-
-> ⚠ **research/08-craft.md** — The file is explicit that the TIERING ITSELF is asserted: the sweep found no study of what non-technical business owners notice. Treat the ordering as a testable hypothesis, not a finding.
-
-> ⚠ **Ryan / u/Citrous_Oyster, CodeStitch** — His revenue claims are self-reported with no ledger. And his accessibility advice contains an error nobody in the corpus corrected: he says contrast "should be at least 3:1", which is the LARGE-text threshold. WCAG AA requires 4.5:1 for body text. This kit follows WCAG, not him.
-
-> ⚠ **impeccable 4.3.1, craft-floor.md** — It runs as an editor hook inside Claude Code, Codex, Cursor and Copilot, not as an MCP server. Where a rule here overlaps, this kit says so and credits it rather than claiming the ground.
-
-### `three-state-theme` ? A colour that only exists in one theme
+### `A-CONTRAST-BODY` ?? Body text below 4.5:1 contrast
 
 *The floor — what makes a page look broken rather than cheap · confidence DEMONSTRATED*
 
-**What it looks for.** A custom property whose only definition sits inside `@media (prefers-color-scheme: dark)` or `[data-theme="dark"]`, with no value in a bare `:root`. Also fires when a dark media block is not guarded as `:root:not([data-theme="light"])` while a manual toggle exists, and when the two dark states disagree about which tokens they set.
+**What it looks for.** Computed WCAG 2.1 contrast ratio below 4.5:1 for text under 24px (or under 18.66px bold), against its resolved background. Computed for every token pair the stylesheet declares, in light mode and dark mode separately.
 
-**Why it matters.** There are three theme states, not two. An explicit choice stamps `data-theme`; the default setting stamps nothing at all, and only `prefers-color-scheme` separates light from dark. So a colour defined only inside the dark media query does not exist for a visitor whose machine is set to light — which is most of them. The page renders with the property's fallback, or with nothing, which on a text colour means invisible text. The reason this bug ships so reliably is that it is invisible to anyone developing on a dark-mode Mac. The pattern that closes it: the complete light palette on bare `:root`; the dark overrides under `@media (prefers-color-scheme: dark)` guarded as `:root:not([data-theme="light"])` so an explicit light choice wins; and the same overrides again under `:root[data-theme="dark"]` so the toggle wins in both directions.
+**Why it matters.** This is the standard, and the corpus records a practitioner in this exact market getting it wrong: he says contrast should be at least 3:1. WCAG AA requires 4.5:1 for normal-size body text — 3:1 covers only large text (24px and up, or 18.66px bold) and non-text interface elements. Do not copy that number. And there is a viewing-condition argument on top of the standard: the real reading environment is a phone screen in daylight on a sidewalk. Low-contrast tinted greys that look refined indoors vanish outdoors.
 
-**The better move.** Define every token in bare `:root` first. Then redefine only what changes, in both dark blocks. And give `body` an explicit background from a token — a transparent body borrows whatever the host is painting behind it.
+**The better move.** Darken the text or lighten the ground until it passes. On a coloured surface, tint the secondary text from that surface's hue or from the foreground colour — never with a plain grey.
 
-**Who says so.** chess-tee-forge/store, DESIGN-SYSTEM.md
+**What it teaches.** Contrast is the measured difference in brightness between text and its background, and there is a legal-grade standard for it: ordinary text needs a ratio of at least 4.5 to 1. Be careful of advice saying 3 to 1 is enough — that only applies to large headings. And remember the real reading conditions: a phone held outside in sunlight, by someone in their fifties.
 
-> ⚠ **chess-tee-forge/store, DESIGN-SYSTEM.md** — Two of its rules are here because that project shipped the bug first. It advertised one price and charged another, from a second copy of the figure. And it set a name under a quotation, which is an attribution even with no "said" and no dash.
+**Who says so.** WCAG 2.1 / 2.2 AA · local-site-forge research/08-craft.md · impeccable 4.3.1 — design skill and PostToolUse detector hook
+
+> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+
+> ⚠ **undefined** — Its detector is a compiled binary, so its exact thresholds were not readable. Rules credited here are transcribed from the craft floor's prose, which states bans and defaults without numbers. Where this rulebook attaches a number to an impeccable ban, the number comes from Gesso or from measurement here, and says so.
+
+### `C-THEME-CONTRACT` ? The three-state theme pattern not followed
+
+*Craft — the details that separate considered from competent · confidence DEMONSTRATED*
+
+**What it looks for.** Any of the three states missing; or a custom property whose ONLY definition is inside a media query or an attribute selector; or a `prefers-color-scheme: dark` block not guarded with `:root:not([data-theme="light"])`.
+
+**Why it matters.** There are three states, not two: explicit light, explicit dark, and the default of following the system. Getting the guard wrong means a visitor who has explicitly chosen light mode still gets a dark page when their phone is dark. Defining a colour ONLY inside a media query means it is undefined for everyone else.
+
+**The better move.** Define the complete light palette on bare `:root`. Redefine only the tokens that change inside the guarded media query. Redefine them a third time under the explicit dark attribute so a toggle wins in both directions. Give `body` an explicit background token — a transparent body borrows whatever is behind it.
+
+**What it teaches.** There are three situations, not two: the visitor has chosen light, has chosen dark, or has chosen nothing and is following their phone. Handling only two of them means one group of people gets the wrong page. Write the light colours plainly first, then override them twice — once for the system setting, once for an explicit choice.
+
+**Who says so.** chess-tee-forge storefront — DESIGN-SYSTEM.md and store/
+
+> ⚠ **undefined** — Its own font delivery links fonts.googleapis.com, which research/11 §5.4 rejects. Take the honesty rules; do not take the font route.
+
+### `C-OKLCH-LITERAL` ?! oklch() shipped without a hex fallback
+
+*Craft — the details that separate considered from competent · confidence ASSERTED*
+
+**What it looks for.** An `oklch()`, `oklab()`, `lch()` or `lab()` value with no hex or rgb declaration of the same property immediately preceding it in the same rule.
+
+**Why it matters.** An unparseable colour causes the browser to DROP the declaration entirely, and on a bad in-app web view that can mean invisible text. The corpus's instruction is precise and worth following exactly: author in OKLCH, emit hex. Compute at generation time.
+
+**The better move.** Compute the hex at build time and emit that. Keep the OKLCH value in a comment so the intent survives.
+
+**What it teaches.** Newer ways of writing colours are easier to reason about but not every phone browser understands them, and when a browser does not understand a colour it ignores that line completely — which can leave text with no colour at all. Work in the new format while designing and write out the old format in the file.
+
+**Who says so.** local-site-forge research/08-craft.md
+
+> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
 ---
 
@@ -324,75 +432,129 @@ This is the largest single improvement available and it costs nothing. Measured 
 - Take body text UP to 19px. GOV.UK serves the least technical audience of any digital product in English and has tested this harder than any agency will.
 - Cap every paragraph at 60 to 70 characters wide.
 
-**The rules that carry this** — 4 of them:
+**The rules that carry this** — 7 of them:
 
-### `single-font-page` ? One font doing every job
-
-*Tier 2 — felt rather than named, but decisive · confidence ASSERTED*
-
-**What it looks for.** Fewer than two distinct font-family stacks across the whole project, counting the generic fallbacks as one family. Also fires on a named overused face used as the display voice.
-
-**Why it matters.** Gesso ships `single-font-page` and `overused-font-stack`; Krebs counted the faces. research/08-craft.md quotes it in four words: "A one-font page is a template page." A page needs at least a display voice and a reading voice, because they do different work — a headline is seen, body text is read, and the shapes that suit one are wrong for the other. research/08-craft.md §6.1 is honest about the trap underneath this, and it is worth knowing before you fix it: under a no-external-requests constraint the obvious answer is a system stack, but on Android `system-ui` resolves to Roboto, and Roboto is on the banned list. So the constraint-satisfying answer lands on a named tell for exactly the device most visitors use. The escape is to inline one subsetted display face — the sweep measured a single face at about 43 KB, which is 66 ms on a 5 Mbps connection.
-
-**The better move.** Pair a display face with a reading face. If you cannot carry a web font, pair two DIFFERENT system stacks — a serif for display (Iowan Old Style, Palatino, Georgia) against the system sans for body — which is still two voices and avoids the one-font signature. If you can carry one font, carry the display face and let body text use the system stack: research/08-craft.md §6.2 says that buys most of the visual difference for about 43 KB.
-
-**Who says so.** Gesso Build, @gessobuild/anti-slop · Adrian Krebs, "Design Slop" · research/08-craft.md
-
-> ⚠ **Adrian Krebs, "Design Slop"** — Krebs self-reports a 5-10% false-positive rate. He is also honest against his own thesis — an HN commenter caught his own blog post wearing the cream/beige escape hatch he was documenting.
-
-> ⚠ **research/08-craft.md** — The file is explicit that the TIERING ITSELF is asserted: the sweep found no study of what non-technical business owners notice. Treat the ordering as a testable hypothesis, not a finding.
-
-### `hero-kicker` ? The little label above the headline
+### `T2-SINGLE-FONT` ? One typeface doing every job
 
 *Tier 2 — felt rather than named, but decisive · confidence DEMONSTRATED*
 
-**What it looks for.** The element immediately preceding the primary <h1> among its siblings, when it is 60 characters or fewer AND 9 words or fewer AND is not itself a heading AND contains no link, list, nav or button. Uppercase text or letter-spacing of 0.08em or more strengthens the match but is not required.
+**What it looks for.** Fewer than 2 distinct primary font families across the declared `font-family` stacks, where a family is the first non-generic entry in each stack.
 
-**Why it matters.** Gesso ships this as `hero-kicker-eyebrow` with an auto-fix that simply deletes it. Hallmark auto-fails the tag-left/heading-right variant as "the single most reliable templated-editorial tell". The impeccable craft floor is the strictest voice in the corpus and the only one that calls it a ban rather than a default: "A kicker or eyebrow above a heading. This one is a ban, not a default: no brief earns it back. The heading carries its own weight; delete the label and let the heading speak." The eyebrow exists because a headline felt thin and something had to fill the space above it. It never adds information — it restates the category the headline is already in.
+**Why it matters.** Gesso's line is flat: a one-font page is a template page. Every reference-tier site in the corpus uses at least two families — typically a display face and a text face. This is also the cheapest way out of the named-typeface trap, because the second face does not have to be famous.
 
-**The better move.** Delete it. Then read the H1 on its own. If the page now feels thin, the eyebrow was propping up a weak headline and the real fix is a better headline: one that could be true or false. "Chess lessons" is a category. "I teach the endgame first, because that is where club games are decided" is a sentence somebody could disagree with, which is what makes it worth reading.
+**The better move.** Add a second family for headings only. On a page that must make no external requests, the free version is a serif system stack on headings (`ui-serif, Georgia, 'Times New Roman', serif`) with the system sans for body — but verify on Android, which has no Georgia and will give you Noto Serif.
 
-**Who says so.** Gesso Build, @gessobuild/anti-slop · Adrian Krebs, "Design Slop" · Hallmark (Hassan El Mghari / Nutlope) · impeccable 4.3.1, craft-floor.md
+**What it teaches.** Books use one typeface for chapter titles and another for the paragraphs, and the difference is half of why a book looks like a book. A page where every word is the same typeface reads as a document nobody typeset. Two is enough; three is usually too many.
 
-> ⚠ **Adrian Krebs, "Design Slop"** — Krebs self-reports a 5-10% false-positive rate. He is also honest against his own thesis — an HN commenter caught his own blog post wearing the cream/beige escape hatch he was documenting.
+**Who says so.** Gesso Build — @gessobuild/anti-slop · local-site-forge research/11-reference-tier.md
 
-> ⚠ **Hallmark (Hassan El Mghari / Nutlope)** — Design opinion with a commercial context. Its CORE tells match Krebs’s independent empirical count, which is why the core is trusted here; its elaborate prescriptions (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever this kit uses them.
+> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
 
-> ⚠ **impeccable 4.3.1, craft-floor.md** — It runs as an editor hook inside Claude Code, Codex, Cursor and Copilot, not as an MCP server. Where a rule here overlaps, this kit says so and credits it rather than claiming the ground.
+> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
 
-### `emoji-feature-icon` ?? Emoji standing in for an icon
+### `T2-BANNED-FONT` ? A typeface on the named-tell list
+
+*Tier 2 — felt rather than named, but decisive · confidence DEMONSTRATED*
+
+**What it looks for.** A banned face named as the FIRST family in any `font-family` stack. A banned face appearing later in the stack as a fallback is not counted — that is what a fallback is for.
+
+**Why it matters.** These are the faces a generator reaches for. There is a real and important refutation to record alongside it, though: the corpus measured Linear's shipped type at H1 38px / weight 510 / -0.022em and concluded Inter is not the tell — UNTUNED Inter is. Nobody generating slop types 510.
+
+**The better move.** On a hosted site: self-host one subsetted variable `woff2` from outside the list. Candidates that are free, self-hostable, and on neither banned list: Newsreader, Fraunces, Bricolage Grotesque, Martian Mono. Reject Playfair Display and Instrument Serif — both read 'wedding invitation'. On a single-file page where a webfont is impossible, tune what you have: the weight and tracking matter more than the name.
+
+**What it teaches.** A handful of typefaces show up on almost every machine-made page, so they carry a faint smell of the machine. The useful finding underneath is that the typeface is rarely the real problem — the settings are. A common font set carefully looks better than a rare font set carelessly.
+
+**Who says so.** Gesso Build — @gessobuild/anti-slop · local-site-forge research/11-reference-tier.md
+
+> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
+
+> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
+
+### `T2-KICKER-H1` ?? The eyebrow badge above the main headline
+
+*Tier 2 — felt rather than named, but decisive · confidence DEMONSTRATED*
+
+**What it looks for.** The element immediately preceding the primary `<h1>` in document order, when its text is <= 60 characters AND <= 9 words, AND it is either fully uppercase or carries `letter-spacing >= 0.08em`, AND it is not itself a heading, and contains no links, list items, nav or buttons.
+
+**Why it matters.** It is a named gate in two detectors, with an auto-fix that simply deletes the element. The headline is already the top of the page; the label above it is a second, smaller headline that repeats what the first one is about to say.
+
+**The better move.** Delete it. The auto-fix in both source detectors is deletion, not rewriting. If the label carried real information, fold that information into the headline.
+
+**What it teaches.** A small label above a big headline is a habit from slide decks. It makes the reader read the same idea twice, at two sizes, before reaching anything new. Deleting it always works — that is why both detectors that flag it simply remove it rather than suggesting a rewrite.
+
+**Who says so.** Gesso Build — @gessobuild/anti-slop
+
+> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
+
+### `T1-EMOJI-ICON` ?? Emoji standing in for icons
 
 *Tier 1 — clocked in five seconds, no design vocabulary needed · confidence DEMONSTRATED*
 
-**What it looks for.** An emoji character at the START of a list item, heading, card, step or button — the position where an icon would go. An emoji inside a sentence is left alone.
+**What it looks for.** One or more emoji code points used as the entire content of an element in an icon position. Emoji inside running prose are spared.
 
-**Why it matters.** Hallmark fails this as gate 30, Gesso ships it as `emoji-icon`, Krebs counted it, and the impeccable craft floor puts it plainly: "Unicode glyphs or emoji standing in for an icon system. Icons are drawn." There is a second reason that matters more for a page shown on a phone: research/08-craft.md §7.2 notes emoji render as Google's blob set on Android, which looks nothing like the iOS emoji the page was almost certainly eyeballed against. So the page you approved is not the page half your visitors see.
+**Why it matters.** Two things at once. It is a named Tier 1 tell in three independent sources. And on Android — the phone most of your visitors hold — emoji render in Google's set, which looks nothing like the Apple emoji the page was almost certainly eyeballed against. So a page checked on a Mac differs from the shipped page in exactly the places the emoji appear.
 
-**The better move.** Hand-author the icon as inline SVG — 3 to 8 lines, 200 to 500 bytes. Or use no icon at all: research/08-craft.md quotes the blunter option, "most feature lists don't need icons". Watch one trap if you do draw them: febbhav's "Lucide five" finding is that even a correctly inlined stock glyph carries a fingerprint if you pick the obvious one — Sparkles for AI, Zap for fast, Shield for secure, Check for benefit, ArrowRight for a CTA.
+**The better move.** Hand-author the icon as inline SVG — three to eight lines, 200-500 bytes each. Or ship no icons at all: most feature lists do not need them. Watch the adjacent trap, TRAP-LUCIDE-FIVE.
 
-**Who says so.** Hallmark (Hassan El Mghari / Nutlope) · Gesso Build, @gessobuild/anti-slop · Adrian Krebs, "Design Slop" · impeccable 4.3.1, craft-floor.md
+**What it teaches.** An emoji is a picture from someone else's font, and it changes shape depending on the phone. Drawn icons, even crude ones, are yours and look the same everywhere. The cheapest correct answer is usually to delete the icons and let the words carry the list.
 
-> ⚠ **Hallmark (Hassan El Mghari / Nutlope)** — Design opinion with a commercial context. Its CORE tells match Krebs’s independent empirical count, which is why the core is trusted here; its elaborate prescriptions (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever this kit uses them.
+**Who says so.** Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents · impeccable 4.3.1 — design skill and PostToolUse detector hook · local-site-forge research/08-craft.md
 
-> ⚠ **Adrian Krebs, "Design Slop"** — Krebs self-reports a 5-10% false-positive rate. He is also honest against his own thesis — an HN commenter caught his own blog post wearing the cream/beige escape hatch he was documenting.
+> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
 
-> ⚠ **impeccable 4.3.1, craft-floor.md** — It runs as an editor hook inside Claude Code, Codex, Cursor and Copilot, not as an MCP server. Where a rule here overlaps, this kit says so and credits it rather than claiming the ground.
+> ⚠ **undefined** — Its detector is a compiled binary, so its exact thresholds were not readable. Rules credited here are transcribed from the craft floor's prose, which states bans and defaults without numbers. Where this rulebook attaches a number to an impeccable ban, the number comes from Gesso or from measurement here, and says so.
 
-### `italic-in-heading` !? One italic word inside an upright heading
+> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+
+### `TRAP-ITALIC-IN-HEADING` ? An italic word inside an upright heading
 
 *The trap tier — reads as sophisticated today, will read as generated soon · confidence ASSERTED*
 
-**What it looks for.** An <em>, <i>, or an element with font-style: italic, inside an h1, h2 or h3 whose other words are upright.
+**What it looks for.** An `<em>` or `<i>` element, or a `font-style: italic` rule, inside an `<h1>`, `<h2>` or `<h3>`.
 
-**Why it matters.** Hallmark gate 38a auto-fails this as "among the most reliable AI tells", and adds the observation that makes it a trap rather than a mistake: this is the CURRENT fix for a boring headline, and it is already burned. The move is to take a flat headline and italicise the one word that was supposed to carry the meaning — which is a way of pointing at the interesting word instead of writing an interesting sentence.
+**Why it matters.** This one is ALREADY burned, and the corpus says why it matters that it is: this is the current fix for a boring headline, and it is already on a detector's auto-fail list. The escape hatch closed before most people noticed it opened.
 
-**The better move.** Rewrite the headline so no word needs pointing at. If the emphasis is genuinely semantic, <em> is correct HTML and a screen reader will read it as emphasis — but then ask whether the surrounding sentence has earned it.
+**The better move.** Rewrite the headline so the important word is important because of what it says, not because of how it leans. If the headline needs emphasis to work, the headline needs rewriting.
 
-**Who says so.** Hallmark (Hassan El Mghari / Nutlope) · febbhav, "Signs of AI Design"
+**What it teaches.** Tilting one word in a headline to make it stand out has become such a common machine-written move that it now reads as machine-written. The underlying problem is usually that the headline is not saying anything, and a slanted word will not fix that.
 
-> ⚠ **Hallmark (Hassan El Mghari / Nutlope)** — Design opinion with a commercial context. Its CORE tells match Krebs’s independent empirical count, which is why the core is trusted here; its elaborate prescriptions (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever this kit uses them.
+**Who says so.** Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents
 
-> ⚠ **febbhav, "Signs of AI Design"** — Catalogues rather than demonstrates.
+> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
+
+### `TY-BODY-MEASURE` ?! Body text lines too long or too short
+
+*Craft — the details that separate considered from competent · confidence ASSERTED*
+
+**What it looks for.** No `max-width` in `ch` on body paragraphs, or a value outside 55-78ch. The two sources give slightly different bands (60-70 and 65-75); the union is used and the rule reports which bound was crossed.
+
+**Why it matters.** Long lines make the eye lose its place returning to the left margin. It is one of the oldest settled results in typesetting and it is one declaration.
+
+**The better move.** `max-width: 66ch` on prose. The opening lede runs shorter — around 34ch — because it is read as a unit rather than scanned.
+
+**What it teaches.** There is a comfortable line length for reading, around 65 characters. Past that, your eye struggles to find the start of the next line and you re-read the same one. Setting the limit in characters rather than pixels keeps it right on every screen.
+
+**Who says so.** impeccable 4.3.1 — design skill and PostToolUse detector hook · local-site-forge research/11-reference-tier.md
+
+> ⚠ **undefined** — Its detector is a compiled binary, so its exact thresholds were not readable. Rules credited here are transcribed from the craft floor's prose, which states bans and defaults without numbers. Where this rulebook attaches a number to an impeccable ban, the number comes from Gesso or from measurement here, and says so.
+
+> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
+
+### `TY-H1-MEASURE` ?! The headline runs too wide
+
+*Craft — the details that separate considered from competent · confidence MEASURED_HERE*
+
+**What it looks for.** No `max-width` in `ch` on the H1, or a value above 22ch.
+
+**Why it matters.** The corpus's line is exact: a 5rem headline running 40 characters is not a hero, it is a paragraph that got bigger. Capping it at 16-22 characters and adding `text-wrap: balance` is two declarations.
+
+**The better move.** `max-width: 18ch; text-wrap: balance;`. Balance makes the lines come out even instead of leaving one orphaned word.
+
+**What it teaches.** A headline should break into two or three short lines, not run edge to edge. Measuring the limit in characters rather than pixels means it stays right at every screen size. Adding `text-wrap: balance` stops the last line ending up as a single stranded word.
+
+**Who says so.** local-site-forge research/11-reference-tier.md
+
+> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
 
 ---
 
@@ -406,149 +568,185 @@ The test that runs through all of this: what job is this doing? A shadow modelli
 - If two of them are the same colour but mark different kinds of thing, the colour is not a signal. It is paint.
 - Delete the ones that survive neither question. Subtraction is most of what "designed" means here.
 
-**The rules that carry this** — 9 of them:
+**The rules that carry this** — 10 of them:
 
-### `edge-stripe` ? The coloured stripe down the side of a card
-
-*Tier 2 — felt rather than named, but decisive · confidence DEMONSTRATED*
-
-**What it looks for.** A `border-left` or `border-right` (or the -width/-color longhands) of 2px or more carrying a colour with OKLCH chroma above 0.03 — that is, a colour rather than a hairline.
-
-**Why it matters.** research/08-craft.md calls this "the highest signal-to-effort tell in the whole list", and quotes the sentence that makes it stick: "colored left borders are almost as reliable a sign of AI-generated design as em-dashes for text." Krebs built his whole study around it. Gesso ships it as `edge-stripe`. The impeccable craft floor bans anything above 1px. Four independent sources, one conclusion. It is worth understanding WHY it became the signature rather than just avoiding it: it is the cheapest possible way to make a box look designed. One declaration, instant visual interest, no judgement required. Which is exactly why a machine with no judgement reaches for it.
-
-**The better move.** Use a hairline on all four sides — `border: 1px solid var(--line)` — and let space do the separating. research/08-craft.md §8.3: "the hairline costs nothing and reads cleaner than glass." If you want an accent near a heading, set a small accent square beside it instead: same colour, deliberate placement, no template signature.
-
-**Who says so.** Gesso Build, @gessobuild/anti-slop · Adrian Krebs, "Design Slop" · Hacker News practitioner threads · impeccable 4.3.1, craft-floor.md
-
-> ⚠ **Adrian Krebs, "Design Slop"** — Krebs self-reports a 5-10% false-positive rate. He is also honest against his own thesis — an HN commenter caught his own blog post wearing the cream/beige escape hatch he was documenting.
-
-> ⚠ **Hacker News practitioner threads** — Forum anecdote. Never better than ASSERTED, and tagged that way.
-
-> ⚠ **impeccable 4.3.1, craft-floor.md** — It runs as an editor hook inside Claude Code, Codex, Cursor and Copilot, not as an MCP server. Where a rule here overlaps, this kit says so and credits it rather than claiming the ground.
-
-### `heavy-shadow` ? Puffy stacked shadows
+### `T2-EDGE-STRIPE` ?? The coloured left-border stripe
 
 *Tier 2 — felt rather than named, but decisive · confidence DEMONSTRATED*
 
-**What it looks for.** Gesso's executable detector, reproduced exactly: FAIL if ≥3 blurred non-inset layers, OR ≥2 blurred layers where any alpha > 0.12, OR one blurred layer with alpha > 0.30.
+**What it looks for.** `border-left` or `border-right` at 2px or more, carrying a colour that is not the page's hairline neutral, on a non-blockquote element. Gesso's published band is 3-6px; impeccable refuses anything above 1px. This detector uses 2px as the floor and reports which of the two bars was crossed.
 
-**Why it matters.** A heavy shadow is what a page reaches for when it wants depth it has not earned with layout. research/08-craft.md §8.1 is unusually careful here, because two good sources disagree: Comeau's crafted five-layer shadow — doubling offsets and blurs at a consistent 0.075 alpha — would trip Gesso's ≥3-layer detector. The corpus resolves it by intent rather than by count: "one ratio + low per-layer alpha + hue matched to the surface = craft. Three arbitrary layers at 0.1 / 0.15 / 0.18 = slop." And then it gives a generator the shorter instruction: ship Gesso's single subtle layer.
+**Why it matters.** This is described in the corpus as the highest signal-to-effort tell in the whole list, and four sources found it independently. One practitioner's line: coloured left borders are almost as reliable a sign of AI-generated design as em dashes are for text. Krebs built his entire 1,590-page study around it.
 
-**The better move.** Flatten to `box-shadow: 0 1px 2px rgba(0, 0, 0, .06)` — that is Gesso's own auto-fix, and it cannot be got wrong. On a dark surface, do not use a shadow at all: signal elevation with lightness, about +3% per level. And never a coloured glow on a light ground.
+**The better move.** Delete the stripe. If a heading needs an accent near it, use a small solid accent square beside the heading, or change the heading's own colour. If the card needs separating, a 1px hairline on all four sides is the confident version.
 
-**Who says so.** Gesso Build, @gessobuild/anti-slop · Josh W. Comeau
+**What it teaches.** A thick coloured line down the left side of a box is the single most recognisable machine-made design decision on the web right now. It is also doing no work — it is not separating anything, it is decorating. A thin line all the way round, or nothing, reads as deliberate.
 
-### `over-rounded` ? Corners rounded past the stop
+**Who says so.** Gesso Build — @gessobuild/anti-slop · Adrian Krebs — Design Slop · impeccable 4.3.1 — design skill and PostToolUse detector hook
 
-*Tier 2 — felt rather than named, but decisive · confidence DEMONSTRATED*
+> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
 
-**What it looks for.** A `border-radius` of 40px or more on a filled surface. Pills (9999px, 999px) and circles (50%) are exempt — they are a different shape, not an over-rounded rectangle.
+> ⚠ **undefined** — An HN commenter caught his own blog post wearing the cream/warm-oat trap. The study is sound; the author is not outside the trend he measured.
 
-**Why it matters.** Gesso's own wording is the teaching note: "40px+ corners turn content cards into blobs: the 'friendly' dial turned past its stop. Confident systems hold 8-24px." The radius is a claim about how formal the thing is. At 8px it is a document. At 16px it is an app. At 48px it is a toy, and a chess teacher's page is not a toy — the subject is the most serious game there is, and the page should not be apologising for that.
+> ⚠ **undefined** — Its detector is a compiled binary, so its exact thresholds were not readable. Rules credited here are transcribed from the craft floor's prose, which states bans and defaults without numbers. Where this rulebook attaches a number to an impeccable ban, the number comes from Gesso or from measurement here, and says so.
 
-**The better move.** Clamp to 24px. Gesso's auto-fix does exactly that. Hold one radius across the whole page rather than varying it per component.
-
-**Who says so.** Gesso Build, @gessobuild/anti-slop
-
-### `pill-everything` !? The pill-shaped button
-
-*The trap tier — reads as sophisticated today, will read as generated soon · confidence ASSERTED*
-
-**What it looks for.** Three or more rules setting a fully-rounded radius (999px or more, or 50%) on non-circular elements.
-
-**Why it matters.** research/08-craft.md §8.2 passes the pill through its radius detector and then adds a caveat in the same row: "the pill CTA is separately the most-cloned single element of 2026." It is not a failure. It is a shape that was distinctive three years ago, became the default, and is now on the way to reading as dated — the same arc the 2015 flat-design button travelled. Recorded here so the choice is made deliberately rather than inherited.
-
-**The better move.** If the pill is the house shape and everything else agrees with it, keep it — consistency beats novelty. If it is on the buttons because buttons come pill-shaped now, try the page's own radius instead: an 8-12px button next to an 8-12px card is a system, and a system is what reads as expensive.
-
-**Who says so.** research/08-craft.md
-
-> ⚠ **research/08-craft.md** — The file is explicit that the TIERING ITSELF is asserted: the sweep found no study of what non-technical business owners notice. Treat the ordering as a testable hypothesis, not a finding.
-
-### `backdrop-blur` ? Glass as decoration
+### `T2-PUFFY-SHADOW` ?? Puffy stacked shadows
 
 *Tier 2 — felt rather than named, but decisive · confidence DEMONSTRATED*
 
-**What it looks for.** Any `backdrop-filter` or `-webkit-backdrop-filter` declaration containing blur().
+**What it looks for.** >= 3 blurred non-inset layers, OR >= 2 blurred layers where any alpha > 0.12, OR a single blurred layer with alpha > 0.30. Inset shadows and zero-blur rings are not counted as layers here.
 
-**Why it matters.** Three separate costs, and only the first is aesthetic. It is a named AI tell — the HN comment the corpus quotes twice, two years apart: "It's not a Claude generated website without at least one backdrop-filter: blur(1000px) element that slows older machines to a crawl." It forces a continuous repaint on scroll, which is the thing research/08-craft.md §7.1 lists as forbidden on a mid-range Android. And it disables subpixel text rendering for everything above it, so the text in a blurred nav is measurably worse than the text everywhere else on the same page. The impeccable craft floor names the distinction to keep: glass as a specific effect can be earned; glass as decoration cannot.
+**Why it matters.** Depth on a page should be barely perceptible. The reference tier is subtractive here: Legora ships zero box-shadows on its entire homepage, and so does Teenage Engineering. Puffy stacks are the cheap-tier signature. Layer count is NOT a performance question — a 5-layer ladder and a 2-layer shadow measured the same speed — so the objection is purely that it looks generated, and that is decisive by itself.
 
-**The better move.** Give the element a solid background from your own palette and a 1px hairline underneath it. That is what the blur was approximating anyway, and it costs nothing to paint.
+**The better move.** Flatten to one barely-there layer, or remove shadows entirely and separate surfaces with a 1px hairline instead. On a dark background, never use shadow for depth — raise the lightness of the raised surface by about 3% per level.
 
-**Who says so.** Hacker News practitioner threads · Adrian Krebs, "Design Slop" · Josh W. Comeau · impeccable 4.3.1, craft-floor.md
+**What it teaches.** A shadow's job is to say 'this is slightly in front of that', and it takes almost nothing to say it. Big soft shadows are what a machine reaches for when it wants a card to look important. The safest version is a single one-pixel shadow at about six percent opacity, and the best version on many pages is no shadow at all.
 
-> ⚠ **Hacker News practitioner threads** — Forum anecdote. Never better than ASSERTED, and tagged that way.
+**Who says so.** Gesso Build — @gessobuild/anti-slop · local-site-forge research/11-reference-tier.md · impeccable 4.3.1 — design skill and PostToolUse detector hook
 
-> ⚠ **Adrian Krebs, "Design Slop"** — Krebs self-reports a 5-10% false-positive rate. He is also honest against his own thesis — an HN commenter caught his own blog post wearing the cream/beige escape hatch he was documenting.
+> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
 
-> ⚠ **impeccable 4.3.1, craft-floor.md** — It runs as an editor hook inside Claude Code, Codex, Cursor and Copilot, not as an MCP server. Where a rule here overlaps, this kit says so and credits it rather than claiming the ground.
+> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
 
-### `uniform-card-grid` ?? Identical cards in a row
+> ⚠ **undefined** — Its detector is a compiled binary, so its exact thresholds were not readable. Rules credited here are transcribed from the craft floor's prose, which states bans and defaults without numbers. Where this rulebook attaches a number to an impeccable ban, the number comes from Gesso or from measurement here, and says so.
 
-*Tier 1 — clocked in five seconds, no design vocabulary needed · confidence DEMONSTRATED*
+### `T2-RADIUS-40` ? Corners rounded past the point of confidence
 
-**What it looks for.** Three or more sibling elements sharing an identical structural signature — same tag, same normalised class list, same child shape to three levels — where each has real internal structure, AND they sit side by side: either they carry a card-like class name, or their container has a `display: grid` or `display: flex` rule. Numeric suffixes are stripped, so card-1 and card-2 count as the same card. Sections stacked down a page are not this; a grid of rounded rectangles is.
+*Tier 2 — felt rather than named, but decisive · confidence DEMONSTRATED*
 
-**Why it matters.** The HN comment the corpus quotes says it exactly: "AI tends to spit out a bullet point list of features… then puts them in a grid of rounded rects." research/08-craft.md is careful about what the tell actually is — "the tell is UNIFORMITY, not the number three. Four identical cards is the same page." And there is a commercial argument underneath the aesthetic one, which is the better reason: equal cards claim the three things are equally important. For a chess teacher, beginner group classes and a serious tournament-prep student are not the same size of thing, and a layout that says they are is not just generated-looking, it is wrong about the business.
+**What it looks for.** `border-radius` between 40px and 400px on a filled surface. Pills (`9999px`, `999px`) and circles (`50%`) pass this rule — they are a different shape, not an over-rounded rectangle. See T2-PILL-CTA for the pill.
 
-**The better move.** Give them unequal weight. The one that matters most gets more room, a photograph, a longer description, or its own section; the others get a line each. research/08-craft.md §4: "Less sloppy AND more commercially correct." The impeccable craft floor goes further — it treats same-size icon-plus-heading-plus-text cards as the lazy container and nested cards as always wrong.
+**Why it matters.** Past about 24px, corners stop reading as 'soft' and start reading as 'blobby': the friendly dial turned past its stop. The corpus measured a competitor site with 152 elements at radius >= 40px and used it as a marker of the cheap tier.
 
-**Who says so.** Adrian Krebs, "Design Slop" · Hallmark (Hassan El Mghari / Nutlope) · Gesso Build, @gessobuild/anti-slop · Hacker News practitioner threads · impeccable 4.3.1, craft-floor.md
+**The better move.** Clamp to 24px. Confident systems hold 8-24px and use ONE radius throughout rather than three.
 
-> ⚠ **Adrian Krebs, "Design Slop"** — Krebs self-reports a 5-10% false-positive rate. He is also honest against his own thesis — an HN commenter caught his own blog post wearing the cream/beige escape hatch he was documenting.
+**What it teaches.** Rounded corners have a working range. Below about 8px they are barely visible; above about 24px the box stops looking like a box. Pick one value between those and use it for everything on the page.
 
-> ⚠ **Hallmark (Hassan El Mghari / Nutlope)** — Design opinion with a commercial context. Its CORE tells match Krebs’s independent empirical count, which is why the core is trusted here; its elaborate prescriptions (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever this kit uses them.
+**Who says so.** Gesso Build — @gessobuild/anti-slop
 
-> ⚠ **Hacker News practitioner threads** — Forum anecdote. Never better than ASSERTED, and tagged that way.
+> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
 
-> ⚠ **impeccable 4.3.1, craft-floor.md** — It runs as an editor hook inside Claude Code, Codex, Cursor and Copilot, not as an MCP server. Where a rule here overlaps, this kit says so and credits it rather than claiming the ground.
-
-### `fake-chrome` ? A drawing of a browser, inside a browser
+### `T2-PILL-CTA` ?! The fully-rounded pill button
 
 *Tier 2 — felt rather than named, but decisive · confidence ASSERTED*
 
-**What it looks for.** A class or id naming browser chrome, a device frame, or a terminal window.
+**What it looks for.** `border-radius` of 999px or more on an element whose selector matches /btn|button|cta/.
 
-**Why it matters.** Hallmark fails this as gate 47 and the line it uses is the argument: "The user already has the chrome… Redrawing it in a page is like printing a photograph of a picture frame inside a real picture frame." It is also a tell about intent — the frame exists to make a screenshot look like a product, and a page that needs that has decided the thing inside the frame cannot carry itself.
+**Why it matters.** It passes the over-rounded detector by construction, and the corpus still names it separately: the pill CTA is the most-cloned single element of 2026. It is not wrong. It is just not a decision.
 
-**The better move.** Show the content without the frame. If it needs a boundary, a hairline and some space will do it.
+**The better move.** Decide it rather than inherit it. Pick one corner language for the whole project and hold it: soft (18px), crisp (4px), or flat (0). Radius, shadow and border weight as a TRIPLE are what make two pages read as different studios; any one of them alone carries almost nothing.
 
-**Who says so.** Hallmark (Hassan El Mghari / Nutlope) · febbhav, "Signs of AI Design"
+**What it teaches.** A capsule-shaped button is everywhere right now, which is neither good nor bad — but you should be able to say why yours is that shape. Choosing one corner style and applying it to every box on the site is what makes a page look like it came from one hand.
 
-> ⚠ **Hallmark (Hassan El Mghari / Nutlope)** — Design opinion with a commercial context. Its CORE tells match Krebs’s independent empirical count, which is why the core is trusted here; its elaborate prescriptions (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever this kit uses them.
+**Who says so.** local-site-forge research/08-craft.md · local-site-forge research/08a-sitegen-spec.md
 
-> ⚠ **febbhav, "Signs of AI Design"** — Catalogues rather than demonstrates.
+> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
-### `ai-footer` ? A four-column footer for a one-person business
+> ⚠ **undefined** — Its `--stagger: 45ms` has no practitioner source and the file says so. Do not attribute it to anyone.
 
-*Tier 2 — felt rather than named, but decisive · confidence ASSERTED*
+### `T2-BACKDROP-BLUR` ?? backdrop-filter: blur()
 
-**What it looks for.** Three or more of the headings Product / Company / Resources / Legal / Solutions / Developers / Platform inside a <footer>.
+*Tier 2 — felt rather than named, but decisive · confidence DEMONSTRATED*
 
-**Why it matters.** Hallmark gates 42-43 name the pattern and research/08-craft.md quotes the line that settles it: "A bakery doesn't have a Resources column." This footer is the org chart of a Series-B SaaS company rendered as navigation. A one-person teaching practice that ships it is describing a company that does not exist, and the visitor — who came to find out whether you can teach their kid — now has to hunt for a phone number among four columns of nothing.
+**What it looks for.** Any `backdrop-filter` or `-webkit-backdrop-filter` containing `blur()`.
 
-**The better move.** A footer for a small practice is: who you are, how to reach you, where you are, and the one legal line you actually need. Four lines, not four columns. The nav above it should be the pages that exist, in the order someone needs them.
+**Why it matters.** Three separate costs. It is named by practitioners as the single marker of a machine-generated page. It repaints continuously while the page scrolls, which is exactly the wrong thing on a mid-range Android. And it disables subpixel text rendering for the whole element, so the text inside it gets measurably blurrier.
 
-**Who says so.** Hallmark (Hassan El Mghari / Nutlope) · research/08-craft.md
+**The better move.** Replace with a solid background in the page's own ground colour plus a 1px hairline border underneath. It is more confident, it has no failure modes, and the text inside it gets sharper.
 
-> ⚠ **Hallmark (Hassan El Mghari / Nutlope)** — Design opinion with a commercial context. Its CORE tells match Krebs’s independent empirical count, which is why the core is trusted here; its elaborate prescriptions (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever this kit uses them.
+**What it teaches.** Frosted glass looks expensive and costs the phone real work — it has to re-blur the background on every frame while you scroll. It also makes the text sitting on it slightly fuzzier. A solid bar with a thin line under it looks more certain and never stutters.
 
-> ⚠ **research/08-craft.md** — The file is explicit that the TIERING ITSELF is asserted: the sweep found no study of what non-technical business owners notice. Treat the ordering as a testable hypothesis, not a finding.
+**Who says so.** local-site-forge research/08-craft.md · impeccable 4.3.1 — design skill and PostToolUse detector hook · local-site-forge research/11-reference-tier.md
 
-### `placeholder-imagery` ?? A picture of somebody else
+> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+
+> ⚠ **undefined** — Its detector is a compiled binary, so its exact thresholds were not readable. Rules credited here are transcribed from the craft floor's prose, which states bans and defaults without numbers. Where this rulebook attaches a number to an impeccable ban, the number comes from Gesso or from measurement here, and says so.
+
+> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
+
+### `T1-UNIFORM-CARDS` ? Identical icon-topped cards as the page structure
 
 *Tier 1 — clocked in five seconds, no design vocabulary needed · confidence DEMONSTRATED*
 
-**What it looks for.** An <img> or <source> whose src points at a placeholder or stock-photo host, or that has an empty src, or that has no alt attribute at all.
+**What it looks for.** >= 3 sibling elements sharing the same tag and class list, each containing an icon-position element followed by a heading followed by a paragraph, all occupying equal grid tracks.
 
-**Why it matters.** research/08-craft.md §8.6 makes the empty or placeholder src an auto-fail, and §3.1 gives the reason stock is worse than nothing: you are showing a photograph of somebody else's room to the person who knows exactly what their own room looks like. The file names the trap precisely — "near-miss specificity reads as deception; total abstraction reads as design". A generic chess-club photo is close enough to your club to invite the comparison and lose it. The missing `alt` is a separate failure with the same shape: it is the attribute that tells a blind visitor, and a search engine, what the picture is, and leaving it off is a claim that the picture does not matter.
+**Why it matters.** The tell is UNIFORMITY, not the number three — four identical cards is the same page. It also misrepresents most businesses: a plumber's emergency callout is the money and drain cleaning is not, so equal cards are commercially wrong as well as visually generic.
 
-**The better move.** Use a real photograph you took, tightly cropped rather than full-bleed, desaturated about 8% so it sits on the page instead of on top of it. One real photograph beats every stock image, and it is the one thing on the page a visitor can verify is true. If there is no photograph yet, ship a designed hole that says so — research/08-craft.md §5.3: "the holes are the pitch." And give every image an alt that says what it shows.
+**The better move.** Give them unequal weight. Make the one that earns the money twice the size, drop the icons, and let the others be a plain list. Less work and more honest about the business.
 
-**Who says so.** research/08-craft.md · Gesso Build, @gessobuild/anti-slop · febbhav, "Signs of AI Design"
+**What it teaches.** A row of identical boxes says every one of these things matters exactly the same amount, which is almost never true. Decide which one actually brings in the money and make it bigger. The page gets more useful and less generic in the same edit.
 
-> ⚠ **research/08-craft.md** — The file is explicit that the TIERING ITSELF is asserted: the sweep found no study of what non-technical business owners notice. Treat the ordering as a testable hypothesis, not a finding.
+**Who says so.** Adrian Krebs — Design Slop · impeccable 4.3.1 — design skill and PostToolUse detector hook
 
-> ⚠ **febbhav, "Signs of AI Design"** — Catalogues rather than demonstrates.
+> ⚠ **undefined** — An HN commenter caught his own blog post wearing the cream/warm-oat trap. The study is sound; the author is not outside the trend he measured.
+
+> ⚠ **undefined** — Its detector is a compiled binary, so its exact thresholds were not readable. Rules credited here are transcribed from the craft floor's prose, which states bans and defaults without numbers. Where this rulebook attaches a number to an impeccable ban, the number comes from Gesso or from measurement here, and says so.
+
+### `T1-FAKE-CHROME` ? A drawn browser window, phone frame or terminal
+
+*Tier 1 — clocked in five seconds, no design vocabulary needed · confidence DEMONSTRATED*
+
+**What it looks for.** A class name or id matching the known chrome-mockup vocabulary, or three circular elements of ~12px sitting in a row above a bordered content box. The class-name form is what this detector tests; the geometric form needs a render.
+
+**Why it matters.** The corpus's image for this is exact: the user already has the chrome. Redrawing it inside the page is like printing a photograph of a picture frame inside a real picture frame. On a phone it also eats horizontal space that the actual content needs.
+
+**The better move.** Show the screenshot on its own with a hairline border. If the point is 'this is a website', the visitor already knows — they are on one.
+
+**What it teaches.** Drawing a fake browser window around a picture is a habit borrowed from software marketing. It wastes width on a phone and tells the viewer nothing they did not already know. Show the picture; skip the frame.
+
+**Who says so.** Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents · febbhav — Signs of AI Design
+
+> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
+
+> ⚠ **undefined** — Catalogues rather than demonstrates.
+
+### `T2-AI-FOOTER` ? The four-column Product / Company / Resources / Legal footer
+
+*Tier 2 — felt rather than named, but decisive · confidence ASSERTED*
+
+**What it looks for.** 3 or more of those words used as column headings inside `<footer>`.
+
+**Why it matters.** The corpus's line is the whole argument: a bakery does not have a Resources column. The structure belongs to a software company with documentation, a careers page and an investor deck, and filling it for a shop means inventing pages.
+
+**The better move.** A local business footer is the address, the phone number, the hours, and whatever the law requires. Typeset it as part of the design rather than bolting it on.
+
+**What it teaches.** A footer full of link columns is borrowed from software companies with dozens of pages. A shop has an address, a number, and opening times. Putting those in properly is more useful to a visitor than four columns of links to pages that do not exist.
+
+**Who says so.** Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents
+
+> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
+
+### `T1-PLACEHOLDER-SRC` ?? A placeholder image service in a shipped page
+
+*Tier 1 — clocked in five seconds, no design vocabulary needed · confidence DEMONSTRATED*
+
+**What it looks for.** Any `<img src>` matching a known placeholder host, or empty, or `#`.
+
+**Why it matters.** It is an auto-fail in the corpus and it is unambiguous: a placeholder in a shipped page means the page was never finished. It also makes a network request to a third party from a page that claims to make none.
+
+**The better move.** Use a real photograph of the real thing, or remove the image and the block around it. A labelled empty space is honest; a stranger's face is not.
+
+**What it teaches.** Placeholder image services hand you a random stock face or a grey rectangle so you can see the layout while building. Shipping one means a visitor is looking at a stranger and being told it is you. If you have no photo yet, delete the image and say so in words.
+
+**Who says so.** local-site-forge research/08-craft.md
+
+> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+
+### `T1-NO-IMAGES` ? No photographs at all
+
+*Tier 1 — clocked in five seconds, no design vocabulary needed · confidence MEASURED_HERE*
+
+**What it looks for.** Zero `<img>` elements, counting `<picture><img>` but not counting decorative inline SVG or the grain texture.
+
+**Why it matters.** Zero images is itself a signal that nobody visited. On a page whose whole claim is 'I looked at your business', the absence of any picture of that business is the loudest possible contradiction. The corpus caught this in its own output and called it out by name.
+
+**The better move.** One photograph. Maximum one, if the page must be a single self-contained file — a 1200px-wide WebP encoded into the page costs 40-80 KB, comparable to an entire font budget, and two or three push the page past half a megabyte. Make it the storefront, or the person.
+
+**What it teaches.** A page about a real place with no picture of that place reads as a form letter. One photograph, taken on your phone, does more for believability than every other item on this list combined — and it is the one thing on the page the owner can verify is true.
+
+**Who says so.** local-site-forge research/08-craft.md · local-site-forge research/11a-verity-build-spec.md
+
+> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
 ---
 
@@ -565,156 +763,171 @@ You get to animate about two things. A generated page typically spends its whole
 
 **The rules that carry this** — 10 of them:
 
-### `no-press-feedback` ? Nothing happens when you tap
-
-*Tier 2 — felt rather than named, but decisive · confidence DEMONSTRATED*
-
-**What it looks for.** The project has buttons or links styled as buttons, and no `:active` rule anywhere in its CSS.
-
-**Why it matters.** research/08-craft.md measured this across 13 generated sites and found `grep -l ":active" → 0` and `grep -l "hover: hover" → 0`. Zero press feedback, zero hover guards, on pages whose whole purpose was to be demonstrated on a phone. Kowalski's first practical tip is the two-line fix, and his reason is the one to remember: "The interface should feel as if it's listening to the user." On a phone there is no hover. The visitor taps your Contact button and the interface does nothing at all until the next page loads — which on a slow connection is a second of wondering whether the tap registered. `transform: scale()` is composite-only, so the acknowledgement lands within one frame even while the main thread is still parsing. It is arguably the only animation on a page guaranteed to be smooth on a cheap phone.
-
-**The better move.** Ship these together, because guarding hover alone leaves touch users with nothing:
-
-    .btn { transition: transform .12s ease-out; }
-    @media (hover: hover) and (pointer: fine) { .btn:hover { transform: translateY(-2px); } }
-    .btn:active { transform: translateY(0) scale(.97); }
-    @media (pointer: coarse) { .btn { min-height: 48px; } }
-
-Write the FULL transform on :active — a bare scale() would clobber the hover translate. The floor for the scale is about 0.95; below that it reads as collapse rather than depression. Apply it only to real interactive elements, never to a card, or you imply a tap that does nothing.
-
-**Who says so.** Emil Kowalski, 7 Practical Animation Tips · research/08-craft.md · Ryan / u/Citrous_Oyster, CodeStitch
-
-> ⚠ **research/08-craft.md** — The file is explicit that the TIERING ITSELF is asserted: the sweep found no study of what non-technical business owners notice. Treat the ordering as a testable hypothesis, not a finding.
-
-> ⚠ **Ryan / u/Citrous_Oyster, CodeStitch** — His revenue claims are self-reported with no ledger. And his accessibility advice contains an error nobody in the corpus corrected: he says contrast "should be at least 3:1", which is the LARGE-text threshold. WCAG AA requires 4.5:1 for body text. This kit follows WCAG, not him.
-
-### `unguarded-hover` ? A hover effect on a device with no mouse
-
-*Tier 2 — felt rather than named, but decisive · confidence ASSERTED*
-
-**What it looks for.** A `:hover` rule that changes transform, scale, translate, box-shadow or filter, and is not inside `@media (hover: hover)`. A hover that only changes colour or underline is left alone: its stuck state is not visible as a fault.
-
-**Why it matters.** On Android Chrome an unguarded :hover STICKS after a tap. The visitor taps your call-to-action, the dialer opens, they come back, and the button is still lifted — which to a non-technical viewer reads as a rendering bug on your site. research/08-craft.md flags this rule as one the sweep asserts itself: the browser behaviour is well documented and trivially reproducible, but no practitioner citation was retrieved for the guard. So it is ASSERTED and you can falsify it in thirty seconds on a real phone.
-
-**The better move.** Wrap hover effects in `@media (hover: hover) and (pointer: fine)`, and give touch users a `:active` state instead. Those two must ship together — see `no-press-feedback`.
-
-**Who says so.** research/08-craft.md · Emil Kowalski, 7 Practical Animation Tips
-
-> ⚠ **research/08-craft.md** — The file is explicit that the TIERING ITSELF is asserted: the sweep found no study of what non-technical business owners notice. Treat the ordering as a testable hypothesis, not a finding.
-
-### `motion-ceiling` ? Motion slower than the eye reads as motion
-
-*Tier 2 — felt rather than named, but decisive · confidence DEMONSTRATED*
-
-**What it looks for.** A transition or animation duration above 300ms on anything that is not a large travelling surface (a drawer, a sheet). Kowalski states the ceiling twice across two articles and his shipped libraries hold to it.
-
-**Why it matters.** Kowalski's worked comparison is a 400ms dropdown against a 180ms one: the 400ms version "noticeably underperforms". research/08-craft.md §2.2 sharpens it into a better way to think about the number — velocity, not duration. Fourteen pixels over 450ms is about 31 px/second, which is below the threshold at which the eye reads movement as movement. It reads as DRIFT: the element appears to be settling rather than arriving. At 240ms the same 14px travels at about 58 px/s and reads as intent. The practical bands: 100-200ms for hover, press and state changes; 200-300ms for entrances; 400-500ms only for something large that physically travels, like Vaul's iOS sheet at 500ms with cubic-bezier(0.32, 0.72, 0, 1).
-
-**The better move.** Bring it under 300ms. And split the durations per property the way Sonner ships them — `transition: transform 500ms, opacity 200ms` — because opacity should always be shorter than transform. Exits run at about 75% of entrances.
-
-**Who says so.** Emil Kowalski, 7 Practical Animation Tips · Sonner, shipped styles.css · research/08-craft.md
-
-> ⚠ **research/08-craft.md** — The file is explicit that the TIERING ITSELF is asserted: the sweep found no study of what non-technical business owners notice. Treat the ordering as a testable hypothesis, not a finding.
-
-### `ease-on-entrance` ? The sluggish easing curve
-
-*Tier 2 — felt rather than named, but decisive · confidence DEMONSTRATED*
-
-**What it looks for.** A transition or animation whose timing function is the plain keyword `ease`, or `ease-in`, on an entering element. Also fires on `transition: all`.
-
-**Why it matters.** Plain `ease` is `cubic-bezier(0.25, 0.1, 0.25, 1)`, which has an ease-IN component — the element starts from zero velocity. That slow start is the sluggish signature, and it is the default, so it is what you get by not deciding. Comeau describes what ease-out gives instead: "the effect that something came hustling in from far away, and settles in front of the user." Kowalski: "Easing is the most important part of any animation." It is a one-token fix with a payoff out of all proportion to the edit. `transition: all` is a separate problem in the same declaration: it animates properties you did not intend, including layout properties that invalidate the layout every frame.
-
-**The better move.** Use `ease-out` for anything entering and `ease-in` for anything leaving. Sharper drop-ins, ascending: out-cubic `cubic-bezier(0.33, 1, 0.68, 1)`, out-quart `(0.25, 1, 0.5, 1)`, out-expo `(0.16, 1, 0.3, 1)`. research/08-craft.md flags those three triples as recalled rather than retrieved — verify them before you rely on the exact numbers, though the ordering is not in doubt. Never `transition: all`; name the properties.
-
-**Who says so.** Josh W. Comeau · Emil Kowalski, 7 Practical Animation Tips
-
-### `reveal-travel` ? A reveal that travels too far
-
-*Tier 2 — felt rather than named, but decisive · confidence ASSERTED*
-
-**What it looks for.** A translateY or translate3d of more than 14px in a transform used for a scroll reveal or keyframe entrance.
-
-**Why it matters.** The tasteful band for a scroll reveal is 8-14px. Forty pixels and above is the AOS.js default and, in research/08-craft.md's words, "the most recognisable template-site signature there is". The reason is physical: a real object entering your field of view does not start forty pixels away and drift in. The corpus tags this ASSERTED — it is Kowalski's scale rule inverted — while noting the AOS default is a matter of public record.
-
-**The better move.** Bring the travel to 8-14px and the duration to 200-300ms. Both numbers, not one: a short travel over a long duration is the drift problem in `motion-ceiling`.
-
-**Who says so.** Emil Kowalski, 7 Practical Animation Tips · research/08-craft.md
-
-> ⚠ **research/08-craft.md** — The file is explicit that the TIERING ITSELF is asserted: the sweep found no study of what non-technical business owners notice. Treat the ordering as a testable hypothesis, not a finding.
-
-### `no-reduced-motion` ? Motion with no way to turn it off
+### `F-NO-PRESS` ? No press feedback on the primary action
 
 *The floor — what makes a page look broken rather than cheap · confidence DEMONSTRATED*
 
-**What it looks for.** The project declares a transition or animation and has no `@media (prefers-reduced-motion)` block anywhere.
+**What it looks for.** No `:active` rule setting a transform on an interactive selector.
 
-**Why it matters.** Some people get motion sickness from parallax and sliding panels — genuinely sick, not merely annoyed — and their operating system already carries the setting that says so. Honouring it is one media query. Both Comeau and Kowalski publish the pattern; they disagree only about which direction to write it in.
+**Why it matters.** This is named the highest-value single item in the corpus's whole work order. The demo is literally 'here, tap the call button' — and right now nothing happens until the dialer opens. `transform: scale()` is composite-only, so the acknowledgement lands within one frame even while the main thread is still parsing: it is arguably the only animation on the page guaranteed to be smooth on a cheap phone. The interface should feel as if it is listening to the user.
 
-**The better move.** Swap the animation rather than deleting it, which is Kowalski's pattern:
+**The better move.** Three lines. The scale floor is 0.95 — below that it reads as collapse rather than depression. Apply it only to real buttons and links, never to cards, or you imply tappability that is not there. Note that `:active` on iOS Safari needs a real `<button>` or `<a>`; a plain `<div>` does not get it.
 
-    @media (prefers-reduced-motion: reduce) { .el { animation: fade .2s; } }
+**What it teaches.** When you tap a button on a phone, something should happen immediately — before the call connects, before the page changes. A tiny shrink is enough, and it is the one animation that stays smooth even when the phone is busy, because it is handled separately from everything else. It is three lines and it is worth more than every scroll animation on the page.
 
-Or invert the default, which is Comeau's: no transition at all until `@media (prefers-reduced-motion: no-preference)`. Do not reach for the universal `!important` reset — see `nuclear-motion-reset`.
+**Who says so.** Emil Kowalski — design engineer at Linear, ex-Vercel; author of Sonner and Vaul · local-site-forge research/08a-sitegen-spec.md
 
-**Who says so.** Josh W. Comeau · Emil Kowalski, 7 Practical Animation Tips
+> ⚠ **undefined** — His own Sonner ships close to the `prefers-reduced-motion` nuclear reset that Comeau argues against. Practitioners genuinely disagree there.
 
-### `nuclear-motion-reset` ? The reduced-motion sledgehammer
+> ⚠ **undefined** — Its `--stagger: 45ms` has no practitioner source and the file says so. Do not attribute it to anyone.
 
-*Tier 2 — felt rather than named, but decisive · confidence DEMONSTRATED*
+### `F-HOVER-UNGUARDED` ? A hover effect with no touch guard
 
-**What it looks for.** A universal selector inside a prefers-reduced-motion block setting animation-duration or transition-duration to a near-zero value with !important.
+*The floor — what makes a page look broken rather than cheap · confidence MEASURED_HERE*
 
-**Why it matters.** Comeau gives three objections to `* { animation-duration: 0.01ms !important }`. It kills motion-free animations that were already safe for someone with a vestibular disorder. With JavaScript-driven physics it can actually SPEED MOTION UP, because the CSS duration is not what is driving it. And the honest one: "the only real way to know whether our app is accessible or not is to test it." Worth knowing that practitioners genuinely disagree here — Kowalski's own Sonner ships close to the nuclear version. This kit sides with Comeau and says so rather than pretending the question is settled.
+**What it looks for.** A `:hover` rule changing transform, translate, scale or box-shadow, outside `@media (hover: hover)`.
 
-**The better move.** Swap the animation rather than removing it: `.el { animation: bounce .2s } @media (prefers-reduced-motion: reduce) { .el { animation: fade .2s } }`. Or invert the default the way Comeau does — no transition at all by default, added back under `(prefers-reduced-motion: no-preference)`.
+**Why it matters.** On Android Chrome the hover state STICKS after a tap, so the button stays visibly lifted after the visitor has pressed it. To a non-technical viewer that is a rendering bug, arriving in the exact moment the pitch is 'tap the call button'. The corpus measured this absent from all thirteen of its own generated pages.
 
-**Who says so.** Josh W. Comeau
+**The better move.** Guard the hover AND add a press state in the same change. Guarding hover alone leaves touch users with no feedback at all, which is worse than the stuck state it fixes. These two must ship together.
 
-### `universal-reveal` ? Everything fading up on scroll
+**What it teaches.** Hovering does not exist on a phone, but phones try to emulate it, and the result is that a button stays stuck in its hover state after being tapped. Wrapping hover effects so they only apply to real mouse pointers fixes it — but you must add a press effect at the same time, or touch users get no response at all.
 
-*Tier 2 — felt rather than named, but decisive · confidence DEMONSTRATED*
+**Who says so.** local-site-forge research/08a-sitegen-spec.md
 
-**What it looks for.** Six or more elements carrying a reveal/fade-in/animate-on-scroll class or a data-aos attribute.
+> ⚠ **undefined** — Its `--stagger: 45ms` has no practitioner source and the file says so. Do not attribute it to anyone.
 
-**Why it matters.** Hallmark and febbhav both name it; the sentence that lands is "Every section fades in when it enters the viewport. Every list staggers. The page never settles." AOS.js has been emitting fade-in-up on every element since 2015, so the pattern is a decade old and unmistakable. research/08-craft.md §2.2 adds the strategic reading via Freiberg's 90/10 rule: when the whole motion budget is one uniform reveal applied to twelve elements, the UNIFORMITY is the tell. Spending the same budget on two or three moments that respond to the user — a press, a confirmation — reads as more considered while doing strictly less.
-
-**The better move.** Delete the reveal from everything above the fold, and from most of what is below it. Keep at most one deliberate entrance, and spend what you save on press feedback, which is the motion a visitor actually causes.
-
-**Who says so.** Hallmark (Hassan El Mghari / Nutlope) · febbhav, "Signs of AI Design" · Rauno Freiberg, Web Interface Guidelines · research/08-craft.md
-
-> ⚠ **Hallmark (Hassan El Mghari / Nutlope)** — Design opinion with a commercial context. Its CORE tells match Krebs’s independent empirical count, which is why the core is trusted here; its elaborate prescriptions (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever this kit uses them.
-
-> ⚠ **febbhav, "Signs of AI Design"** — Catalogues rather than demonstrates.
-
-> ⚠ **research/08-craft.md** — The file is explicit that the TIERING ITSELF is asserted: the sweep found no study of what non-technical business owners notice. Treat the ordering as a testable hypothesis, not a finding.
-
-### `hero-behind-reveal` ? The headline is hidden until a script runs
-
-*Tier 2 — felt rather than named, but decisive · confidence INFERENCE*
-
-**What it looks for.** The primary <h1>, or an ancestor of it, carries a reveal/fade-in class or a data-aos attribute.
-
-**Why it matters.** This is a bug, not a taste call, and research/08-craft.md §2.2 found it in its own generator. The H1 is almost certainly the Largest Contentful Paint element, and an element at opacity: 0 does not count for LCP. So the page has put its own largest paint behind a script parse, an IntersectionObserver callback, and a transition — and it is above the fold, where there is no scroll yet to trigger the reveal in the first place. On a mid-range phone over a slow connection that is several hundred milliseconds of self-inflicted delay on the one element the visitor came for. There is a second, sharper reason: if the script fails, the headline never appears at all. The corpus flags the LCP half of this reasoning as the sweep's own INFERENCE rather than a vendor statement, and this rule inherits that tag.
-
-**The better move.** Take the reveal off the hero entirely — H1, subhead, buttons and any list inside it. research/08-craft.md found nested reveals there too: a revealed <ul> containing revealed <li> children, each with its own delay, which is an opacity:0 subtree inside an opacity:0 parent. Pull the whole hero out rather than tuning it.
-
-**Who says so.** research/08-craft.md
-
-> ⚠ **research/08-craft.md** — The file is explicit that the TIERING ITSELF is asserted: the sweep found no study of what non-technical business owners notice. Treat the ordering as a testable hypothesis, not a finding.
-
-### `sticky-collision` ? Two sticky things at the same height
+### `T2-DURATION-CEILING` ? Animations longer than 300 milliseconds
 
 *Tier 2 — felt rather than named, but decisive · confidence DEMONSTRATED*
 
-**What it looks for.** Two or more rules setting `position: sticky` with `top: 0`, or a sticky element whose `top` is a hardcoded pixel guess at another element's height.
+**What it looks for.** A duration above 300ms on an interaction or entrance. Ambient loops (Ken Burns) and failsafe keyframes are excluded — those are deliberately long and have their own rules.
 
-**Why it matters.** Two elements both stuck at `top: 0` overlap during scroll, and the one deeper in the DOM paints over the nav. It looks badly broken rather than slightly wrong. research/08-craft.md §8.5 found the same bug in its own generator, in a form worth recognising: a banner sticky at top:0 and a nav sticky at a hardcoded `top: 36px` — a GUESSED banner height, not a measured one. On a narrow phone the banner wraps to two lines, becomes taller than 36px, and the nav lands on top of it.
+**Why it matters.** Kowalski states this twice across two articles with a side-by-side comparator: a 400ms dropdown noticeably underperforms a 180ms one, and the same values recur in his shipped library CSS. The practical bands are 100-200ms for hover and press, 200-300ms for entrances, and 400-500ms ONLY for large surfaces that physically travel across the screen.
 
-**The better move.** Define the height as a custom property — `--banner-height: 44px` — use it in both places, and give the nav a higher z-index than any in-page sticky box. One source of truth for the number, which is the same rule as `single-source`.
+**The better move.** Split the durations per property rather than using one number: opacity shorter than transform. The shipped production ratio is 2.5x — `transition: transform 500ms, opacity 200ms`. For an entrance on this kind of page: opacity 180ms, transform 260ms, and never invert them.
 
-**Who says so.** research/08-craft.md
+**What it teaches.** Under a third of a second is the window where movement reads as responsiveness. Past it, the same movement reads as the page being slow. And a useful trick from a shipped library: fade the thing in faster than you move it, so it has arrived visually before it has finished travelling.
 
-> ⚠ **research/08-craft.md** — The file is explicit that the TIERING ITSELF is asserted: the sweep found no study of what non-technical business owners notice. Treat the ordering as a testable hypothesis, not a finding.
+**Who says so.** Emil Kowalski — design engineer at Linear, ex-Vercel; author of Sonner and Vaul
+
+> ⚠ **undefined** — His own Sonner ships close to the `prefers-reduced-motion` nuclear reset that Comeau argues against. Practitioners genuinely disagree there.
+
+### `T2-PLAIN-EASE-ENTRANCE` ? The sluggish entrance curve
+
+*Tier 2 — felt rather than named, but decisive · confidence DEMONSTRATED*
+
+**What it looks for.** The `ease` keyword or `cubic-bezier(0.25, 0.1, 0.25, 1)` on a transition or animation in a reveal/entrance rule.
+
+**Why it matters.** `ease` has an ease-IN component, so the element starts from zero velocity. That slow start is the sluggish signature. The alternative gives the effect that something came hustling in from far away and settles in front of the user. Easing is the most important part of any animation, and this is a one-token fix.
+
+**The better move.** Use `ease-out`, or out-cubic. Do NOT use out-expo at short durations — at 180-260ms it is so front-loaded it reads as a glitch.
+
+**What it teaches.** Easing is the rhythm of a movement — whether it starts fast and settles, or starts slow and speeds up. Things arriving on screen should start fast and settle, like something sliding to a stop. The default setting does the opposite, which is why so many animated pages feel heavy.
+
+**Who says so.** Josh W. Comeau — independent educator, interactive CSS tutorials · local-site-forge research/11-reference-tier.md
+
+> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
+
+### `T2-AOS-TRAVEL` ? Elements travelling too far on entry
+
+*Tier 2 — felt rather than named, but decisive · confidence ASSERTED*
+
+**What it looks for.** `translateY` of 15px or more in the hidden state of a reveal rule. The corpus locks 14px as the ceiling for a client site and recommends going quieter, not louder, on your own.
+
+**Why it matters.** 40px and above is the default of a widely-used scroll-animation library and is the most recognisable template signature there is. The corpus supplies both ends of the dial from production: Legora's hero word reveal travels TWO pixels. Two pixels is felt, not seen — and a large travel distance reads as a website doing a trick, which invites the thought that someone paid for it.
+
+**The better move.** Set the travel to 14px and stop. On your own site, consider 2px, or no travel at all — a pure fade.
+
+**What it teaches.** When something slides into place, the distance it travels is what decides whether the motion reads as considered or as a stunt. A long slide is the default setting of a popular animation library, so it is on an enormous number of pages. A very short one — a few pixels — is felt rather than seen, which is the effect you actually want.
+
+**Who says so.** Emil Kowalski — design engineer at Linear, ex-Vercel; author of Sonner and Vaul · local-site-forge research/11-reference-tier.md
+
+> ⚠ **undefined** — His own Sonner ships close to the `prefers-reduced-motion` nuclear reset that Comeau argues against. Practitioners genuinely disagree there.
+
+> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
+
+### `T2-TRANSITION-ALL` ? transition: all
+
+*Tier 2 — felt rather than named, but decisive · confidence ASSERTED*
+
+**What it looks for.** `transition: all` or `transition-property: all`.
+
+**Why it matters.** It animates properties you did not intend, including layout properties that force the browser to recalculate the page on every frame. It also makes the intent unreadable: nobody can tell from the code what is supposed to move.
+
+**The better move.** Name the properties. Almost always `transform` and `opacity`, which are the two the browser can animate without redoing layout.
+
+**What it teaches.** Telling the browser to animate 'all' properties means it watches every one of them, including the ones that change the layout of the page and force everything to be measured again. Name the two or three you actually want to move.
+
+**Who says so.** local-site-forge research/08-craft.md · Josh W. Comeau — independent educator, interactive CSS tutorials
+
+> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+
+### `T2-UNIVERSAL-FADEUP` ? Every section fading up on scroll
+
+*Tier 2 — felt rather than named, but decisive · confidence ASSERTED*
+
+**What it looks for.** More than half of the page's top-level content blocks carry the same reveal/animate-on-scroll class.
+
+**Why it matters.** The page never settles. This has been the default output of one scroll-animation library since 2015, so the uniformity IS the signature. The corpus frames it as a budget problem: roughly 100% of the motion budget spent on one identical reveal applied to twelve elements, when two or three moments that respond to the USER would read as more considered while doing strictly less.
+
+**The better move.** Spend the budget on the press instead. Two rules: a `:active` scale on real buttons, and at most one entrance sequence below the fold. Above the fold nothing animates, because there is no scroll yet.
+
+**What it teaches.** When everything on a page animates in, the animation stops meaning anything — it just delays the reading. The version that feels considered is the opposite: almost nothing moves on its own, and the things the visitor touches respond instantly. One is cheaper to build and reads as more expensive.
+
+**Who says so.** Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents · Rauno Freiberg — design engineer at Vercel; Web Interface Guidelines
+
+> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
+
+> ⚠ **undefined** — He says himself: 'This essay is not a tutorial nor a collection of guidelines.'
+
+### `T2-HERO-REVEAL` ?? The biggest thing on the page is hidden until JavaScript runs
+
+*Tier 2 — felt rather than named, but decisive · confidence MEASURED_HERE*
+
+**What it looks for.** The first heading inside the hero region carries a class that the stylesheet sets to `opacity: 0`.
+
+**Why it matters.** It is a bug, not a taste call. An element at `opacity: 0` does not count as painted, so the page's own largest paint waits for a script to parse and an observer to fire. Above-the-fold content should never be revealed on scroll for the simple reason that there is no scroll yet.
+
+**The better move.** Strip the reveal class from the hero heading, its subhead, its buttons and any proof list. Reveal starts at the first section below the fold, or not at all.
+
+**What it teaches.** Browsers measure how quickly your biggest piece of content appears. If that piece starts invisible and waits for JavaScript, you have put your own score behind a script for no benefit — nobody has scrolled yet, so there is nothing to reveal. Let the top of the page simply be there.
+
+**Who says so.** local-site-forge research/08a-sitegen-spec.md
+
+> ⚠ **undefined** — Its `--stagger: 45ms` has no practitioner source and the file says so. Do not attribute it to anyone.
+
+### `T2-NESTED-REVEAL` ? A reveal inside a reveal
+
+*Tier 2 — felt rather than named, but decisive · confidence MEASURED_HERE*
+
+**What it looks for.** An element carrying a reveal class that contains a descendant carrying the same class.
+
+**Why it matters.** An `opacity: 0` subtree inside an `opacity: 0` parent with independent delays. The inner elements can finish their animation while the parent is still invisible, so the timings are meaningless and the content can appear in the wrong order.
+
+**The better move.** Pull the whole group out of the reveal system rather than tuning the delays. Animate the container or the children, never both.
+
+**What it teaches.** If a box fades in and the things inside it also fade in separately, the two fades fight each other and the timing stops being controllable. Pick one level to animate.
+
+**Who says so.** local-site-forge research/08a-sitegen-spec.md
+
+> ⚠ **undefined** — Its `--stagger: 45ms` has no practitioner source and the file says so. Do not attribute it to anyone.
+
+### `F-STICKY-COLLISION` ? Two sticky elements that will overlap
+
+*The floor — what makes a page look broken rather than cheap · confidence DEMONSTRATED*
+
+**What it looks for.** Two or more rules setting `position: sticky` with `top: 0`; or a sticky `top` given as a literal pixel value rather than a custom property.
+
+**Why it matters.** Easy to hit and it looks badly broken. Both stick at the same place during scroll and the deeper-in-DOM one paints over the other. The hardcoded-offset version is worse because it works on the developer's screen: a two-line banner on a narrow phone is taller than the guessed number.
+
+**The better move.** Measure the first element's height in script and write it to a custom property, then offset the second by that property. Give the top element the higher z-index.
+
+**What it teaches.** Two bars that both stick to the top of the screen will land in the same place and cover each other. If you offset the second one by a number you guessed, it will be wrong on a narrow phone where the first bar wraps to two lines. Measure it instead.
+
+**Who says so.** local-site-forge research/08-craft.md
+
+> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
 ---
 
@@ -731,117 +944,139 @@ The most useful editing tool in the whole corpus, and it is free. "Search your m
 
 **The rules that carry this** — 8 of them:
 
-### `benefit-speak` ?! Benefit-speak
+### `W-BENEFIT-SPEAK` ?? Benefit-speak
 
-*Tier 3 — copy, which for a teaching business may matter most of all · confidence DEMONSTRATED*
+*Tier 3 — copy, which for a teaching practice may matter most of all · confidence DEMONSTRATED*
 
-**What it looks for.** A word from the benefit-speak lexicon in visible copy: elevate, supercharge, streamline, empower, effortless(ly), seamless(ly), revolutionize, game-changer, world-class, next-level, unleash, turbocharge, "unlock the/your/a/new". Functional uses ("unlock with Face ID") are spared.
+**What it looks for.** One or more lexicon terms in visible copy. Functional uses are spared — 'Unlock with Face ID' is an instruction, not a claim.
 
-**Why it matters.** Gesso ships this as a hard gate. Each of these words describes a FEELING the reader is supposed to have rather than a thing you do, which means none of them can be checked. That is why they cluster: a sentence with no checkable content has to be filled with something, and this is the vocabulary that fills it. A parent choosing a chess teacher is not evaluating whether you will "elevate" their child. They are working out whether you will turn up, whether you can teach, and what it costs.
+**Why it matters.** It is a published gate with a named word list, which makes it one of the few copy rules that is genuinely executable. Every one of these words describes an effect on the reader rather than a thing the business does, so none of them can be checked.
 
-**The better move.** Replace the word with the thing it was standing in for. Not "elevate your game" — "we work through your own losses, one a week, until you stop losing the same way." The second sentence can be wrong, which is exactly what makes it worth believing.
+**The better move.** Replace each one with the thing it is standing in for. 'Streamline your accounts' probably means 'we file your quarterly return'. Say that.
 
-**Who says so.** Gesso Build, @gessobuild/anti-slop · research/08-craft.md
+**What it teaches.** These words all describe how the reader is supposed to feel rather than what actually happens. They are also the exact words that show up on every machine-written page, so they now read as filler even to people who could not explain why. Swap each one for the concrete thing it was hiding.
 
-> ⚠ **research/08-craft.md** — The file is explicit that the TIERING ITSELF is asserted: the sweep found no study of what non-technical business owners notice. Treat the ordering as a testable hypothesis, not a finding.
+**Who says so.** Gesso Build — @gessobuild/anti-slop
 
-### `not-x-but-y` ?! The "not just X, it's Y" cadence
+> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
 
-*Tier 3 — copy, which for a teaching business may matter most of all · confidence DEMONSTRATED*
+### `W-NOT-X-BUT-Y` ? The 'not just X, it's Y' cadence
 
-**What it looks for.** "not just X, it's Y", "isn't just X, it's Y", "more than just X", "not only X but also Y" in visible copy.
+*Tier 3 — copy, which for a teaching practice may matter most of all · confidence DEMONSTRATED*
 
-**Why it matters.** Gesso names it "the single most recognized generated-copy cadence: contrast as a tic." The structure promises a reversal and then delivers a synonym — "not just lessons, it's a journey" tells the reader nothing except that the writer wanted the sentence to feel bigger than it was. It is a rhythm rather than an argument, which is why a model produces it: the shape is learnable without any content behind it.
+**What it looks for.** A sentence opening with 'not just', 'more than just', "it's not (just) a/an/about" or "isn't just", followed by a contrasting clause.
 
-**The better move.** Delete the first half. Whatever comes after "it's" was the claim; say that, and say it in terms that could be checked. If the second half turns out to be nothing once the scaffolding is gone, you have found a sentence that was never saying anything.
+**Why it matters.** Named in the corpus as the single most recognised generated-copy cadence: contrast as a tic. It promises that the second half is more valuable than the first, and the second half is always the vaguer of the two.
 
-**Who says so.** Gesso Build, @gessobuild/anti-slop
+**The better move.** Delete the first half. Whatever the second half claims, say it directly — and then check it against the falsifiability test, because the second half is usually the unfalsifiable one.
 
-### `em-dash-copy` ?! An em dash in short interface copy
+**What it teaches.** This sentence shape sounds like it is making a point, but it works by dismissing something concrete in favour of something vague. Say the concrete thing and stop.
 
-*Tier 3 — copy, which for a teaching business may matter most of all · confidence DEMONSTRATED*
+**Who says so.** Gesso Build — @gessobuild/anti-slop
 
-**What it looks for.** A U+2014 em dash in visible copy of 120 characters or fewer — a heading, a button, a label, a card. Unspaced ranges (Mon–Fri, 9–5) use an en dash and are spared. Long prose is spared.
+> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
 
-**Why it matters.** Gesso ships `em-dash-copy` with an auto-fix to a comma, and the corpus puts it alongside the coloured left border as one of the two most reliable machine signatures. That is not because the punctuation is wrong — in an essay the em dash is the right mark. It is because short UI copy has no room for an aside, so when one appears it is usually the model reaching for a rhythm rather than the writer making a break. In a button label or a card heading it reads as written-by-something.
+### `W-EM-DASH` ? An em dash in short interface copy
 
-**The better move.** Use a comma, a full stop, or two sentences. If the aside is worth keeping, it is worth its own line. Keep the em dash for prose where you are genuinely interrupting yourself.
+*Tier 3 — copy, which for a teaching practice may matter most of all · confidence DEMONSTRATED*
 
-**Who says so.** Gesso Build, @gessobuild/anti-slop
+**What it looks for.** A U+2014 EM DASH in a visible text block of 140 characters or fewer. Unspaced ranges (Mon—Fri, 9—5) are spared: that is a range, not a rhetorical pause.
 
-### `fabricated-precision` ?! A number that sounds measured and is not
+**Why it matters.** It is the most-cited written tell there is, and its detector is one of the cleanest in the corpus: a single U+2014 in visible copy, with unspaced ranges spared.
 
-*Tier 3 — copy, which for a teaching business may matter most of all · confidence DEMONSTRATED*
+**The better move.** A comma, a full stop, or two sentences. In long-form prose the em dash is fine; in a button label or a card heading it is a tell.
 
-**What it looks for.** 99.9% / 99.99%, an "Nx" multiplier, "#1", "trusted by" plus a crowd, a percentage improvement, or a large round count — in visible copy.
+**What it teaches.** The long dash has become the single most recognised sign of machine-written text, particularly in short phrases where a comma would do. Long prose can carry it. A four-word heading cannot.
 
-**Why it matters.** Gesso ships `fabricated-precision` and `oversized-number`; Hallmark's gate 46 is broader and is the one that matters here: ANY metric the client did not supply. The corpus states the principle in one line — "The number-shaped hole is honest; the fabricated number is slop." A decimal place is a claim that somebody counted. 99.9% says a measurement was taken; "10x" says a comparison was run. If neither happened, the number is doing the work of evidence while being decoration, and the person most likely to notice is the one who knows the real figure.
+**Who says so.** Gesso Build — @gessobuild/anti-slop
 
-**The better move.** research/08-craft.md gives the fixes in preference order. Replace the number with an em dash and a plainly-labelled "metric to confirm" block. Or ask and wait. Or — the honest one nobody likes — rebuild the section without a proof slot at all, because "a stat-led macrostructure with no real stats is the wrong macrostructure." If you DO have the number, say where it came from: "37 students since 2019, from my own records" beats "trusted by hundreds" and cannot be doubted.
+> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
 
-**Who says so.** Gesso Build, @gessobuild/anti-slop · Hallmark (Hassan El Mghari / Nutlope) · chess-tee-forge/store, DESIGN-SYSTEM.md
+### `W-FABRICATED-PRECISION` ?? Fabricated precision
 
-> ⚠ **Hallmark (Hassan El Mghari / Nutlope)** — Design opinion with a commercial context. Its CORE tells match Krebs’s independent empirical count, which is why the core is trusted here; its elaborate prescriptions (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever this kit uses them.
+*Tier 3 — copy, which for a teaching practice may matter most of all · confidence DEMONSTRATED*
 
-> ⚠ **chess-tee-forge/store, DESIGN-SYSTEM.md** — Two of its rules are here because that project shipped the bug first. It advertised one price and charged another, from a second copy of the figure. And it set a name under a quotation, which is an attribution even with no "said" and no dash.
+**What it looks for.** Any of: a 99.9-class uptime figure, an Nx multiplier, '#1', 'trusted by' followed by a round crowd number, an un-abbreviated figure of 10,000 or more, or a vague plural crowd claim.
 
-### `misattributed-stat` ?! The statistic that does not check out
+**Why it matters.** A precise number invites checking. A precise number that is invented fails the check. And on a page for a small business the reader is usually the owner, who knows exactly how many customers he has.
 
-*Tier 3 — copy, which for a teaching business may matter most of all · confidence DEMONSTRATED*
+**The better move.** Delete it, or replace it with the real number and say where it came from and when it was measured. If the real number is small, the small number is more persuasive than the round one, because it is checkable.
 
-**What it looks for.** The claim that 94% (or 97%) of first impressions are design-related, in any phrasing, attributed to Stanford or not.
+**What it teaches.** Numbers are the most persuasive thing you can put on a page and the easiest thing to be caught on. A round impressive figure that nobody can trace is worse than no figure — it teaches the reader that you do not check things, and once they have learned that they discount everything else.
 
-**Why it matters.** research/04-design-language.md carries a red statistic-integrity warning about exactly this, because it is the stat anyone writing about web design reaches for first, and it is wrong. Stanford's Web Credibility Project found 46.1% — that consumers assessed credibility partly on visual design. The 94% figure comes from a DIFFERENT study measuring what participants gave feedback about (94% of feedback concerned design, 6% content), which is a completely different claim. The "2026 update, 97%, 19,000 participants" version has no corroboration at all and appears only on SEO-content aggregator pages. The reason this is a hard rule rather than a nitpick is in the source file: "A business owner who Googles your stat and finds it's wrong has learned you don't check things." In a trust sale that is fatal, and teaching is entirely a trust sale.
+**Who says so.** Gesso Build — @gessobuild/anti-slop
 
-**The better move.** Cite Lindgaard, Fernandes, Dudek & Brown (2006), "Attention web designers: You have 50 milliseconds to make a good first impression!", Behaviour & Information Technology 25(2), 115-126 — real, peer-reviewed, around 1,068 citations, and it says what you wanted the other one to say. Or cite Stanford's actual 46.1%. Or cite nothing, which is also fine.
+> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
 
-**Who says so.** research/04-design-language.md · Lindgaard, Fernandes, Dudek & Brown (2006)
+### `W-BANNED-STAT-94` ?? The 94% first-impressions statistic
 
-> ⚠ **Lindgaard, Fernandes, Dudek & Brown (2006)** — Cited here for one reason: it is the REPLACEMENT for the "94% of first impressions are design-related / Stanford" claim, which research/04 documents as a misattribution. Stanford’s Web Credibility Project actually found 46.1%. This kit detects the wrong figure in your copy and will never emit it.
+*Tier 3 — copy, which for a teaching practice may matter most of all · confidence DEMONSTRATED*
 
-### `unsupported-superlative` ?! An award nobody gave
+**What it looks for.** A 94% or 97% figure within 80 characters of 'first impression' or 'design'. The 2026 '97%, 19,000 participants, 16 countries' variant has no corroboration anywhere and appears only on content-aggregator pages; treat it as fabricated.
 
-*Honesty — claims that cannot be checked, and claims that are not yours · confidence DEMONSTRATED*
+**Why it matters.** It is a documented misattribution and it is the one statistic you would reach for first. Stanford's Web Credibility Project found 46.1% of consumers assessed credibility partly on visual design. The 94% comes from a different study measuring what participants gave FEEDBACK about — a completely different claim. A prospect who Googles your statistic and finds it wrong has learned you do not check things, and in a trust sale that is fatal.
 
-**What it looks for.** "Award-winning", "#1 rated", "best-selling", "world-class", "market leader", "the best in the city".
+**The better move.** Cite Lindgaard et al. 2006 — 'Attention web designers: You have 50 milliseconds to make a good first impression!', Behaviour & Information Technology 25(2), 115-126, three experiments, around 1,068 citations. Or cite the real Stanford figure of 46.1%. Or cite nothing.
 
-**Why it matters.** A superlative reads as a checkable claim, because it is one. If there is no award and no ranking behind it, a visitor who looks and finds nothing has learned something about everything else on the page.
+**What it teaches.** There is a famous statistic about design and first impressions that is quoted everywhere and is wrong — the real number from that study is about half as big, and the 94% comes from a different study asking a different question. Using it is a test you will fail in front of the one person most likely to check.
 
-**The better move.** Name the award and link to it. Or say the specific true thing, which is almost always more persuasive: not "award-winning coach" but "FIDE Candidate Master, teaching since 1998".
+**Who says so.** local-site-forge research/04-design-language.md · local-site-forge research/11-reference-tier.md
 
-**Who says so.** chess-tee-forge/store, DESIGN-SYSTEM.md · Gesso Build, @gessobuild/anti-slop
+> ⚠ **undefined** — Its §3 'what reads as modern' list (bento, kinetic type, glassmorphism) is directional secondary-source consensus, and research/08 §4 later records that in 2026 'reads as 2026' and 'reads as AI-generated' are the same set. Where 04 and 08 conflict, 08 wins and the rule says so.
 
-> ⚠ **chess-tee-forge/store, DESIGN-SYSTEM.md** — Two of its rules are here because that project shipped the bug first. It advertised one price and charged another, from a second copy of the figure. And it set a name under a quotation, which is an attribution even with no "said" and no dash.
+> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
 
-### `unfalsifiable-claim` ?! A sentence that cannot be false
+### `W-WEASEL-TRUST` ? Unearned trust language
 
-*Tier 3 — copy, which for a teaching business may matter most of all · confidence ASSERTED*
+*Tier 3 — copy, which for a teaching practice may matter most of all · confidence ASSERTED*
 
-**What it looks for.** A phrase from the unfalsifiable lexicon in visible copy.
+**What it looks for.** Any of those phrases in visible copy, unless an adjacent element supplies the specific award, the specific client, or the specific measurement.
 
-**Why it matters.** This is the falsifiability test applied directly. research/08-craft.md §5.3 calls it the single most useful sentence in the whole sweep: "Search your meeting notes" beats "Unlock your knowledge" because it CAN BE TRUE. Every phrase in this lexicon fails the test — no possible state of the world would make "committed to excellence" false, which is why it conveys nothing and why every competitor can write it too. The corpus adds the point that matters for a small practice: for this audience "bespoke" does not mean aesthetically unique, it means "this person looked at MY situation". That is a content property. No amount of design produces it; one specific fact does.
+**Why it matters.** These are claims, and a claim with no evidence attached is worse than no claim. The corpus is direct about the mechanism for this audience: the buyer's live fear is abandonment and fraud, not ugliness. Unsupported trust language reads as the shape of the thing they have been warned about.
 
-**The better move.** Replace it with something that could be wrong. Not "tailored to your needs" — "we start from your last three losses, not from an opening book." Not "proven track record" — "eleven of my students have crossed 1600; two have not, and I will tell you why on the call." The second half of that sentence is what makes the first half believable.
+**The better move.** Name the award and the year, or name the clients with their permission, or delete the sentence. A licence number, a years-in-business figure you can prove, or an opening time are all checkable and do the same job better.
 
-**Who says so.** Gesso Build, @gessobuild/anti-slop · research/08-craft.md
+**What it teaches.** Words like 'trusted' and 'award-winning' are claims about the world, and a reader who cannot check them treats them as noise at best and as a warning sign at worst. One specific verifiable fact — a licence number, the year the shop opened — outperforms a paragraph of them.
 
-> ⚠ **research/08-craft.md** — The file is explicit that the TIERING ITSELF is asserted: the sweep found no study of what non-technical business owners notice. Treat the ordering as a testable hypothesis, not a finding.
+**Who says so.** Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents · local-site-forge research/08-craft.md
 
-### `rule-of-three` ?! Every list exactly three items long
+> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
 
-*Tier 3 — copy, which for a teaching business may matter most of all · confidence ASSERTED*
+> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
-**What it looks for.** Three or more lists on one page, every one of them exactly three items long.
+### `W-FALSIFIABILITY` ? A sentence that cannot be true or false
 
-**Why it matters.** From the HN practitioner thread the corpus quotes: prose forced into bullets, lists always exactly three items, and "items that don't all seem to belong in the same natural category". The last is the sharpest detector in the set and no tool can automate it — but the first two are countable. Three is the length a list comes out when the number was chosen by rhythm rather than by the subject. Real inventories are lumpy: you teach four things, or two, or seven with three that matter.
+*Tier 3 — copy, which for a teaching practice may matter most of all · confidence ASSERTED*
 
-**The better move.** Count the actual things and list that many. If one of them is more important than the others — and for a teaching practice one usually is — do not give it equal billing in a bullet list. Say it in a sentence and let the rest be a list.
+**What it looks for.** Reported, not gated. Every heading and lede is listed with the question attached. Sentences with no concrete anchor at all are surfaced at the top of the list.
 
-**Who says so.** Hacker News practitioner threads · research/08-craft.md
+**Why it matters.** This is the governing rule of the whole corpus, not a copy tip. The test is one question: can this sentence be true or false? 'Quality service you can trust' cannot be. 'We open at 7 so you can get a cut before work' can. Every claim on the page should be falsifiable BY THE OWNER, because he is the reader — and for this audience, 'bespoke' does not mean aesthetically unique, it means 'this person looked at MY business'. That is a content property. No amount of palette variation produces it; a single specific fact does.
 
-> ⚠ **Hacker News practitioner threads** — Forum anecdote. Never better than ASSERTED, and tagged that way.
+**The better move.** Replace the claim with a fact the owner could confirm or deny. Opening times, a neighbourhood, a licence number, the makes of car serviced, what to bring to an appointment, the after-hours policy. Each is concrete, each is checkable, and each is more persuasive than an adjective.
 
-> ⚠ **research/08-craft.md** — The file is explicit that the TIERING ITSELF is asserted: the sweep found no study of what non-technical business owners notice. Treat the ordering as a testable hypothesis, not a finding.
+**What it teaches.** Ask of every sentence on the page: could someone prove this wrong? 'We deliver excellence' cannot be proven wrong, which is why it means nothing. 'We open at 7' can, which is why it is worth reading. The sentences that could be wrong are the only ones doing any work.
+
+**Who says so.** Gesso Build — @gessobuild/anti-slop · local-site-forge research/11-reference-tier.md
+
+> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
+
+> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
+
+### `W-RULE-OF-THREE` ?! Every list is exactly three items
+
+*Tier 3 — copy, which for a teaching practice may matter most of all · confidence ASSERTED*
+
+**What it looks for.** 3 or more lists on the page, all of exactly 3 items.
+
+**Why it matters.** Three is the length a generator produces because three looks balanced, not because the business has three of something. It is the copy equivalent of three identical cards, and the tell is the same: uniformity across the page, not the number itself.
+
+**The better move.** Let each list be as long as the truth. Four services is four items. One service is one item and a sentence.
+
+**What it teaches.** Lists of three look tidy, so machines produce them constantly. Businesses rarely have exactly three of everything. Let the number of items be the real number — the raggedness is a sign a person wrote it.
+
+**Who says so.** local-site-forge research/08-craft.md
+
+> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
 ---
 
@@ -856,95 +1091,143 @@ This is the only thing on the whole list that cannot be recovered from once it i
 - Leave the hole and label it. For a page that is still a proposal the honest hole is an ADVANTAGE: it proves the rest was not fabricated either, and it hands the subject something concrete to supply.
 - Write every fact once. A price in two files is two prices, and they agree right up until the day one of them is edited.
 
-**The rules that carry this** — 6 of them:
+**The rules that carry this** — 8 of them:
 
-### `invented-proof` ?? Proof that nobody supplied
+### `H-INVENTED-TESTIMONIAL` ? A testimonial that did not come from a customer
 
-*Honesty — claims that cannot be checked, and claims that are not yours · confidence DEMONSTRATED*
+*Honesty — claims that cannot be checked, and claims that are not yours · confidence ASSERTED*
 
-**What it looks for.** A testimonial block, a star rating, an "as seen in" or "trusted by" line, or a customer count — anywhere in the page, including inside an HTML comment. A sentence that NEGATES the claim ("no testimonials yet") is reported as a note instead.
+**What it looks for.** Any testimonial, review or star-rating component present. Reported for confirmation rather than auto-failed — the check is whether the content came from a real customer, which the tool cannot know.
 
-**Why it matters.** research/08-craft.md §5.3 puts the stake in the ground: "Never fabricate proof. A fake testimonial from 'Sarah M.' with a generated headshot, shown to a man who knows every regular in his shop, is unrecoverable." For a chess teacher the equivalent is sharper still, because the club is small and everybody knows everybody. An invented parent quote is a quote that a real parent will read, and recognise as not theirs. The reference storefront handles this by saying outright, on the page, that it has no reviews and no press — which is not an apology, it is the thing that makes everything else on the page believable.
+**Why it matters.** The corpus is unusually blunt: a fake testimonial from 'Sarah M.' with a generated headshot, shown to a man who knows every regular in his shop, is unrecoverable. And it inverts into an advantage — a visible 'your Google rating goes here' block is not a weakness. It is a conversation opener, it proves you did not fabricate, and it gives the owner something to do. The holes are the pitch.
 
-**The better move.** Delete it, and leave a labelled hole where it was: a visible block that says what will go there and who it will come from. research/08-craft.md gives the reasoning in one line — "The holes are the pitch." When the first real quotation arrives, you will have somewhere to put it, and it will land with the weight of the only quotation on the page.
+**The better move.** Show the real reviews, with a link to where they live. If there are none yet, ship the labelled hole: a block that says a Google rating goes here, styled as part of the design rather than as an apology.
 
-**Who says so.** chess-tee-forge/store, DESIGN-SYSTEM.md · research/08-craft.md · Hallmark (Hassan El Mghari / Nutlope)
+**What it teaches.** Made-up reviews are the single most expensive mistake on a small business page, because the person you are showing it to knows every one of their actual customers. An empty, clearly-labelled space for reviews is not embarrassing — it is proof you did not invent any, and it gives the owner an obvious next step.
 
-> ⚠ **chess-tee-forge/store, DESIGN-SYSTEM.md** — Two of its rules are here because that project shipped the bug first. It advertised one price and charged another, from a second copy of the figure. And it set a name under a quotation, which is an attribution even with no "said" and no dash.
+**Who says so.** local-site-forge research/08-craft.md · chess-tee-forge storefront — DESIGN-SYSTEM.md and store/
 
-> ⚠ **research/08-craft.md** — The file is explicit that the TIERING ITSELF is asserted: the sweep found no study of what non-technical business owners notice. Treat the ordering as a testable hypothesis, not a finding.
+> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
-> ⚠ **Hallmark (Hassan El Mghari / Nutlope)** — Design opinion with a commercial context. Its CORE tells match Krebs’s independent empirical count, which is why the core is trusted here; its elaborate prescriptions (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever this kit uses them.
+> ⚠ **undefined** — Its own font delivery links fonts.googleapis.com, which research/11 §5.4 rejects. Take the honesty rules; do not take the font route.
 
-### `unverified-attribution` ? A name under a quotation
-
-*Honesty — claims that cannot be checked, and claims that are not yours · confidence DEMONSTRATED*
-
-**What it looks for.** A quotation block immediately followed by a short block that reads as an attribution: a <cite>, a dash and a capitalised name, a class naming it as an author or source, a <figcaption>, a "said/wrote/according to" verb, or — the subtle one — a person-shaped name standing on its own line.
-
-**Why it matters.** A name set under a quotation IS an attribution, even with no "said" and no dash. The reference storefront shipped exactly this bug, which is why the rule exists in this form: it carried a famous chess quotation with a name beneath it, and the attribution was one of those that is repeated everywhere and traces to no primary source. The page now carries the same words with no name and a note explaining why. That is the harder and better answer — the quotation is still worth reading, and the claim about who said it was the part that could not be supported. For a chess site this is not hypothetical. A large share of the most-quoted chess aphorisms are misattributed, and the audience for your site is the exact population that knows it.
-
-**The better move.** Three options, in order of preference. Find the primary source and cite it, with the book and the page. Or keep the quotation and drop the name, with a line saying why — that is what the storefront does. Or drop the quotation. If you have verified it, record it in a `.honesty.json` file at the site root: `{"verified":[{"text":"…","source":"Lasker, Manual of Chess, 1925, p. 121"}]}`. An entry with no source suppresses nothing, deliberately — a promise is not a citation.
-
-**Who says so.** chess-tee-forge/store, DESIGN-SYSTEM.md
-
-> ⚠ **chess-tee-forge/store, DESIGN-SYSTEM.md** — Two of its rules are here because that project shipped the bug first. It advertised one price and charged another, from a second copy of the figure. And it set a name under a quotation, which is an attribution even with no "said" and no dash.
-
-### `placeholder-identity` ?? A stand-in name, address or number still in the page
+### `H-QUOTE-ATTRIBUTION` ?? A name set under a quotation
 
 *Honesty — claims that cannot be checked, and claims that are not yours · confidence DEMONSTRATED*
 
-**What it looks for.** Acme / Contoso / Globex, "Your Company Here", John or Jane Doe, an @example.com address, a 555-01xx phone number, or 123 Main Street.
+**What it looks for.** A text block of 12 words or fewer immediately following a `blockquote`, `q`, or an element whose class matches /quote|testimonial|words|pull/, when that block contains a capitalised name pattern, a dash-prefixed name, or a job-title word.
 
-**Why it matters.** These are worse than an empty space because a visitor will read them as real and may try to use them. The reference storefront's answer is worth copying exactly: it draws the unfilled fields AS unfilled fields — a dashed box reading WORDMARK, with the words "placeholder, no name chosen" beside it, and a sentence in the footer saying the four legal fields must be filled before a single order is taken. "A premature logo is worse than none, so the dashed field is the design: an unfilled box on a drawing."
+**Why it matters.** This is the rule that exists because the bug shipped. A name set under a quotation IS an attribution, whether or not it is inside a `<cite>` tag, and whether or not anyone intended it as one. If the attribution has not been traced to a primary source, that layout is asserting something untrue.
 
-**The better move.** Put the real detail in. If you do not have it yet, draw the hole: mark the element `data-placeholder` and style it as an obviously unfilled field, so nobody — including you, six weeks from now — mistakes it for content.
+**The better move.** Either trace the attribution to a primary source and cite it properly with a link, or remove the name and add a note saying the attribution could not be verified. Removing the name is not a loss — the note is more interesting than the name was.
 
-**Who says so.** chess-tee-forge/store, DESIGN-SYSTEM.md
+**What it teaches.** Putting a name under a quote tells the reader that person said it. If you have not actually traced the quote to where it was first written down, you are making a claim you cannot support — and quotes get misattributed constantly. Keep the words, drop the name, and say why.
 
-> ⚠ **chess-tee-forge/store, DESIGN-SYSTEM.md** — Two of its rules are here because that project shipped the bug first. It advertised one price and charged another, from a second copy of the figure. And it set a name under a quotation, which is an attribution even with no "said" and no dash.
+**Who says so.** chess-tee-forge storefront — DESIGN-SYSTEM.md and store/
 
-### `unfinished-marker` ?! A note to yourself that a visitor can read
+> ⚠ **undefined** — Its own font delivery links fonts.googleapis.com, which research/11 §5.4 rejects. Take the honesty rules; do not take the font route.
 
-*Honesty — claims that cannot be checked, and claims that are not yours · confidence DEMONSTRATED*
-
-**What it looks for.** TODO, TBD, FIXME, XXX, PLACEHOLDER, COMING SOON, or a bracketed [insert something here] in visible copy.
-
-**Why it matters.** A visitor cannot tell the difference between a site that is unfinished and a site that is abandoned. "Coming soon" has meant both for thirty years.
-
-**The better move.** Fill it in, or delete the block until you can. A shorter complete page beats a longer one with holes in it.
-
-**Who says so.** chess-tee-forge/store, DESIGN-SYSTEM.md
-
-> ⚠ **chess-tee-forge/store, DESIGN-SYSTEM.md** — Two of its rules are here because that project shipped the bug first. It advertised one price and charged another, from a second copy of the figure. And it set a name under a quotation, which is an attribution even with no "said" and no dash.
-
-### `lorem-ipsum` ?? Filler Latin still in the page
+### `H-INVENTED-BRAND` ? A brand name or logo that does not exist
 
 *Honesty — claims that cannot be checked, and claims that are not yours · confidence DEMONSTRATED*
 
-**What it looks for.** Lorem ipsum, dolor sit amet, consectetur adipiscing, and their neighbours.
+**What it looks for.** Reported, not gated. Every brand-position element is listed and the question is attached.
 
-**Why it matters.** A visitor reads this as a broken site, not as a draft. It is the single most legible sign that nobody has read the page.
+**Why it matters.** A premature logo is worse than none. It presents a decision as already made, and it presents it to the one person who would know it was not. The right answer is to make the placeholder LOOK like a placeholder: an unfilled box on a drawing.
 
-**The better move.** Write the real sentence, or delete the block until there is one.
+**The better move.** If no name or mark exists, ship the placeholder as a placeholder — a dashed box reading WORDMARK, with a line beside it saying no name has been chosen — and repeat the point in words in the footer. Do not restyle the placeholder into something that looks like a decision.
 
-**Who says so.** chess-tee-forge/store, DESIGN-SYSTEM.md
+**What it teaches.** If the business has no logo yet, drawing one for them is not a favour: it quietly claims a decision they have not made. A box that visibly says 'no name chosen' is honest, looks deliberate, and starts the right conversation.
 
-> ⚠ **chess-tee-forge/store, DESIGN-SYSTEM.md** — Two of its rules are here because that project shipped the bug first. It advertised one price and charged another, from a second copy of the figure. And it set a name under a quotation, which is an attribution even with no "said" and no dash.
+**Who says so.** chess-tee-forge storefront — DESIGN-SYSTEM.md and store/
 
-### `single-source` ? The same number written in two places
+> ⚠ **undefined** — Its own font delivery links fonts.googleapis.com, which research/11 §5.4 rejects. Take the honesty rules; do not take the font route.
+
+### `H-PRESS-LOGOS` ? A logo wall or 'as seen in' strip
+
+*Honesty — claims that cannot be checked, and claims that are not yours · confidence ASSERTED*
+
+**What it looks for.** An 'as seen in' / 'trusted by' phrase, or a container whose class names a logo wall.
+
+**Why it matters.** Borrowed credibility. Reproducing someone else's mark also carries a trademark problem the page usually has not thought about, and on a spec or concept build it is doubly wrong: the corpus records a documented case of an unsolicited same-name site outranking the real business in search results.
+
+**The better move.** Remove it. If there are real clients who have agreed to be named, name them in words with a link — that is checkable, where a logo is decorative.
+
+**What it teaches.** A row of famous logos borrows other people's reputations and usually without asking. Naming a real client in a sentence, with their permission, does more and cannot be misread.
+
+**Who says so.** local-site-forge research/11-reference-tier.md
+
+> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
+
+### `W-PLACEHOLDER-TEXT` ?? Placeholder text shipped
+
+*Tier 3 — copy, which for a teaching practice may matter most of all · confidence DEMONSTRATED*
+
+**What it looks for.** Any of those strings in visible copy.
+
+**Why it matters.** It means the page was never read end to end before it was shown to someone. On a page for a specific business, a visible template slot is the exact accusation being defended against.
+
+**The better move.** Fill it, or delete the block. If the information genuinely is not available yet, make the gap deliberate and labelled — a visible 'your Google rating goes here' block is a conversation opener and proves you did not invent one.
+
+**What it teaches.** There is a big difference between a gap you meant to leave and a gap you forgot. A deliberate gap, clearly labelled, is honest and gives the owner something to do. Filler text that nobody replaced says the page was never finished.
+
+**Who says so.** chess-tee-forge storefront — DESIGN-SYSTEM.md and store/
+
+> ⚠ **undefined** — Its own font delivery links fonts.googleapis.com, which research/11 §5.4 rejects. Take the honesty rules; do not take the font route.
+
+### `H-SINGLE-SOURCE` ?? The same value written in two places
 
 *Honesty — claims that cannot be checked, and claims that are not yours · confidence DEMONSTRATED*
 
-**What it looks for.** A price, a phone number or an email address appearing as a literal in two or more files.
+**What it looks for.** The same price, phone number, street address or hours string appearing as a literal in 2 or more files of the project.
 
-**Why it matters.** This rule is here because the reference storefront shipped the bug. Four agents built it in parallel against two different pricing documents, and the product grid, the basket and the payment worker each ended up with their own copy of the numbers. A customer walking from a card to the basket watched the price fall and a shipping line appear. The rule the project adopted afterwards is absolute and is worth adopting whole: "A second copy of a price is a second price, and it will drift." It drifts because the two copies are updated by different people on different days, and nothing in the system notices they disagree.
+**Why it matters.** This is not a style preference. Four agents built the chess-tee-forge storefront in parallel against two pricing documents, and the product grid, the basket and the payment worker each ended up with their own copy of the numbers. A customer walking from a product card to the basket watched the price fall and a shipping line appear. A second copy of a price is a second price, and it will drift.
 
-**The better move.** Pick one place for each fact — a small JSON file, or a single element that the others read from — and reference it everywhere else. If that is more machinery than the site deserves, the smaller discipline still works: decide which file is the source, write it in a comment at the top of the others, and check it when you change the number.
+**The better move.** Put the value in exactly one data file and read it everywhere else. Give that file no fallback copy — if it fails to load, the page should fail loudly rather than quietly showing a stale number. That is the correct failure.
 
-**Who says so.** chess-tee-forge/store, DESIGN-SYSTEM.md
+**What it teaches.** If a price is typed in two files, you now have two prices, and one day they will disagree. Keep every fact in one place and read it from there. This sounds like housekeeping and it is actually the difference between a page that is true and a page that used to be true.
 
-> ⚠ **chess-tee-forge/store, DESIGN-SYSTEM.md** — Two of its rules are here because that project shipped the bug first. It advertised one price and charged another, from a second copy of the figure. And it set a name under a quotation, which is an attribution even with no "said" and no dash.
+**Who says so.** chess-tee-forge storefront — DESIGN-SYSTEM.md and store/
+
+> ⚠ **undefined** — Its own font delivery links fonts.googleapis.com, which research/11 §5.4 rejects. Take the honesty rules; do not take the font route.
+
+### `H-UNSOURCED-METRIC` ? A number with no method and no date
+
+*Honesty — claims that cannot be checked, and claims that are not yours · confidence MEASURED_HERE*
+
+**What it looks for.** A numeric claim with no method, date, sample size or source statement within 400 characters.
+
+**Why it matters.** The persuasive value of a number is its checkability. A rounded gloss that a curious owner or a competitor can break on the first question inverts it. The corpus caught itself doing this on the one page whose entire thesis was checkability: a headline claiming 1,184 sites 'no longer load' was false for at least 523 of them, because 290 were parked pages that load fine and 233 returned 404s from a server that answers.
+
+**The better move.** State the method, the date and the population, as a caption. The itemised version is MORE persuasive than the round one, not less, and it is the only version that survives the phone call it is designed to provoke. If a figure is an assumption, stamp it as one.
+
+**What it teaches.** A number with no explanation is an opinion in a suit. Say where it came from, when you measured it, and what exactly you counted — the detail is what makes it convincing, and it is also what stops you being caught out when someone adds up the columns.
+
+**Who says so.** local-site-forge research/11-reference-tier.md · Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents · chess-tee-forge storefront — DESIGN-SYSTEM.md and store/
+
+> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
+
+> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
+
+> ⚠ **undefined** — Its own font delivery links fonts.googleapis.com, which research/11 §5.4 rejects. Take the honesty rules; do not take the font route.
+
+### `H-EMPTY-PROOF-SECTION` ? A proof section with nothing in it
+
+*Honesty — claims that cannot be checked, and claims that are not yours · confidence ASSERTED*
+
+**What it looks for.** A section whose heading or class names proof, containing no text content beyond its own heading, or containing only elements matching W-PLACEHOLDER-TEXT.
+
+**Why it matters.** Worse than omitting the section. It shows the shape of proof with no proof in it, which reads as either an oversight or a template. The corpus's preferred fix is structural: a stat-led macrostructure with no real stats is the wrong macrostructure — rebuild the section rather than filling it.
+
+**The better move.** Three options, in order: replace the number with a labelled hole and a grey 'metric to confirm' block; ask the client and pause; or rebuild the section without a proof slot at all.
+
+**What it teaches.** An empty reviews section is the shape of a promise with nothing inside. Either put something real in it, or label the gap deliberately, or take the whole section out and build the page without that slot.
+
+**Who says so.** local-site-forge research/11-reference-tier.md · Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents
+
+> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
+
+> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
 
 ---
 
@@ -958,51 +1241,141 @@ The hardest idea here, and the reason the problem cannot be solved once. Every e
 - For each one ask: did I choose this, or did I arrive at it because the last thing was burned? Choosing by elimination leaves the same trace as not choosing.
 - The only stable position is deriving choices from the specific subject, because that is the one thing nobody else can adopt.
 
-**The rules that carry this** — 3 of them:
+**The rules that carry this** — 8 of them:
 
-### `cream-wash` !? The cream-and-italic-serif escape
+### `TRAP-CREAM-WASH` ?! The warm cream ground
 
-*The trap tier — reads as sophisticated today, will read as generated soon · confidence ASSERTED*
+*The trap tier — reads as sophisticated today, will read as generated soon · confidence DEMONSTRATED*
 
-**What it looks for.** A page ground in OKLCH lightness 0.92-0.99 at hue 40-110 with chroma 0.015-0.06 — warm oat or cream — reported on its own, and reported harder when a serif display face or monospace capital labels appear with it.
+**What it looks for.** The page's dominant ground colour at OKLCH hue 50-100, chroma above 0.012, lightness above 0.90 — i.e. a visibly warm off-white rather than a barely-tinted one. The 0.012 floor deliberately spares the 0.005-0.015 neutral-tint band that T2-ZERO-CHROMA-GREY requires.
 
-**Why it matters.** Gesso ships this as `cream-default-wash`, and the detail that makes the point is that an HN commenter caught Adrian Krebs's OWN BLOG POST wearing it while he was documenting AI design tells: "recently it's more of the same beige scheme this very blog post is using." Cream became the answer to purple. Then everyone answered purple the same way. The palette is not the problem — the reference storefront in this same corpus is deliberately bone #F3EDE1 rather than white, and it is right to be. The difference is that its cream is DERIVED: it is the measured colour of the ink it prints with. A cream chosen because cream reads as tasteful is a different object from a cream chosen because it is the colour of the thing.
+**Why it matters.** It is already on a detector's trap list, and the corpus records the sharpest possible illustration: a commenter caught the author of the AI-slop STUDY wearing it on the blog post announcing the study. Being the escape hatch is exactly what burns an escape hatch.
 
-**The better move.** Keep the warm ground if you can say where it came from. If you cannot, move the hue somewhere the crowd is not — the anchor hue of a real object in the subject, with the neutrals carrying 0.005-0.015 chroma of it. And if you are also pairing it with a large italic serif and monospace capital labels, you are wearing the full uniform, not one piece of it.
+**The better move.** Keep it if it came from somewhere — the awning, the paper stock, the tile. Change it if it came from a palette list. The test is whether you can say where it came from.
 
-**Who says so.** Gesso Build, @gessobuild/anti-slop · Adrian Krebs, "Design Slop" · febbhav, "Signs of AI Design"
+**What it teaches.** Warm cream backgrounds became popular as the sensible alternative to purple, which means they are now the new default answer. Nothing is wrong with the colour. What matters is whether you chose it or inherited it, and you can tell by whether you can say where it came from.
 
-> ⚠ **Adrian Krebs, "Design Slop"** — Krebs self-reports a 5-10% false-positive rate. He is also honest against his own thesis — an HN commenter caught his own blog post wearing the cream/beige escape hatch he was documenting.
+**Who says so.** Gesso Build — @gessobuild/anti-slop
 
-> ⚠ **febbhav, "Signs of AI Design"** — Catalogues rather than demonstrates.
+> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
 
-### `safe-green` !? Emerald as the "not purple" accent
-
-*The trap tier — reads as sophisticated today, will read as generated soon · confidence ASSERTED*
-
-**What it looks for.** Tailwind emerald #10B981 or its immediate neighbours used as an accent.
-
-**Why it matters.** Gesso ships this as `safe-green-default`. It is the second move in the same game as `indigo-accent`: a generator told not to use purple reaches for the next colour in the same palette file, and emerald is where it lands. It is already flagged, which means it is already burned. Worth noticing what the pattern is, because it will happen again with whatever replaces emerald: the problem was never the hue, it was that the hue came out of a palette rather than out of the subject.
-
-**The better move.** Derive the accent from something real. If the subject has no object to take a colour from, palette_from_subject will build one and will refuse both indigo and this green.
-
-**Who says so.** Gesso Build, @gessobuild/anti-slop · febbhav, "Signs of AI Design"
-
-> ⚠ **febbhav, "Signs of AI Design"** — Catalogues rather than demonstrates.
-
-### `numbered-sections` !? 01 / 02 / 03 as section numbering
+### `TRAP-CREAM-PACKAGE` ? The full cream-and-serif package
 
 *The trap tier — reads as sophisticated today, will read as generated soon · confidence ASSERTED*
 
-**What it looks for.** Two or more short blocks on a page whose entire content is a zero-padded two-digit number.
+**What it looks for.** All three present: a cream ground by the TRAP-CREAM-WASH test, a serif family on display headings, and uppercase monospace or widely-tracked small labels.
 
-**Why it matters.** Gesso ships this as `numbered-section-markers` and the impeccable craft floor refuses it unless "the sequence itself carries information the reader needs". That qualifier is the whole rule. If the reader must do step 01 before step 02, the numbers are information. If they are on the sections of a homepage, they are editorial costume — borrowed from print design where the numbers indexed something, applied to a page where they index nothing.
+**Why it matters.** Any one of the three is defensible. All three together is a recognisable house style with a name, and the corpus's verdict is exact: a serif H1 is defensible; a serif H1 on cream with mono uppercase kickers is not. Pick one.
 
-**The better move.** Delete them. If the sequence genuinely matters — a lesson pathway, an enrolment process — number them 1, 2, 3 without the zero padding, because the padding is the part that is decoration.
+**The better move.** Drop one. The uppercase mono labels are the easiest to lose, and they are usually eyebrow kickers anyway, which T2-KICKER-ANY already wants gone.
 
-**Who says so.** Gesso Build, @gessobuild/anti-slop · impeccable 4.3.1, craft-floor.md
+**What it teaches.** Three specific choices — a cream background, a big italic serif headline, and tiny uppercase labels in a typewriter font — have travelled together so often that together they are now a recognisable look rather than three decisions. Any two of them is fine. All three is a costume.
 
-> ⚠ **impeccable 4.3.1, craft-floor.md** — It runs as an editor hook inside Claude Code, Codex, Cursor and Copilot, not as an MCP server. Where a rule here overlaps, this kit says so and credits it rather than claiming the ground.
+**Who says so.** local-site-forge research/11-reference-tier.md
+
+> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
+
+### `TRAP-SAFE-GREEN` ?! Emerald as the not-purple accent
+
+*The trap tier — reads as sophisticated today, will read as generated soon · confidence DEMONSTRATED*
+
+**What it looks for.** The exact emerald hexes, or an accent at OKLCH hue 150-175 with chroma above 0.12 and lightness 0.60-0.80. Calibration: `#10B981` is hue 162.5, chroma 0.149, lightness 0.696. A deeper forest green — which the corpus treats favourably — sits well below the lightness floor and correctly does not fire.
+
+**Why it matters.** It is the other escape from purple, and it is already on a detector's trap list for exactly that reason. It also carries a second problem for this audience specifically: the green-tick-on-a-rounded-square grammar is the visual language of security-scan spam and automated audit email, and 'free website' plus automated email is already a recognised scam signature to a small-business owner.
+
+**The better move.** If green is right for the business, go deeper and less bright — a forest rather than a mint. Deep green on cream is structurally identical to the enterprise pattern yet reads hospitable rather than corporate when the copy is a human voice and the neutrals are warm.
+
+**What it teaches.** Bright emerald green became the standard answer to 'not purple', so it is now its own default. It also looks like the tick in an automated security scan, which is not the association you want on a page a small business owner was not expecting. A deeper, quieter green does the same job without either problem.
+
+**Who says so.** Gesso Build — @gessobuild/anti-slop · local-site-forge research/11a-verity-build-spec.md
+
+> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
+
+### `TRAP-SECTION-NUMBERS` ?! Editorial section numbering
+
+*The trap tier — reads as sophisticated today, will read as generated soon · confidence DEMONSTRATED*
+
+**What it looks for.** Two or more zero-padded section numbers used as labels. One is not a pattern.
+
+**Why it matters.** Named by a detector rule and by an independent design skill. It signals an editorial or agency register that the page has not earned, and it implies a sequence — most pages do not have one.
+
+**The better move.** Delete them — unless the sections genuinely are steps that must be done in order, in which case number them plainly (1, 2, 3) and say what the sequence is.
+
+**What it teaches.** Numbering your sections 01, 02, 03 looks editorial, and it promises the reader an order that usually is not there. If the sections really are steps in a process, number them and say so. If they are just sections, the numbers are decoration.
+
+**Who says so.** Gesso Build — @gessobuild/anti-slop · impeccable 4.3.1 — design skill and PostToolUse detector hook
+
+> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
+
+> ⚠ **undefined** — Its detector is a compiled binary, so its exact thresholds were not readable. Rules credited here are transcribed from the craft floor's prose, which states bans and defaults without numbers. Where this rulebook attaches a number to an impeccable ban, the number comes from Gesso or from measurement here, and says so.
+
+### `TRAP-BENTO` ?! The bento grid as the default layout
+
+*The trap tier — reads as sophisticated today, will read as generated soon · confidence ASSERTED*
+
+**What it looks for.** A grid of 4 or more columns where child items use two or more different `grid-column: span N` values. A plain equal grid is not a bento and does not fire.
+
+**Why it matters.** This is the clearest case in the whole rulebook of a recommendation ageing inside its own corpus, and it is worth stating plainly because it is the model for how to read everything in this tier. research/04 §3 selected this vocabulary DELIBERATELY in August 2026 because it 'reads as 2026'. research/08 §4, written the same month, records the correction: in 2026, 'reads as 2026' and 'reads as AI-generated' are the same set, because the AI generators are what standardised 2026. That is not a contradiction between the two files; it is what changed between them.
+
+**The better move.** Choose the layout from the amount of content, not from the year — see S-DENSITY-MISMATCH. Under five items, one column and bigger type beats any grid.
+
+**What it teaches.** The grid of differently-sized blocks was the fashionable layout of 2026, which is exactly why it is now one of the things that marks a page as machine-made — the generators all learned it at once. The lesson is bigger than this one layout: choosing a shape because it is current means choosing whatever the generators are also choosing.
+
+**Who says so.** local-site-forge research/04-design-language.md · local-site-forge research/08-craft.md
+
+> ⚠ **undefined** — Its §3 'what reads as modern' list (bento, kinetic type, glassmorphism) is directional secondary-source consensus, and research/08 §4 later records that in 2026 'reads as 2026' and 'reads as AI-generated' are the same set. Where 04 and 08 conflict, 08 wins and the rule says so.
+
+> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+
+### `TRAP-GLASSMORPHISM` ?! Glassmorphism as a design language
+
+*The trap tier — reads as sophisticated today, will read as generated soon · confidence ASSERTED*
+
+**What it looks for.** Two or more `backdrop-filter` declarations, i.e. used as a material rather than once as an effect.
+
+**Why it matters.** It arrived in this corpus from the 'what reads as modern in 2026' list and is contradicted by everything measured afterwards: the blur is a named generated-page tell, it repaints on scroll, and it degrades text rendering. This is the third rule in this file where research/04's modern list and research/08's tell list name the same thing.
+
+**The better move.** See T2-BACKDROP-BLUR. A solid surface with a hairline is more confident and has no failure modes.
+
+**What it teaches.** Frosted-glass panels were on every 2026 'what's modern' list, which means every page generator learned them at the same time. They also cost the phone real work and make the text on them slightly blurrier. Two reasons to stop, arriving from different directions.
+
+**Who says so.** local-site-forge research/04-design-language.md · local-site-forge research/08-craft.md
+
+> ⚠ **undefined** — Its §3 'what reads as modern' list (bento, kinetic type, glassmorphism) is directional secondary-source consensus, and research/08 §4 later records that in 2026 'reads as 2026' and 'reads as AI-generated' are the same set. Where 04 and 08 conflict, 08 wins and the rule says so.
+
+> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+
+### `TRAP-LUCIDE-FIVE` ?! The five predictable icon glyphs
+
+*The trap tier — reads as sophisticated today, will read as generated soon · confidence ASSERTED*
+
+**What it looks for.** Two or more of the named glyphs, by class or icon name.
+
+**Why it matters.** This is a subtle and useful finding: even CORRECTLY hand-inlined icons carry a fingerprint if you pick the obvious glyph. The problem is not the icon library. It is the mapping from concept to symbol, which every generator makes the same way.
+
+**The better move.** Draw the icon for the actual thing. A plumber's emergency callout is not a lightning bolt, it is a tap. The best answer is often no icons at all — most feature lists do not need them.
+
+**What it teaches.** Even when you draw your icons by hand, choosing the obvious symbol gives the game away: sparkles means clever, a lightning bolt means fast, a shield means safe. Every generator makes the same choice. Draw the thing you actually do instead, or skip the icons.
+
+**Who says so.** febbhav — Signs of AI Design
+
+> ⚠ **undefined** — Catalogues rather than demonstrates.
+
+### `TRAP-MODERN-BY-LIST` ? A design chosen from a what-is-modern list
+
+*The trap tier — reads as sophisticated today, will read as generated soon · confidence MEASURED_HERE*
+
+**What it looks for.** 5 or more of the eight named cluster members firing on the same page. The member list is expected to change; the count is the rule.
+
+**Why it matters.** This is the general form of the whole trap tier and it deserves its own rule. The corpus states it exactly: in 2026, 'reads as 2026' and 'reads as AI-generated' are the same set, BECAUSE the AI generators are what standardised 2026. Any choice made because it is current is a choice made by whatever the generators were trained on. The corpus measured this cluster in one of its own pages: a blurred sticky nav, a radial-gradient hero glow, three pill radii, nine clamps, balanced text wrapping, three colour-mixes, tight hero tracking, a bento grid and a gradient initials mark — all in one file, and it names that cluster as the 2026 house style of the major AI page builders.
+
+**The better move.** There is no single fix and that is the point. Pick the one thing on the page that came from the business rather than from a list — a colour taken from the shopfront, a section that exists because this trade needs it, a photograph — and build outward from that. Then remove whichever cluster members are not doing work.
+
+**What it teaches.** Any one fashionable choice is fine. A page where every choice is the fashionable one for that year was assembled by the fashion, not by you — and since the page generators were trained on the same fashion, your page and theirs converge. The way out is to start from something true about this particular business and let that decide the rest.
+
+**Who says so.** local-site-forge research/08-craft.md
+
+> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
 ---
 
@@ -1017,51 +1390,123 @@ You cannot see this one by looking at the page. It is that every page you ship s
 - Vary the axis that actually carries: the list of sections and their order. Do NOT vary the motion; identical motion across every site reads as competence, and varied motion reads as indecision.
 - Then measure it rather than arguing about it: screenshot the top of twenty pages, put them on one sheet, and see whether you can tell which is which.
 
-**The rules that carry this** — 3 of them:
+**The rules that carry this** — 7 of them:
 
-### `shared-skeleton` ?? Two different sites wearing the same page
+### `V-SKELETON` ?? This page has the same section skeleton as one you already shipped
 
-*Variety — the tell that is not on any single page · confidence MEASURED*
+*Variety — the tell that is not on any single page · confidence MEASURED_HERE*
 
-**What it looks for.** Two or more pages in DIFFERENT site folders whose stylesheets hash identically, or whose body structure hashes identically. Pages inside one site are expected to share a shell and are not compared.
+**What it looks for.** The `skeleton` hash equals that of any different site among the last 12 ledger entries.
 
-**Why it matters.** This is the failure that cannot be recovered from by fixing a page, because it is not on a page. research/08-craft.md hashed the style block of thirteen generated sites and got two distinct values: "There are two stylesheets, not thirteen. The only difference between them is three hex values." A viewer who has seen one of your other sites recognises this instantly, and what they learn is not that you used a template — it is that the attention they thought was on their business was on nobody's. Hallmark's own authors documented the same failure against their own tool, with 21 themes available and one macrostructure still coming out. That is the important part: having options does not produce variety. Only a record of what you did last does.
+**Why it matters.** This is the deepest tell in the corpus and the hardest failure to recover from. A bad gradient is one page's problem. An owner who recognises a competitor's site in yours has learned something about you that no single page can un-teach. And the corpus is specific that the section INVENTORY and COUNT are what make two pages look like different jobs rather than one job run twice.
 
-**The better move.** Change the axes that carry, which research/08a-sitegen-spec.md ranks: the section INVENTORY and its order first, because the identity and count of sections is what makes two pages look like different jobs rather than one job run twice; then density; then the ground colour; then the type pairing. Recolouring is the axis that carries least. `init_site` in this kit reads a ledger of what it emitted last and is forbidden from repeating the structural choices — which is the only mechanism that actually works.
+**The better move.** Change the section inventory, not the colours. Derive it from the trade: a tax office has a deadline strip and a what-to-bring checklist; a plumber has an emergency strip and a service area; a vet has an after-hours note. Do NOT shuffle a fixed list — arbitrary order reads as arbitrary.
 
-**Who says so.** research/08-craft.md · Hallmark (Hassan El Mghari / Nutlope)
+**What it teaches.** The most damaging thing about a page built by a tool is not any single detail. It is that the next page the tool builds has the same bones. Someone who has seen one of your sites recognises the next one instantly. The fix is not new colours — it is a different set of sections, chosen because this kind of business needs them.
 
-> ⚠ **research/08-craft.md** — The file is explicit that the TIERING ITSELF is asserted: the sweep found no study of what non-technical business owners notice. Treat the ordering as a testable hypothesis, not a finding.
+**Who says so.** local-site-forge research/08-craft.md · Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents
 
-> ⚠ **Hallmark (Hassan El Mghari / Nutlope)** — Design opinion with a commercial context. Its CORE tells match Krebs’s independent empirical count, which is why the core is trusted here; its elaborate prescriptions (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever this kit uses them.
+> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
-### `ledger-repeat` ? The same shape as something you shipped before
+> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
 
-*Variety — the tell that is not on any single page · confidence MEASURED*
+### `V-STYLE-SKELETON` ?? This stylesheet is a previous one with different values
 
-**What it looks for.** A page whose structural fingerprint matches an entry already in the variety ledger for a different subject.
+*Variety — the tell that is not on any single page · confidence MEASURED_HERE*
 
-**Why it matters.** The ledger exists so that the previous rule can be answered across time rather than only within one folder. Two sites built six weeks apart are still two sites a visitor can put side by side. This rule is the memory.
+**What it looks for.** The value-blind `style_skeleton` hash equals that of any different site among the last 12 ledger entries.
 
-**The better move.** Change the section inventory — not the colours. `init_site` does this automatically when it can see the ledger; if you built this page by hand, the fastest real change is to add or remove a section and reorder what remains.
+**Why it matters.** This is the facet that shows what a raw hash hides. The corpus measured two distinct stylesheet hashes across thirteen pages and concluded there were two stylesheets. With the values removed there is one — the entire difference between the two groups was three hex values. A generator that changes only values has not produced variety; it has produced one design in several colourways, which is a different and much weaker thing.
 
-**Who says so.** research/08-craft.md
+**The better move.** Vary the GROUND rather than the accent. Changing the ground colour changes the entire read of the page; changing the accent changes a button — same edit budget, roughly ten times the perceived difference. Then vary density from the content volume, and the corner-shadow-border triple from a stable hash of the business. Motion is the one axis that should NOT vary: fix it once and apply it uniformly, because nobody sees two of your sites side by side except you, and one correct motion system is a competence win.
 
-> ⚠ **research/08-craft.md** — The file is explicit that the TIERING ITSELF is asserted: the sweep found no study of what non-technical business owners notice. Treat the ordering as a testable hypothesis, not a finding.
+**What it teaches.** If you take two of your pages and delete every colour and every measurement from both stylesheets, do they become the same file? If so, you have one design, and the differences between your sites are paint. Real variation shows up in which rules exist at all — a different layout, different sections, a different set of decisions.
 
-### `zero-images` ? No photographs anywhere
+**Who says so.** local-site-forge research/08a-sitegen-spec.md
 
-*Variety — the tell that is not on any single page · confidence MEASURED*
+> ⚠ **undefined** — Its `--stagger: 45ms` has no practitioner source and the file says so. Do not attribute it to anyone.
 
-**What it looks for.** No <img> element anywhere in the site, and no <picture> or CSS background-image carrying a real file.
+### `V-AGGREGATE-SIMILARITY` ? This page is a near-copy of one you already shipped
 
-**Why it matters.** research/08-craft.md §5.5 measured zero <img> tags across all thirteen generated previews and calls the absence its own signal: "Zero images is itself a signal that nobody visited." A page of pure typography can be beautiful, and the corpus is clear that stock is worse than nothing — but a site about a person, with no picture of the person or of where they teach, has a hole where the most verifiable thing on the page would go. One real photograph is the only element a visitor can check against the world.
+*Variety — the tell that is not on any single page · confidence MEASURED_HERE*
 
-**The better move.** One photograph, and one is the recommendation rather than a minimum — the corpus says "ONE photo maximum, everything else CSS art." Crop it tightly rather than running it full bleed, bias the composition left or right rather than centring it, desaturate about 8% with `filter: saturate(.92)` so it sits on the page rather than on top of it, give it `aspect-ratio` and `object-fit: cover` so the layout never jumps, and never lazy-load it if it is the hero. If there is no photograph yet, draw the hole and say what will go in it.
+**What it looks for.** Weighted facet distance to the nearest different site in the last 12 entries below 0.15. Hash facets contribute 0 when equal and 1 when different; vector facets contribute their normalised Euclidean distance, clamped to 1.
 
-**Who says so.** research/08-craft.md
+**Why it matters.** Exact-hash rules are evaded by any trivial change. A generator that adds one section, or one extra card, escapes both collision rules while producing a page that is obviously the same page. This rule is the one that survives a generator trying to pass it.
 
-> ⚠ **research/08-craft.md** — The file is explicit that the TIERING ITSELF is asserted: the sweep found no study of what non-technical business owners notice. Treat the ordering as a testable hypothesis, not a finding.
+**The better move.** Look at which facets contributed nothing — the report names them. Those are the axes you are not actually varying.
+
+**What it teaches.** Two pages can avoid being identical in any single way and still obviously be the same page. This check scores the overall similarity rather than looking for exact matches, so adding one extra card does not fool it. It also tells you which parts of the design never change, which is usually the more useful answer.
+
+**Who says so.** Measured in this rulebook, 2026-09-17
+
+> ⚠ **undefined** — Thirteen pages from one generator across two verticals (tax/accounting and law) is a narrow sample. A threshold calibrated only against it is calibrated against one failure mode.
+
+### `V-PALETTE-MODE-COLLAPSE` ? One palette used far more often than the others, or options never used at all
+
+*Variety — the tell that is not on any single page · confidence MEASURED_HERE*
+
+**What it looks for.** One palette family above 50% of the last 12 builds, or fewer than 60% of the declared options ever used. Requires the project to declare its option set; without one the rule reports that it cannot check and says why.
+
+**Why it matters.** This is the precise failure the corpus measured and named: having options does not prevent defaulting to one. The generator had six palettes and emitted two — ten times and three times — and never emitted four of them. The mechanism for variation existed and produced mode collapse. That is why a ledger is required and a menu is not sufficient.
+
+**The better move.** Stop asking a model to choose. Map the category to the palette deterministically, and seed anything genuinely arbitrary from a stable hash of the business name and address so the same business always regenerates the same site — otherwise you cannot refer to 'the one I sent you'. And the strongest version of this axis is not the palette at all: where a real photograph or a storefront observation exists, derive the accent from the awning, the sign, the van, the tile.
+
+**What it teaches.** Giving a tool six colour schemes to choose from does not get you six colour schemes. It gets you whichever one it likes, most of the time. The only way to know is to write down what you used last time and look. That is all a ledger is, and it is the difference between having options and using them.
+
+**Who says so.** local-site-forge research/08a-sitegen-spec.md
+
+> ⚠ **undefined** — Its `--stagger: 45ms` has no practitioner source and the file says so. Do not attribute it to anyone.
+
+### `V-NO-LEDGER` ? Building repeatedly with no ledger
+
+*Variety — the tell that is not on any single page · confidence ASSERTED*
+
+**What it looks for.** No ledger file found, or fewer entries in it than the number of sites under this operator's directory. Fires at `info` until three builds, then `warn`.
+
+**Why it matters.** Variety you cannot measure is variety you do not have. The corpus's instruction is not 'add more themes', it is 'record what was emitted last' — and it says so specifically because a tool with twenty-one themes still shipped one macrostructure. Building the ledger from day one is cheap; retrofitting it after fifty sites means the first fifty are unmeasured.
+
+**The better move.** Record every build. It is one small JSON file, it lives outside the project so it survives the next project, and it is the only mechanism that turns 'I have options' into 'I used them'.
+
+**What it teaches.** You cannot tell whether your sites are becoming samey by looking at the one in front of you. You need a note of what the last dozen looked like. Keeping that note is the whole mechanism — without it, having lots of options just means the tool picks its favourite one every time and nobody notices.
+
+**Who says so.** local-site-forge research/08-craft.md
+
+> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+
+### `S-SECTION-INVENTORY` ? The same section inventory regardless of trade
+
+*Structure — the shape of the document underneath the paint · confidence DEMONSTRATED*
+
+**What it looks for.** Reported, not gated. Also fires automatically when a project builds more than one site and two sites in different trades share an identical section skeleton — see V-SKELETON.
+
+**Why it matters.** This is the largest single differentiator available and it is a CONTENT decision, not a styling one. Practitioners who own this market ship per-industry design packs rather than one template with a palette switch. A tax office needs a deadline strip and a what-to-bring checklist. A plumber needs an emergency strip and a service area. A vet needs an after-hours policy — the single most-searched fact for that trade, and checkable.
+
+**The better move.** Derive the inventory from the trade with a lookup table, and let every section that references a per-business fact DEGRADE TO OMISSION when the data is absent — never to a filled-in guess. Do not shuffle a fixed list to create variety; arbitrary order reads as arbitrary.
+
+**What it teaches.** Two businesses in different trades should not get the same set of sections. An accountant's customers need to know what to bring and when the deadline is. A plumber's customer has a burst pipe and needs a number. Deciding what sections exist, before deciding what they look like, is the single biggest thing that makes two pages look like two jobs.
+
+**Who says so.** Ryan / u/Citrous_Oyster — Oak Harbor Web Designs, founder of CodeStitch · local-site-forge research/08a-sitegen-spec.md
+
+> ⚠ **undefined** — His revenue claims are self-reported with no ledger and are not relied on anywhere. His accessibility advice contains a real error: he says contrast 'should be at least 3:1'. WCAG 2.x AA requires 4.5:1 for normal-size body text. Do not copy that number. Section-order claims are DEMONSTRATED as 'this is what these people shipped' and ASSERTED as to why.
+
+> ⚠ **undefined** — Its `--stagger: 45ms` has no practitioner source and the file says so. Do not attribute it to anyone.
+
+### `S-BOILERPLATE-IDENTICAL` ?! Required boilerplate that is byte-identical across every build
+
+*Structure — the shape of the document underneath the paint · confidence MEASURED_HERE*
+
+**What it looks for.** A required-boilerplate block whose normalised text is byte-identical to the same block in a previously-built site in the ledger.
+
+**Why it matters.** These blocks usually CANNOT be removed — they are mandated. That makes them the loudest remaining 'these all came from one place' element on the page. The corpus's answer is not to delete them but to typeset them as part of the design system rather than as a bolted-on disclaimer bar.
+
+**The better move.** Vary the typesetting, not the text. The words have to be constant; the placement, the type treatment, and whether it reads as designed or as bolted on do not.
+
+**What it teaches.** There are lines you are required to put on every page and cannot change. That makes them the most repeated thing you ship. You cannot change the words, but you can stop them looking like a sticker — set them in the page's own typography and put them where they belong in the layout.
+
+**Who says so.** local-site-forge research/08a-sitegen-spec.md
+
+> ⚠ **undefined** — Its `--stagger: 45ms` has no practitioner source and the file says so. Do not attribute it to anyone.
 
 ---
 
@@ -1069,16 +1514,16 @@ You cannot see this one by looking at the page. It is that every page you ship s
 
 There is no eleventh. The rules will change — the trap tier exists precisely because they must — but the method does not: build it, run `review_site`, read one finding properly rather than fixing forty, make the move, run it again. The reasoning sticks when you can see which single change moved the count.
 
-The rulebook holds **61 rules** across 7 tiers, and every one of them is taught by a stop above except 1, which are variants of rules that are: `declared-placeholder`.
+The rulebook holds **155 rules** across 9 tiers, and every one of them is taught by a stop above except 76, which are variants of rules that are: `T1-GLYPH-REGISTER`, `T1-STOCK-PEOPLE`, `T2-KICKER-ANY`, `T2-COLOR-GLOW`, `T2-HARD-OFFSET-SHADOW`, `T2-HERO-GLOW`, `T2-AVATAR-GRADIENT`, `T2-DISPLAY-WEIGHT`, `TY-ANDROID-WEIGHT`, `T2-TIGHT-TRACKING`, `T2-BOUNCE-EASING`, `T2-MANY-EASINGS`, `T2-LAYOUT-ANIMATION`, `T2-WILL-CHANGE-STATIC`, `T2-CANVAS-PARTICLES`, `T2-SMOOTH-SCROLL`, `T2-FOCUS-FADE`, `T2-AI-NAV`, `L-HERO-PADDING`, `T2-NESTED-CARDS`, `T2-HERO-METRIC`, `T2-MONO-COSTUME`, `T2-GEOMETRIC-MASK`, `T2-DASHED-RULE`, `T2-EMPTY-SPACER`, `T2-BLINK-MARQUEE`, `W-CATEGORY-MISMATCH`, `W-PROSE-AS-BULLETS`, `H-HIDDEN-PRICE`, `H-DECOY-PRICING`, `H-WRONG-LOCAL-DETAIL`, `H-OUT-OF-BAND-HIDDEN`, `H-ASSUMPTION-UNLABELLED`, `H-SPEC-BUILD-PORTFOLIO`, `F-WRAP-ANYWHERE`, `F-LAZY-HERO`, `A-CONTRAST-LARGE`, `A-NO-FOCUS-VISIBLE`, `A-HEADING-ORDER`, `F-DARK-MODE-MISSING`, `F-PAGE-BUDGET`, `TY-BODY-SIZE`, `TY-H1-CAP`, `TY-TRACKING-LADDER`, `TY-GOOGLE-FONTS-LINK`, `TY-PRELOAD-CROSSORIGIN`, `TY-FONT-DISPLAY`, `TY-FONT-FALLBACK`, `TY-FONT-UNSUBSET`, `TY-BODY-TRACKING`, `TY-TABULAR-NUMS`, `TY-BROWSER-SURFACES`, `C-HEX-CENSUS`, `C-WARM-COOL-SPLIT`, `C-ACCENT-COVERAGE`, `C-DARK-HUE-SHIFT`, `C-DARK-SHADOW-ELEVATION`, `C-THEME-DEAD-CODE`, `C-HUE-ONLY-STATE`, `C-LAYERED-OFFWHITES`, `S-DENSITY-MISMATCH`, `S-TEL-PRIMARY`, `S-STICKY-CALL-BAR`, `S-ABOVE-FOLD`, `S-LOCALBUSINESS-SCHEMA`, `S-SHARE-PREVIEW`, `MAT-GRAIN-LIVE-FILTER`, `MAT-GRAIN-PNG`, `MAT-GRAIN-OPACITY`, `MAT-HERO-VIDEO`, `MAT-KENBURNS-DIRECTION`, `MAT-WEBGL`, `MAT-IMAGE-TREATMENT`, `MAT-CSS-SIGNATURE`, `MAT-SLIDER-UNGATED`, `TRAP-KINETIC-TYPE`.
 
 ## What a confidence tag means
 
 | Tag | Meaning |
 |---|---|
-| **DEMONSTRATED** | The source ships code, a live comparator, production library CSS, or a counted sample. You can check it without trusting anyone. |
-| **ASSERTED** | Expert opinion or practitioner prose. It may well be right. It is not evidence, and this tool will not pretend otherwise. |
-| **MEASURED** | Measured, not quoted — either from the research corpus’s own artifacts or from your files just now. The numbers in the finding are the measurement. |
-| **INFERENCE** | Reasoning with no source behind it. Recorded as reasoning so it is never mistaken for a citation. |
+| **DEMONSTRATED** | The source ships code, a live comparator, production library CSS, or a counted sample. |
+| **ASSERTED** | Expert opinion or practitioner prose. It may well be right. It is not evidence. |
+| **MEASURED** | Measured rather than quoted — the numbers in the finding are the measurement. |
+| **INFERRED** | Reasoning with no source behind it, recorded as reasoning so it is never mistaken for a citation. |
 
 This matters more than it looks. Where the research says ASSERTED rather than DEMONSTRATED, the tool reports the finding as a **question about your page**, not as a gate it failed — and it says so in the output. A hypothesis laundered into a hard gate is exactly the failure this whole kit was built to avoid.
 

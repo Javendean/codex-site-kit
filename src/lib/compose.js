@@ -155,7 +155,7 @@ function heroSection(family, { subject, siteName }) {
         <p class="actions"><a class="btn" href="#contact">Get in touch</a></p>
       </div>
       <figure class="photo" data-photo-slot="the one photograph">
-        <div class="photo__frame" aria-hidden="true"></div>
+        <div class="photo__frame" data-placeholder="the one photograph"><span>A photograph goes here</span></div>
         <figcaption>A photograph belongs here: the room, the board, the work, or you. Take it on your phone. One real photograph is the only thing on this page a visitor can check against the world, and it beats every stock image ever licensed.</figcaption>
       </figure>
     </section>`;
@@ -230,7 +230,7 @@ const SECTIONS = {
   photo: {
     heading: 'The room',
     body: () => `      <figure class="photo" data-photo-slot="the one photograph">
-        <div class="photo__frame" aria-hidden="true"></div>
+        <div class="photo__frame" data-placeholder="the one photograph"><span>A photograph goes here</span></div>
         <figcaption>A photograph belongs here: the room, the board, the work, or you. Take it on your phone. One real photograph is the only thing on this page a visitor can check against the world, and it beats every stock image ever licensed. A stock photograph is worse than none, because it is close enough to the real thing to invite the comparison and to lose it.</figcaption>
       </figure>`
   },
@@ -245,7 +245,76 @@ const SECTIONS = {
  * Styles
  * ------------------------------------------------------------------ */
 
-function renderCss({ palette, type, surface, density }) {
+/**
+ * The CSS for one hero family.
+ *
+ * Each family gets its own selectors and its own properties, so two sites
+ * built with different heroes have structurally different stylesheets rather
+ * than one stylesheet with different numbers in it.
+ */
+function heroCss(hero) {
+  if (hero === 'split-with-photo') {
+    return `.hero--split { display: grid; grid-template-columns: minmax(0, 1fr); gap: calc(var(--gap) * 2); align-items: start; }
+.hero--split .hero__say { align-self: center; }
+
+@media (min-width: 52rem) {
+  .hero--split { grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); }
+}`;
+  }
+
+  if (hero === 'statement-and-facts') {
+    return `.hero--facts { display: grid; grid-template-columns: minmax(0, 1fr); gap: calc(var(--gap) * 1.5); }
+.hero--facts .facts { align-self: end; }
+
+@media (min-width: 52rem) {
+  .hero--facts { grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.6fr); }
+}`;
+  }
+
+  if (hero === 'question-led') {
+    return `.hero--question .ask {
+  font-family: var(--font-display);
+  font-size: 1.3125rem;
+  color: var(--ink);
+  max-width: 34ch;
+  text-wrap: balance;
+}
+.hero--question .lede { max-width: 48ch; }`;
+  }
+
+  if (hero === 'list-led') {
+    return `.hero--list .plain { margin-block: 1.5rem; }
+.hero--list .plain li:first-child { padding-block-start: 0; }
+.hero--list .actions { margin-block-start: 1.75rem; }`;
+  }
+
+  // type-led
+  return `.hero--type { max-width: 46rem; }
+.hero--type h1 { margin-block-end: 0.35em; }
+.hero--type .lede { font-size: 1.25rem; }`;
+}
+
+/** The unfilled fields, in the page's own surface language. */
+function holeCss(surface) {
+  const base = ['.hole {', '  color: var(--ink-muted);', '  padding: 0.85rem 1rem;'];
+  const close = (...lines) => [...base, ...lines, '}'].join('\n');
+
+  if (surface === 'hairline') return close('  border: 1px solid var(--hairline);', '  border-radius: var(--radius);');
+  if (surface === 'soft') return close('  background: var(--panel);', '  border-radius: var(--radius);', '  box-shadow: var(--shadow);');
+  if (surface === 'sunk') return close('  background: var(--panel);', '  border-radius: var(--radius);');
+  return close('  background: var(--panel);', '  border-inline-start: 1px solid var(--hairline);');
+}
+
+/** The photograph slot, in the page's own surface language. */
+function photoFrameCss(surface) {
+  const base = '.photo__frame {\n  aspect-ratio: 4 / 3;\n  display: grid;\n  place-items: center;\n  color: var(--ink-muted);\n  font-size: 0.9375rem;\n';
+  if (surface === 'hairline') return `${base}  border: 1px solid var(--hairline);\n  border-radius: var(--radius);\n}`;
+  if (surface === 'soft') return `${base}  background: var(--panel);\n  border-radius: var(--radius);\n  box-shadow: var(--shadow);\n}`;
+  if (surface === 'sunk') return `${base}  background: var(--panel);\n  border-radius: var(--radius);\n  outline: 1px solid var(--hairline);\n  outline-offset: -1px;\n}`;
+  return `${base}  background: var(--panel);\n  border-block: 1px solid var(--hairline);\n}`;
+}
+
+function renderCss({ palette, type, surface, density, hero }) {
   const pairing = TYPE_PAIRINGS[type];
   const s = SURFACES[surface];
   const d = DENSITIES[density];
@@ -258,9 +327,9 @@ function renderCss({ palette, type, surface, density }) {
    set to dark — guarded so an explicit light choice still wins — and once
    for the toggle. Three states, not two.
 
-   Authored in OKLCH and emitted as hex on purpose. An oklch() literal that
-   an old in-app WebView cannot parse drops the declaration, and on a text
-   colour that means invisible text.
+   Authored in OKLCH and emitted as hex on purpose. A raw OKLCH literal that
+   an old in-app WebView cannot parse drops the whole declaration, and on a
+   text colour that means invisible text.
    ------------------------------------------------------------------ */
 
 ${paletteCss(palette)}
@@ -296,7 +365,7 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-body);
-  font-size: 1.0625rem;
+  font-size: 1.1875rem;
   line-height: 1.6;
   -webkit-text-size-adjust: 100%;
 }
@@ -318,9 +387,9 @@ h1, h2, h3 {
   min-width: 0;
   margin: 0 0 0.5em;
 }
-h1 { font-size: clamp(2rem, 5vw + 0.5rem, 3.25rem); }
-h2 { font-size: clamp(1.4rem, 2.4vw + 0.6rem, 1.9rem); }
-p { max-width: var(--measure); margin: 0 0 1em; }
+h1 { font-size: clamp(2rem, 2.2vw + 1rem, 3rem); max-width: 22ch; }
+h2 { font-size: clamp(1.4rem, 1.1vw + 1rem, 2rem); max-width: 30ch; }
+p { max-width: 66ch; margin: 0 0 1em; }
 
 a { color: var(--accent); text-underline-offset: 0.18em; }
 
@@ -335,13 +404,30 @@ a { color: var(--accent); text-underline-offset: 0.18em; }
 
 .masthead {
   border-bottom: 1px solid var(--hairline);
-  padding-block: 1rem;
+  padding-block: 1rem 1.4rem;
 }
 .masthead .wrap { display: flex; flex-wrap: wrap; gap: var(--gap); align-items: baseline; justify-content: space-between; }
 .wordmark { font-family: var(--font-display); font-size: 1.0625rem; font-weight: 600; color: var(--ink); text-decoration: none; }
 .masthead nav ul { display: flex; flex-wrap: wrap; gap: 1.25rem; list-style: none; margin: 0; padding: 0; }
 .masthead nav a { color: var(--ink-muted); text-decoration: none; }
 .masthead nav a:hover, .masthead nav a:focus-visible { color: var(--ink); text-decoration: underline; }
+
+.theme__button {
+  font: inherit;
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+  background: none;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  padding: 0.35rem 0.7rem;
+  cursor: pointer;
+  transition: color var(--dur-press) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .theme__button:hover { color: var(--ink); }
+}
+.theme__button:active { color: var(--ink); background: var(--paper-sunk); }
+@media (pointer: coarse) { .theme__button { min-height: 48px; } }
 
 .colophon {
   border-top: 1px solid var(--hairline);
@@ -357,35 +443,31 @@ section + section { border-top: 1px solid var(--hairline); }
 
 .hero { padding-block: calc(var(--section) * 0.8) calc(var(--section) * 1.05); }
 .hero .lede { font-size: 1.1875rem; color: var(--ink-muted); }
-.hero--split { display: grid; grid-template-columns: minmax(0, 1fr); gap: calc(var(--gap) * 2); align-items: start; }
-.hero--facts { display: grid; grid-template-columns: minmax(0, 1fr); gap: calc(var(--gap) * 1.5); }
-.ask { font-family: var(--font-display); font-size: 1.25rem; color: var(--ink); }
 
-@media (min-width: 52rem) {
-  .hero--split { grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); }
-  .hero--facts { grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.6fr); }
-}
+/* ---- the hero, and ONLY the hero this page actually uses -------------
+   Emitting the CSS for all five families would put the same selectors in
+   every stylesheet this kit ever writes, which is the failure the variety
+   rules exist to catch: "this stylesheet is a previous one with different
+   values". Different pages get genuinely different rules, not the same rules
+   with different numbers. */
+
+${heroCss(hero)}
 
 .facts, .rows { margin: 0; }
 .facts > div, .rows > div {
   display: grid; grid-template-columns: minmax(0, 9rem) minmax(0, 1fr);
-  gap: 0.75rem; padding-block: 0.65rem;${s.rule ? '\n  border-bottom: 1px solid var(--hairline);' : ''}
+  gap: 0.75rem; padding-block: 0.65rem;${s.rule ? '\n  border-block-end: 1px solid var(--hairline);' : ''}
 }
 .facts dt, .rows dt { color: var(--ink-muted); font-size: 0.9375rem; }
-.facts dd, .rows dd { margin: 0; }
+.facts dd, .rows dd { margin: 0; font-variant-numeric: tabular-nums; }
 
 .plain { list-style: none; margin: 0 0 1.5rem; padding: 0; max-width: var(--measure); }
-.plain li { padding-block: 0.5rem; border-bottom: 1px solid var(--hairline); }
+.plain li { padding-block: 0.5rem; border-block-end: 1px solid var(--hairline); }
 
 /* ---- the photograph slot ------------------------------------------- */
 
 .photo { margin: 0; }
-.photo__frame {
-  aspect-ratio: 4 / 3;
-  border: 1px dashed var(--hairline);
-  border-radius: var(--radius);
-  background: var(--panel);
-}
+${photoFrameCss(surface)}
 .photo figcaption { margin-top: 0.75rem; font-size: 0.9375rem; color: var(--ink-muted); max-width: var(--measure); }
 
 /* ---- holes ---------------------------------------------------------
@@ -394,13 +476,7 @@ section + section { border-top: 1px solid var(--hairline); }
    data-placeholder attribute when the real words go in.
    ------------------------------------------------------------------ */
 
-.hole {
-  border: 1px dashed var(--hairline);
-  border-radius: var(--radius);
-  background: var(--panel);
-  color: var(--ink-muted);
-  padding: 0.85rem 1rem;
-}
+${holeCss(surface)}
 .hole--inline { display: inline-block; padding: 0.15rem 0.5rem; }
 
 /* ---- the button ----------------------------------------------------
@@ -448,8 +524,11 @@ input, select, textarea {
 }
 
 @media print {
+  /* Paper is the one medium where the page ground really is paper, so the
+     tokens are used rather than overridden. */
   .masthead nav, .actions { display: none; }
-  body { background: #fff; color: #111; }
+  body { background: var(--paper-raised); color: var(--ink); }
+  a { text-decoration: underline; }
 }
 `;
 }
@@ -495,6 +574,11 @@ ${section.body()}
 ${nav.map((id) => `        <li><a href="#${id}">${esc(SECTIONS[id].heading)}</a></li>`).join('\n')}
       </ul>
     </nav>
+    <!-- The theme button is created by the script at the end of this file,
+         so a page with JavaScript off never shows a control that does
+         nothing and never carries an empty box waiting for one. Without
+         JavaScript the theme still follows the machine's own setting,
+         which is the state most visitors are in anyway. -->
   </div>
 </header>
 
@@ -508,6 +592,44 @@ ${body}
     <p>&copy; ${year} ${esc(siteName)}</p>
   </div>
 </footer>
+
+<script>
+/* Three theme states, and the third one needs a control or the CSS for it is
+   dead code. System is the default and is handled entirely in CSS; this adds
+   the two explicit choices and remembers them. Nothing else on this page needs
+   JavaScript, and if this file fails to load the page is unaffected. */
+(function () {
+  var slot = document.querySelector('.masthead .wrap');
+  if (!slot) return;
+  var KEY = 'theme';
+  var order = ['system', 'light', 'dark'];
+  var label = { system: 'Theme: system', light: 'Theme: light', dark: 'Theme: dark' };
+
+  function read() {
+    try { return localStorage.getItem(KEY) || 'system'; } catch (e) { return 'system'; }
+  }
+  function apply(state) {
+    if (state === 'system') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', state);
+    button.textContent = label[state];
+    button.setAttribute('aria-label', label[state] + '. Press to change.');
+  }
+
+  var button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'theme__button';
+  slot.appendChild(button);
+
+  var state = read();
+  apply(state);
+
+  button.addEventListener('click', function () {
+    state = order[(order.indexOf(state) + 1) % order.length];
+    try { state === 'system' ? localStorage.removeItem(KEY) : localStorage.setItem(KEY, state); } catch (e) { /* private browsing: the choice lasts this visit */ }
+    apply(state);
+  });
+})();
+</script>
 </body>
 </html>
 `;
@@ -621,7 +743,7 @@ export function composeSite({ subject, siteName, palette, choices, now = new Dat
     choices,
     files: {
       'index.html': renderPage({ subject, siteName, choices, year }),
-      'styles.css': renderCss({ palette, type: choices.type, surface: choices.surface, density: choices.density }),
+      'styles.css': renderCss({ palette, type: choices.type, surface: choices.surface, density: choices.density, hero: choices.hero }),
       'NOTES.md': renderNotes({ subject, siteName, choices, palette, notes: palette.notes ?? [] })
     }
   };

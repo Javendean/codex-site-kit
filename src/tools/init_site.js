@@ -27,7 +27,10 @@ import { z } from 'zod';
 import { STATUS, failure, guard, table, toolResult } from '../lib/report.js';
 import { buildPalette } from '../lib/palette_rules.js';
 import { composeSite, AXES, INVENTORIES, TYPE_PAIRINGS, SURFACES } from '../lib/compose.js';
-import { readLedger, appendLedger, usedOn, chooseDistinct, seedFrom, fingerprint } from '../lib/ledger.js';
+import { readLedger, record } from '../../rules/ledger.js';
+import { fingerprint } from '../../rules/fingerprint.js';
+import { buildPage, review } from '../lib/rulebook.js';
+import { chooseDistinct, seedFrom } from '../lib/variety.js';
 import { commonOutput } from './common.js';
 
 const TOOL = 'init_site';
@@ -125,21 +128,26 @@ export const handler = guard(TOOL, async (args) => {
     });
   }
 
-  /* ---- the ledger decides the shape --------------------------------- */
-  const ledger = await readLedger();
+  /* ---- the ledger decides the shape ---------------------------------
+     The ledger is the rulebook's own — the same file the five V-* rules read.
+     One record, so a site scaffolded here is a site the variety rules can see.
+     Options are not variety; a record of what was actually emitted is. */
+  const ledger = readLedger();
   const seed = seedFrom(subject.toLowerCase());
-  const previous = ledger.emitted?.[0]?.choices ?? null;
+  const recent = [...ledger.entries].reverse();
+  const previous = recent[0]?.declared ?? null;
+  const usedOn = (axis) => recent.map((e) => e?.declared?.[axis]).filter((v) => typeof v === 'string');
 
   const choices = {
-    inventory: chooseDistinct(AXES.inventory, usedOn(ledger, 'inventory'), seed),
-    hero: chooseDistinct(AXES.hero, usedOn(ledger, 'hero'), seed >> 3),
-    type: chooseDistinct(AXES.type, usedOn(ledger, 'type'), seed >> 6),
-    surface: chooseDistinct(AXES.surface, usedOn(ledger, 'surface'), seed >> 9),
-    density: chooseDistinct(AXES.density, usedOn(ledger, 'density'), seed >> 12)
+    inventory: chooseDistinct(AXES.inventory, usedOn('inventory'), seed),
+    hero: chooseDistinct(AXES.hero, usedOn('hero'), seed >> 3),
+    type: chooseDistinct(AXES.type, usedOn('type'), seed >> 6),
+    surface: chooseDistinct(AXES.surface, usedOn('surface'), seed >> 9),
+    density: chooseDistinct(AXES.density, usedOn('density'), seed >> 12)
   };
 
   /* ---- the colour --------------------------------------------------- */
-  const usedHues = usedOn(ledger, 'hue').map(Number).filter(Number.isFinite);
+  const usedHues = usedOn('hue').map(Number).filter(Number.isFinite);
   const hue =
     typeof args.hue === 'number'
       ? args.hue
@@ -174,19 +182,35 @@ export const handler = guard(TOOL, async (args) => {
     });
   }
 
-  /* ---- record what was chosen --------------------------------------- */
-  const bones = fingerprint(
-    [choices.inventory, choices.hero, INVENTORIES[choices.inventory].join(',')].join('|')
-  );
+  /* ---- record what was actually emitted ------------------------------
+     Fingerprinted from the real files, not from the choices that produced
+     them. Two different sets of choices that render the same page are the
+     same page, and the ledger should say so. */
+  const declared = {
+    ...choices,
+    hue: String(Math.round(palette.anchor_hue)),
+    palette_family: `${choices.surface}-${Math.round(palette.anchor_hue / 30) * 30}`
+  };
 
-  let ledgerResult = { written: false, file: ledger.file, entries: ledger.emitted?.length ?? 0 };
+  const page = buildPage({
+    rel: 'index.html',
+    html: composed.files['index.html'],
+    stylesheets: [{ rel: 'styles.css', text: composed.files['styles.css'] }],
+    declared
+  });
+
+  let ledgerResult = { written: false, file: ledger.file, count: ledger.entries.length };
   if (args.record !== false) {
-    ledgerResult = await appendLedger({
-      subject,
-      skeleton: choices.inventory,
-      bones,
-      choices: { ...choices, hue: String(Math.round(palette.anchor_hue)) }
-    });
+    try {
+      const print = fingerprint(page);
+      print.id = `${path.basename(dir)}:${print.facets.skeleton}`;
+      const recorded = record(print, { label: siteName, pathHint: dir });
+      ledgerResult = { written: true, file: recorded.file, count: recorded.count };
+    } catch (err) {
+      // A read-only home directory must not stop a site being scaffolded. What
+      // is lost is the memory, and the tool says so rather than pretending.
+      ledgerResult = { written: false, file: ledger.file, count: ledger.entries.length, error: String(err.message ?? err) };
+    }
   }
 
   const differs = previous
@@ -243,14 +267,39 @@ export const handler = guard(TOOL, async (args) => {
     {
       title: 'What is deliberately unfinished:',
       body:
-        '  Every dashed box is a labelled hole. That is the design, not an oversight:\n' +
+        '  Every outlined box is a labelled hole. That is the design, not an oversight:\n' +
         '  an unfilled field drawn as an unfilled field. There are no testimonials,\n' +
         '  no ratings, no counts and no press mentions, because none of them are true\n' +
-        '  yet — and the first real one will land with the weight of being the only\n' +
+        '  yet, and the first real one will land with the weight of being the only\n' +
         '  one on the page.\n\n' +
         '  There is no photograph, and that is the highest-value thing left to add.'
     }
   ];
+
+  /* ---- review the output, rather than claim it is clean ---------------
+     The scaffold is written against the rulebook, so it should come back
+     nearly clean — but "should" is an assertion and this kit does not ship
+     assertions. It runs the rulebook over what it just wrote and reports the
+     real number, including the findings it EXPECTS, which are the holes. */
+  const selfReview = review({
+    pages: [page],
+    ledger: null,
+    now: new Date()
+  });
+
+  if (selfReview.findings.length > 0) {
+    sections.push({
+      title: `Checked against the rulebook just now — ${selfReview.findings.length} ${selfReview.findings.length === 1 ? 'finding' : 'findings'}, and every one needs a fact only you have:`,
+      body: selfReview.findings
+        .map((f) => `  ${(f.severity === 'fail' ? '??' : f.severity === 'warn' ? '?' : '?!').padEnd(3)} ${f.title}\n      ${f.fix.split('. ')[0]}.\n      explain_rule("${f.id}")`)
+        .join('\n\n')
+    });
+  } else {
+    sections.push({
+      title: 'Checked against the rulebook just now:',
+      body: `  Nothing fired. ${selfReview.passed.length} rules ran clean; ${selfReview.notRun.length} could not run from files alone and are listed by review_site.`
+    });
+  }
 
   if (palette.notes.length > 0) {
     sections.push({ title: 'Notes on the colour:', body: palette.notes.map((n) => `  · ${n}`).join('\n\n') });
@@ -264,8 +313,8 @@ export const handler = guard(TOOL, async (args) => {
   }
 
   const next = [
-    `Run review_site on ${dir}. It should come back with no faults and one note — the empty photograph slot.`,
-    'Open index.html and fill in the dashed boxes. Each one says what belongs there.',
+    `Run review_site on ${dir} for the full annotated critique, including the rules that could not run from files alone.`,
+    'Open index.html and fill in the outlined boxes. Each one says what belongs there.',
     'Take one photograph and put it in the slot. It is the single highest-value thing you can add.',
     'Run check_responsive when you have content in, to measure the page in a real browser.'
   ];
@@ -286,7 +335,7 @@ export const handler = guard(TOOL, async (args) => {
       differs_from_previous: differs,
       anchor_hue: palette.anchor_hue,
       palette: { light: palette.light, dark: palette.dark },
-      ledger: { path: ledgerResult.file, written: Boolean(ledgerResult.written), entries: ledgerResult.entries ?? 0 },
+      ledger: { path: ledgerResult.file, written: Boolean(ledgerResult.written), entries: ledgerResult.count ?? 0 },
       next
     }
   });

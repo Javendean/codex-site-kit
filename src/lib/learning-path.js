@@ -14,7 +14,10 @@
  * generic, then make it honest, then learn why the escape routes keep closing.
  */
 
-import { RULEBOOK, BY_ID, TIERS } from '../rules/index.js';
+import { rulebook, TIER_LABEL as TIERS } from './rulebook.js';
+
+const { rules: RULEBOOK, byId: RULE_INDEX } = rulebook();
+const BY_ID = Object.fromEntries(RULEBOOK.map((r) => [r.id, r]));
 
 /**
  * The route. Each stop is a lesson with a claim, a thing to do, and the rules
@@ -44,7 +47,7 @@ export const STOPS = [
       'Fix them before you look at anything else. Nothing further on this list matters while one of these is live.',
       'Then run check_responsive, which loads the page in a real browser at four phone widths and MEASURES it. The rules below are read out of the source text; only a browser can tell you whether the page actually scrolls sideways.'
     ],
-    rules: ['missing-viewport', 'missing-lang', 'overflow-hidden', 'bare-fr-grid', 'input-font-size', 'tap-target', 'full-viewport-hero', 'fixed-width-box', 'layout-table', 'stale-copyright']
+    rules: ['F-VIEWPORT-META', 'F-VIEWPORT-LOCKED', 'F-OVERFLOW-CLIP', 'F-BARE-1FR', 'F-INPUT-16PX', 'F-TAP-TARGET', 'T2-HERO-100VH', 'T1-HSCROLL', 'T1-BUTTON-WRAP', 'A-IMG-ALT', 'W-STALE-COPYRIGHT']
   },
   {
     n: 3,
@@ -56,7 +59,7 @@ export const STOPS = [
       'Run palette_from_image on that photograph. It quantises the image and hands back real values plus a contrast matrix.',
       'Pass those colours to init_site. Now the page is the colour of the thing it is about, and you can say so out loud to anyone who asks.'
     ],
-    rules: ['indigo-accent', 'three-stop-gradient', 'banned-gradient-pair', 'gradient-text', 'pure-black-white', 'contrast', 'three-state-theme']
+    rules: ['T1-INDIGO-HEX', 'T1-INDIGO-NEAR', 'T1-GRADIENT-3STOP', 'T1-GRADIENT-CLICHE', 'T1-GRADIENT-TEXT', 'T2-PURE-BW', 'T2-ZERO-CHROMA-GREY', 'A-CONTRAST-BODY', 'C-THEME-CONTRACT', 'C-OKLCH-LITERAL']
   },
   {
     n: 4,
@@ -69,7 +72,7 @@ export const STOPS = [
       'Take body text UP to 19px. GOV.UK serves the least technical audience of any digital product in English and has tested this harder than any agency will.',
       'Cap every paragraph at 60 to 70 characters wide.'
     ],
-    rules: ['single-font-page', 'hero-kicker', 'emoji-feature-icon', 'italic-in-heading']
+    rules: ['T2-SINGLE-FONT', 'T2-BANNED-FONT', 'T2-KICKER-H1', 'T1-EMOJI-ICON', 'TRAP-ITALIC-IN-HEADING', 'TY-BODY-MEASURE', 'TY-H1-MEASURE']
   },
   {
     n: 5,
@@ -81,7 +84,7 @@ export const STOPS = [
       'If two of them are the same colour but mark different kinds of thing, the colour is not a signal. It is paint.',
       'Delete the ones that survive neither question. Subtraction is most of what "designed" means here.'
     ],
-    rules: ['edge-stripe', 'heavy-shadow', 'over-rounded', 'pill-everything', 'backdrop-blur', 'uniform-card-grid', 'fake-chrome', 'ai-footer', 'placeholder-imagery']
+    rules: ['T2-EDGE-STRIPE', 'T2-PUFFY-SHADOW', 'T2-RADIUS-40', 'T2-PILL-CTA', 'T2-BACKDROP-BLUR', 'T1-UNIFORM-CARDS', 'T1-FAKE-CHROME', 'T2-AI-FOOTER', 'T1-PLACEHOLDER-SRC', 'T1-NO-IMAGES']
   },
   {
     n: 6,
@@ -94,7 +97,7 @@ export const STOPS = [
       'Nothing above the fold animates in. There is no scroll yet, and hiding your biggest heading delays the page\'s own largest paint.',
       'Handle prefers-reduced-motion by killing the movement and keeping the fade.'
     ],
-    rules: ['no-press-feedback', 'unguarded-hover', 'motion-ceiling', 'ease-on-entrance', 'reveal-travel', 'no-reduced-motion', 'nuclear-motion-reset', 'universal-reveal', 'hero-behind-reveal', 'sticky-collision']
+    rules: ['F-NO-PRESS', 'F-HOVER-UNGUARDED', 'T2-DURATION-CEILING', 'T2-PLAIN-EASE-ENTRANCE', 'T2-AOS-TRAVEL', 'T2-TRANSITION-ALL', 'T2-UNIVERSAL-FADEUP', 'T2-HERO-REVEAL', 'T2-NESTED-REVEAL', 'F-STICKY-COLLISION']
   },
   {
     n: 7,
@@ -107,7 +110,7 @@ export const STOPS = [
       'Ask the second question too: could a competitor put this sentence on their page unchanged? If so it is not about you, and it is occupying the space where something about you would go.',
       'Run check_copy, which runs only the copy rules, so you can work on the words without the page in front of you.'
     ],
-    rules: ['benefit-speak', 'not-x-but-y', 'em-dash-copy', 'fabricated-precision', 'misattributed-stat', 'unsupported-superlative', 'unfalsifiable-claim', 'rule-of-three']
+    rules: ['W-BENEFIT-SPEAK', 'W-NOT-X-BUT-Y', 'W-EM-DASH', 'W-FABRICATED-PRECISION', 'W-BANNED-STAT-94', 'W-WEASEL-TRUST', 'W-FALSIFIABILITY', 'W-RULE-OF-THREE']
   },
   {
     n: 8,
@@ -120,7 +123,7 @@ export const STOPS = [
       'Leave the hole and label it. For a page that is still a proposal the honest hole is an ADVANTAGE: it proves the rest was not fabricated either, and it hands the subject something concrete to supply.',
       'Write every fact once. A price in two files is two prices, and they agree right up until the day one of them is edited.'
     ],
-    rules: ['invented-proof', 'unverified-attribution', 'placeholder-identity', 'unfinished-marker', 'lorem-ipsum', 'single-source']
+    rules: ['H-INVENTED-TESTIMONIAL', 'H-QUOTE-ATTRIBUTION', 'H-INVENTED-BRAND', 'H-PRESS-LOGOS', 'W-PLACEHOLDER-TEXT', 'H-SINGLE-SOURCE', 'H-UNSOURCED-METRIC', 'H-EMPTY-PROOF-SECTION']
   },
   {
     n: 9,
@@ -132,7 +135,7 @@ export const STOPS = [
       'For each one ask: did I choose this, or did I arrive at it because the last thing was burned? Choosing by elimination leaves the same trace as not choosing.',
       'The only stable position is deriving choices from the specific subject, because that is the one thing nobody else can adopt.'
     ],
-    rules: ['cream-wash', 'safe-green', 'numbered-sections']
+    rules: ['TRAP-CREAM-WASH', 'TRAP-CREAM-PACKAGE', 'TRAP-SAFE-GREEN', 'TRAP-SECTION-NUMBERS', 'TRAP-BENTO', 'TRAP-GLASSMORPHISM', 'TRAP-LUCIDE-FIVE', 'TRAP-MODERN-BY-LIST']
   },
   {
     n: 10,
@@ -145,7 +148,7 @@ export const STOPS = [
       'Vary the axis that actually carries: the list of sections and their order. Do NOT vary the motion; identical motion across every site reads as competence, and varied motion reads as indecision.',
       'Then measure it rather than arguing about it: screenshot the top of twenty pages, put them on one sheet, and see whether you can tell which is which.'
     ],
-    rules: ['shared-skeleton', 'ledger-repeat', 'zero-images']
+    rules: ['V-SKELETON', 'V-STYLE-SKELETON', 'V-AGGREGATE-SIMILARITY', 'V-PALETTE-MODE-COLLAPSE', 'V-NO-LEDGER', 'S-SECTION-INVENTORY', 'S-BOILERPLATE-IDENTICAL']
   }
 ];
 
@@ -212,9 +215,9 @@ export function render({ depth = 'full', stop = null, width = 78 } = {}) {
       out.push(`   THE RULES THAT CARRY THIS  (${s.rules.length})`);
       for (const id of s.rules) {
         const rule = BY_ID[id];
-        out.push(`     ${id}  —  ${rule.title}   [${rule.confidence}]`);
+        out.push(`     ${id}  —  ${rule.title}   [${rule.source?.confidence ?? 'unstated'}]`);
         if (depth === 'full') {
-          out.push(wrap(rule.why, width - 7, '        '));
+          out.push(wrap(rule.why_it_matters, width - 7, '        '));
           out.push(wrap(`MOVE: ${rule.fix}`, width - 7, '        '));
           out.push('');
         }

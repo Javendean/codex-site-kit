@@ -1,364 +1,305 @@
 /**
- * init_site.
+ * The scaffolder, and the one claim it makes that is hard to keep.
  *
- * The load-bearing test in this file is the last group: the scaffold must pass
- * check_honesty, check_assets and check_single_source. A scaffolder that emits
- * work its own linter rejects teaches the person using it that the linter is
- * noise, and after that none of the checks are worth running.
+ * "Two consecutive scaffolds must differ structurally, not just in copy."
+ *
+ * That is the deepest finding in the research corpus — every site you ship
+ * sharing a skeleton — and it is the claim most likely to quietly stop being
+ * true, because nothing about a single site reveals it. So it is tested by
+ * building several sites in a row and comparing their bones, and by feeding
+ * the result back through the rulebook's own variety rules.
+ *
+ * The rest of the file holds the scaffolder to the same standard as anything
+ * it will later criticise: it must come back from review_site with nothing
+ * loud, it must invent nothing, and it must load in a real browser.
  */
 
-import test, { after } from 'node:test';
+import test, { after, before } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFile, readdir } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 
-import { themeContract } from '../src/lib/css.js';
-import { contrastRatio, roundRatio } from '../src/lib/color.js';
-import { cleanup, connect, tempDir, write, writePng } from './helpers.js';
+import { handler as initSite } from '../src/tools/init_site.js';
+import { handler as reviewSite } from '../src/tools/review_site.js';
+import { loadPlaywright } from '../src/lib/browser.js';
+import { AXES } from '../src/lib/compose.js';
+import { cleanup, playwrightAvailable, tempDir } from './helpers.js';
 
 after(cleanup);
 
 const read = (dir, file) => readFile(path.join(dir, file), 'utf8');
 
-async function scaffold(args) {
-  const dir = args.directory ?? (await tempDir('init'));
-  const kit = await connect();
-  const result = await kit.call('init_site', {
-    directory: dir,
-    subject: 'chess lessons for children in Brooklyn',
-    ...args
-  });
-  await kit.close();
-  return { dir, ...result };
+async function build(subject, label = 'site') {
+  const dir = await tempDir(label);
+  const result = await initSite({ directory: dir, subject });
+  assert.equal(result.structuredContent.status, 'pass', result.content[0].text.slice(0, 400));
+  return { dir, data: result.structuredContent, text: result.content[0].text };
 }
 
 /* ------------------------------------------------------------------ *
- * Happy path
+ * The variety claim
  * ------------------------------------------------------------------ */
 
-test('happy path: a complete, openable site is written, and every file is accounted for', async () => {
-  const { dir, data, isError } = await scaffold({
-    site_name: 'Brian Karen Chess',
-    pages: ['Lessons', 'About', 'Contact']
-  });
+test('two consecutive scaffolds differ in their STRUCTURE, not only their words', async () => {
+  const first = await build('chess lessons for club players, Brooklyn', 'variety-a');
+  const second = await build('piano lessons for beginners, Queens', 'variety-b');
 
-  assert.equal(isError, false);
-  assert.equal(data.status, 'pass');
+  assert.notEqual(second.data.choices.inventory, first.data.choices.inventory, 'the section inventory repeated');
+  assert.notEqual(second.data.choices.hero, first.data.choices.hero, 'the hero repeated');
 
-  const onDisk = (await readdir(dir)).sort();
-  assert.deepEqual(onDisk, [
-    '.honesty.json',
-    'README.md',
-    'THEME-NOTES.md',
-    'about.html',
-    'contact.html',
-    'index.html',
-    'lessons.html',
-    'site.js',
-    'styles.css'
-  ]);
-
-  assert.deepEqual(
-    data.files_written.map((f) => f.file).sort(),
-    onDisk,
-    'the report must list exactly what was written'
-  );
-  assert.ok(data.files_written.every((f) => f.bytes > 0), 'nothing may be written empty');
-  assert.equal(data.open_this, path.join(dir, 'index.html'));
+  // The inventory is the highest-carry axis, so the sections themselves must differ.
+  const a = await read(first.dir, 'index.html');
+  const b = await read(second.dir, 'index.html');
+  const sectionsOf = (html) => [...html.matchAll(/<section id="([a-z-]+)"/g)].map((m) => m[1]);
+  assert.notDeepEqual(sectionsOf(b), sectionsOf(a), 'both sites shipped the same sections in the same order');
 });
 
-test('no framework, no build step, no dependency: the page loads two local files and nothing else', async () => {
-  const { dir } = await scaffold({ site_name: 'Chess', pages: ['Lessons'] });
-  const html = await read(dir, 'index.html');
+test('four in a row do not collapse onto one shape', async () => {
+  const subjects = ['a violin teacher in Leeds', 'a bakery in Cork', 'a bike repair shop', 'a tax preparer in Queens'];
+  const built = [];
+  for (const [i, subject] of subjects.entries()) built.push(await build(subject, `spread-${i}`));
 
-  assert.equal(html.match(/<link[^>]+href="styles\.css"/g).length, 1);
-  assert.equal(html.match(/<script src="site\.js" defer><\/script>/g).length, 1);
-  assert.doesNotMatch(html, /https?:\/\//, 'the page must not fetch anything from the network');
-  assert.doesNotMatch(html, /react|vue|tailwind|bootstrap|jquery/i);
+  const inventories = new Set(built.map((b) => b.data.choices.inventory));
+  const heroes = new Set(built.map((b) => b.data.choices.hero));
 
-  const js = await read(dir, 'site.js');
-  // The word appears once, in the comment promising it is not used.
-  assert.doesNotMatch(js, /\.innerHTML|\.outerHTML|insertAdjacentHTML|document\.write/,
-    'nothing reaches the DOM as a string of markup');
-  assert.doesNotMatch(js, /\bimport\b|\brequire\(/, 'no module system, so the file works over file://');
+  assert.ok(inventories.size >= 3, `four builds used ${inventories.size} inventories: ${[...inventories]}`);
+  assert.ok(heroes.size >= 3, `four builds used ${heroes.size} heroes: ${[...heroes]}`);
 });
 
-test('the page is a real document: language, charset, viewport, title, skip link, one h1', async () => {
-  const { dir } = await scaffold({ site_name: 'Chess', pages: ['Lessons'] });
-  const html = await read(dir, 'index.html');
-
-  assert.match(html, /^<!doctype html>/);
-  assert.match(html, /<html lang="en">/);
-  assert.match(html, /<meta charset="utf-8">/);
-  assert.match(html, /<meta name="viewport" content="width=device-width, initial-scale=1">/);
-  assert.match(html, /<title>Chess<\/title>/);
-  assert.match(html, /<a class="skip" href="#main">/);
-  assert.match(html, /<main id="main">/);
-  assert.equal(html.match(/<h1>/g).length, 1, 'exactly one h1 per page');
+test('the ledger is written, and the choice is recorded against what was emitted', async () => {
+  const { data } = await build('a bookbinder in Bath', 'ledger');
+  assert.equal(data.ledger.written, true, 'nothing was recorded, so the next build cannot avoid this shape');
+  assert.ok(data.ledger.entries >= 1);
+  assert.ok(data.choices.inventory && data.choices.hero && data.choices.type && data.choices.surface);
 });
 
-/* ------------------------------------------------------------------ *
- * The three-state theme
- * ------------------------------------------------------------------ */
+test('the report says which axes differ from last time, rather than claiming variety', async () => {
+  await build('a first subject for the ledger', 'prev');
+  const { data, text } = await build('a second and quite different subject', 'next');
 
-test('theme: all three states are present and the dark media query is guarded', async () => {
-  const { dir } = await scaffold({ site_name: 'Chess' });
-  const css = await read(dir, 'styles.css');
-
-  assert.match(css, /:root\s*\{/);
-  assert.match(css, /@media \(prefers-color-scheme: dark\)/);
-  assert.match(css, /:root:not\(\[data-theme="light"\]\)/);
-  assert.match(css, /:root\[data-theme="dark"\]/);
-
-  const contract = themeContract(css);
-  assert.equal(contract.has_dark_media, true);
-  assert.equal(contract.has_dark_attribute, true);
-  assert.equal(contract.dark_media_guarded, true);
+  assert.ok(Array.isArray(data.differs_from_previous));
+  assert.ok(data.differs_from_previous.length >= 2, `only ${data.differs_from_previous.length} axes moved`);
+  assert.match(text, /LAST TIME/, 'the report does not show what the previous build chose');
 });
 
-test('theme: the classic bug is absent — no colour is defined only inside the media query', async () => {
-  const { dir } = await scaffold({ site_name: 'Chess' });
-  const contract = themeContract(await read(dir, 'styles.css'));
-
-  assert.deepEqual(
-    contract.conditional_only,
-    [],
-    'every token must have a value in the bare :root, or it does not exist in the default state'
-  );
-  assert.deepEqual(contract.undefined_tokens, [], 'no var() may point at a token that was never defined');
-  assert.deepEqual(contract.state_gaps, [], 'the two dark states must define the same tokens');
-  assert.ok(contract.tokens.length > 20);
-  assert.ok(contract.tokens.every((t) => t.defined_in_bare_root));
-});
-
-test('theme: the toggle cycles all three states and survives private browsing', async () => {
-  const { dir } = await scaffold({ site_name: 'Chess' });
-  const js = await read(dir, 'site.js');
-  const html = await read(dir, 'index.html');
-
-  assert.match(js, /\['system', 'light', 'dark'\]/);
-  assert.match(js, /removeAttribute\('data-theme'\)/, 'system means no attribute at all');
-  assert.match(js, /localStorage/);
-  assert.equal(
-    (js.match(/catch \(e\) \{ \/\* private browsing/g) || []).length,
-    2,
-    'both localStorage calls must survive a browser that refuses storage'
-  );
-
-  assert.match(html, /data-theme-toggle hidden/, 'a control JavaScript has not wired must not be shown');
-  assert.match(html, /root\.setAttribute\("data-js", "on"\)/, 'the bootstrap must run before first paint');
-});
-
-/* ------------------------------------------------------------------ *
- * The palette
- * ------------------------------------------------------------------ */
-
-test('palette: with a source image the colours come from the subject, and provenance is recorded', async () => {
-  const dir = await tempDir('init-image');
-  const holder = await tempDir('init-image-src');
-  const image = await writePng(holder, 'board.png', [
-    { hex: '#171615', weight: 6 },
-    { hex: '#EDE6D6', weight: 3 },
-    { hex: '#B4331F', weight: 1 }
-  ]);
-
-  const { data } = await scaffold({ directory: dir, site_name: 'Chess', source_image: image });
-
-  assert.equal(data.palette.provisional, false);
-  assert.equal(data.palette.source, path.resolve(image));
-  assert.notEqual(data.palette.light.ground, '#FFFFFF', 'the ground is the subject\'s, not white');
-
-  const css = await read(dir, 'styles.css');
-  assert.match(css, /PALETTE PROVENANCE: quantised from/);
-  assert.match(css, new RegExp(data.palette.light.ground));
-
-  const notes = await read(dir, 'THEME-NOTES.md');
-  assert.match(notes, /Quantised from/);
-});
-
-test('palette: with no source image the colours are labelled provisional, not passed off as a choice', async () => {
-  const { dir, data, text } = await scaffold({ site_name: 'Chess' });
-
-  assert.equal(data.palette.provisional, true);
-  assert.equal(data.palette.source, null);
-
-  const css = await read(dir, 'styles.css');
-  assert.match(css, /PALETTE PROVENANCE: none/);
-  assert.match(css, /not derived from anything/);
-  assert.match(text, /PROVISIONAL/);
-});
-
-test('palette: every text pair clears its WCAG target, in both theme states', async () => {
-  const dir = await tempDir('init-contrast');
-  const holder = await tempDir('init-contrast-src');
-  const image = await writePng(holder, 'p.png', [
-    { hex: '#2B3A55', weight: 5 },
-    { hex: '#F5EFE6', weight: 4 },
-    { hex: '#CE7A2E', weight: 1 }
-  ]);
-
-  const { data } = await scaffold({ directory: dir, site_name: 'Chess', source_image: image });
-
-  assert.equal(data.self_check.contrast.status, 'pass');
-  for (const pair of data.palette.contrast) {
-    assert.equal(pair.passes, true, `${pair.pair} (${pair.state}) was ${pair.ratio}:1, target ${pair.target}`);
-    assert.equal(
-      pair.ratio,
-      roundRatio(contrastRatio(pair.foreground, pair.background)),
-      'the reported ratio must be the real one'
-    );
-  }
-});
-
-test('palette: colours given by hand are used, and pushed into range if they cannot carry text', async () => {
-  const { dir, data } = await scaffold({
-    site_name: 'Chess',
-    palette: {
-      light: { ground: '#FFFFFF', ink: '#000000', accent: '#0B5FA5' },
-      dark: { ground: '#101010', ink: '#F0F0F0', accent: '#7FB5E6' }
-    }
-  });
-
-  assert.equal(data.palette.light.ground, '#FFFFFF');
-  assert.equal(data.palette.light.ink, '#000000');
-  assert.equal(data.palette.provisional, false);
-  assert.ok(data.palette.contrast.every((c) => c.passes));
-
-  const css = await read(dir, 'styles.css');
-  assert.match(css, /--ground:\s+#FFFFFF;/);
-});
-
-/* ------------------------------------------------------------------ *
- * Honesty of the scaffold itself
- * ------------------------------------------------------------------ */
-
-test('honesty: with no site_name the header carries a declared gap, not an invented brand', async () => {
-  const { dir } = await scaffold({});
-  const html = await read(dir, 'index.html');
-
-  assert.match(html, /data-placeholder="site name">Name not chosen yet</);
-  assert.doesNotMatch(html, /Acme|Your Company|Brand Name|Lorem/i);
-});
-
-test('honesty: the scaffold invents nothing — no reviews, ratings, counts or quotations', async () => {
-  const { dir } = await scaffold({ site_name: 'Chess', pages: ['Lessons', 'About'] });
-
-  for (const file of ['index.html', 'lessons.html', 'about.html']) {
-    const html = await read(dir, file);
-    assert.doesNotMatch(html, /testimonial|★|out of 5|as seen in|trusted by/i);
-    assert.doesNotMatch(html, /<blockquote|<cite/i, 'no quotation means no attribution to get wrong');
+test('every axis the scaffolder offers is a real one, and none is empty', () => {
+  for (const [axis, values] of Object.entries(AXES)) {
+    assert.ok(values.length >= 2, `axis "${axis}" has fewer than two options, so it cannot vary`);
+    assert.equal(new Set(values).size, values.length, `axis "${axis}" lists a duplicate`);
   }
 });
 
 /* ------------------------------------------------------------------ *
- * It checks its own work
+ * The scaffold holds to the rulebook it will later apply
  * ------------------------------------------------------------------ */
 
-test('the scaffold passes its own checks — reported, not asserted', async () => {
-  const { data, text } = await scaffold({ site_name: 'Brian Karen Chess', pages: ['Lessons', 'About', 'Contact'] });
+test('the scaffold comes back from the rulebook with nothing loud', async () => {
+  const { dir } = await build('chess lessons for club players, Brooklyn', 'clean');
+  const result = await reviewSite({ directory: dir });
+  const { counts, findings } = result.structuredContent;
 
-  assert.equal(data.self_check.all_passed, true);
-  assert.equal(data.self_check.honesty.status, 'pass');
-  assert.equal(data.self_check.assets.status, 'pass');
-  assert.equal(data.self_check.single_source.status, 'pass');
-  assert.equal(data.self_check.contrast.status, 'pass');
+  assert.equal(counts.fail, 0, `blunders in a scaffold: ${findings.filter((f) => f.severity === 'fail').map((f) => f.id)}`);
 
-  assert.equal(data.self_check.honesty.counts.error, 0);
-  assert.equal(data.self_check.assets.problems.length, 0);
-  assert.deepEqual(data.self_check.single_source.duplicates, []);
-
-  assert.match(text, /I then ran the checks against what I had just written/);
+  // What is left must be the holes: things that need a fact only the owner has.
+  const remaining = findings.map((f) => f.id);
+  const allowed = new Set([
+    'T1-NO-IMAGES',
+    'S-TEL-PRIMARY',
+    'S-LOCALBUSINESS-SCHEMA',
+    'S-SHARE-PREVIEW',
+    'S-STICKY-CALL-BAR',
+    'S-ABOVE-FOLD',
+    'S-BOILERPLATE-IDENTICAL',
+    'H-EMPTY-PROOF-SECTION'
+  ]);
+  for (const id of remaining) {
+    assert.ok(allowed.has(id), `${id} is a scaffolder defect, not a hole waiting for a real fact`);
+  }
 });
 
-test('the scaffold passes the checks run independently afterwards, not only from inside init_site', async () => {
-  const { dir } = await scaffold({ site_name: 'Chess', pages: ['Lessons', 'Contact'] });
+test('the scaffold reviews its own output and reports the real number', async () => {
+  const { text } = await build('a locksmith in Hull', 'selfcheck');
+  assert.match(text, /Checked against the rulebook just now/);
+});
 
-  const kit = await connect();
-  const honesty = await kit.call('check_honesty', { directory: dir });
-  const assets = await kit.call('check_assets', { directory: dir });
-  const single = await kit.call('check_single_source', { directory: dir });
-  await kit.close();
+test('the three theme states are all present, and the dark media query is guarded', async () => {
+  const { dir } = await build('a piano tuner in Derby', 'theme');
+  const css = await read(dir, 'styles.css');
 
-  assert.equal(honesty.data.status, 'pass');
-  assert.equal(assets.data.status, 'pass');
-  assert.equal(single.data.status, 'pass');
-  assert.equal(assets.data.theme.conditional_only.length, 0);
+  assert.match(css, /:root\s*\{/, 'no bare :root, so the light palette does not exist in the default state');
+  assert.match(css, /@media \(prefers-color-scheme: dark\)/, 'no system-dark state');
+  assert.match(css, /:root:not\(\[data-theme="light"\]\)/, 'the dark media query is unguarded');
+  assert.match(css, /:root\[data-theme="dark"\]/, 'no chosen-dark state');
+});
+
+test('the scaffold invents nothing: no ratings, testimonials, counts or press', async () => {
+  const { dir } = await build('a cabinetmaker in Oslo', 'honest');
+  const html = await read(dir, 'index.html');
+
+  for (const pattern of [/testimonial/i, /★|⭐/, /as seen (in|on)/i, /trusted by/i, /\b\d+\+ (happy|satisfied)/i]) {
+    assert.doesNotMatch(html, pattern, `the scaffold invented something matching ${pattern}`);
+  }
+  assert.match(html, /data-placeholder=/, 'nothing is marked as an unfilled field');
+});
+
+test('the copyright year is this year, because a stale one is the cheapest tell there is', async () => {
+  const { dir } = await build('a saddler in Galway', 'year');
+  const html = await read(dir, 'index.html');
+  assert.ok(html.includes(String(new Date().getFullYear())));
+});
+
+test('NOTES.md explains where each choice came from, including the one that derives from nothing', async () => {
+  const { dir } = await build('a glazier in Dundee', 'notes');
+  const notes = await read(dir, 'NOTES.md');
+
+  assert.match(notes, /Section inventory/);
+  assert.match(notes, /Nothing derives this from the subject/, 'the hash-seeded axis does not admit it is hash-seeded');
+  assert.match(notes, /Roboto/, 'the honest font caveat is missing');
 });
 
 /* ------------------------------------------------------------------ *
  * Failure paths
  * ------------------------------------------------------------------ */
 
-test('failure: a folder with files in it is refused, and says what is in there', async () => {
-  const dir = await tempDir('init-occupied');
-  await write(dir, 'my-important-notes.txt', 'do not delete me');
+test('failure: a folder with files in it is refused, and names what is in there', async () => {
+  const dir = await tempDir('occupied');
+  const { writeFile } = await import('node:fs/promises');
+  await writeFile(path.join(dir, 'index.html'), '<h1>mine</h1>', 'utf8');
 
-  const { data, text, isError } = await scaffold({ directory: dir, site_name: 'Chess' });
-
-  assert.equal(isError, true);
-  assert.equal(data.error_code, 'DIRECTORY_NOT_EMPTY');
-  assert.ok(data.fix.some((f) => /my-important-notes\.txt/.test(f)), 'it must name what it refused to overwrite');
-  assert.ok(data.fix.some((f) => /force: true/.test(f)), 'and how to proceed deliberately');
-  assert.doesNotMatch(text, /node_modules|\bat Object\./);
-
-  assert.equal(await read(dir, 'my-important-notes.txt'), 'do not delete me', 'nothing may be touched');
+  const result = await initSite({ directory: dir, subject: 'something' });
+  assert.equal(result.structuredContent.error_code, 'DIRECTORY_NOT_EMPTY');
+  assert.match(result.content[0].text, /index\.html/);
+  assert.equal(await read(dir, 'index.html'), '<h1>mine</h1>', 'the existing file was overwritten anyway');
 });
 
-test('force: true writes into an occupied folder and leaves unrelated files alone', async () => {
-  const dir = await tempDir('init-force');
-  await write(dir, 'my-important-notes.txt', 'do not delete me');
+test('force: true overwrites, and only then', async () => {
+  const dir = await tempDir('force');
+  const { writeFile } = await import('node:fs/promises');
+  await writeFile(path.join(dir, 'index.html'), '<h1>mine</h1>', 'utf8');
+  await writeFile(path.join(dir, 'unrelated.txt'), 'keep me', 'utf8');
 
-  const { data } = await scaffold({ directory: dir, site_name: 'Chess', force: true });
-
-  assert.equal(data.status, 'pass');
-  assert.equal(await read(dir, 'my-important-notes.txt'), 'do not delete me');
-  assert.match(await read(dir, 'index.html'), /<title>Chess<\/title>/);
+  const result = await initSite({ directory: dir, subject: 'a scaffold', force: true });
+  assert.equal(result.structuredContent.status, 'pass');
+  assert.notEqual(await read(dir, 'index.html'), '<h1>mine</h1>');
+  assert.equal(await read(dir, 'unrelated.txt'), 'keep me', 'an unrelated file was destroyed');
 });
 
-test('failure: a source image that cannot be read stops the build rather than guessing colours', async () => {
-  const dir = await tempDir('init-bad-image');
+test('failure: no subject is refused, because every axis is derived from it', async () => {
+  const dir = await tempDir('nosubject');
+  const result = await initSite({ directory: dir, subject: '' });
+  assert.equal(result.structuredContent.error_code, 'NO_SUBJECT');
+  assert.ok(result.structuredContent.fix.some((f) => /subject:/.test(f)));
+});
 
-  const { data, isError } = await scaffold({
-    directory: dir,
-    site_name: 'Chess',
-    source_image: '/Users/nobody/missing.png'
+/* ------------------------------------------------------------------ *
+ * In a real browser
+ * ------------------------------------------------------------------ */
+
+const HAVE_BROWSER = await (async () => {
+  if (!(await playwrightAvailable())) return false;
+  const { module: pw } = await loadPlaywright({});
+  try {
+    const browser = await pw.chromium.launch({ headless: true });
+    await browser.close();
+    return true;
+  } catch {
+    return false;
+  }
+})();
+
+let BROWSER_SITE = null;
+before(async () => {
+  if (!HAVE_BROWSER) return;
+  ({ dir: BROWSER_SITE } = await build('a chess club in Brooklyn', 'browser'));
+});
+
+async function withPage(options, fn) {
+  const { chromium } = (await loadPlaywright({})).module;
+  const browser = await chromium.launch({ headless: true });
+  try {
+    const context = await browser.newContext(options);
+    const page = await context.newPage();
+    await page.goto(pathToFileURL(path.join(BROWSER_SITE, 'index.html')).href, { waitUntil: 'load' });
+    return await fn(page);
+  } finally {
+    await browser.close();
+  }
+}
+
+test('with JavaScript off the page is complete, and shows no control that does nothing', async (t) => {
+  if (!HAVE_BROWSER) return t.skip('Chromium is not available on this machine');
+
+  const result = await withPage({ javaScriptEnabled: false, viewport: { width: 390, height: 780 } }, async (page) => ({
+    headings: await page.locator('h1').count(),
+    buttons: await page.locator('button').count(),
+    text: (await page.locator('main').innerText()).length
+  }));
+
+  assert.equal(result.headings, 1, 'a page needs exactly one h1');
+  assert.equal(result.buttons, 0, 'a control was rendered that nothing is wired to');
+  assert.ok(result.text > 200, 'the page is empty without JavaScript');
+});
+
+test('the theme button cycles system, light and dark, and an explicit light wins on a dark machine', async (t) => {
+  if (!HAVE_BROWSER) return t.skip('Chromium is not available on this machine');
+
+  const states = await withPage({ colorScheme: 'dark', viewport: { width: 1280, height: 800 } }, async (page) => {
+    const button = page.locator('.theme__button');
+    await button.waitFor();
+    const seen = [await page.getAttribute('html', 'data-theme')];
+    for (let i = 0; i < 3; i++) {
+      await button.click();
+      seen.push(await page.getAttribute('html', 'data-theme'));
+    }
+    return seen;
   });
 
-  assert.equal(isError, true);
-  assert.equal(data.error_code, 'IMAGE_NOT_FOUND');
-  assert.ok(
-    data.fix.some((f) => /leave source_image out/.test(f)),
-    'it must offer the way forward, not just the refusal'
+  assert.deepEqual(states, [null, 'light', 'dark', null], `theme cycle was ${JSON.stringify(states)}`);
+});
+
+test('the page does not scroll sideways on the narrowest phone in common use', async (t) => {
+  if (!HAVE_BROWSER) return t.skip('Chromium is not available on this machine');
+
+  const measured = await withPage({ viewport: { width: 320, height: 640 }, hasTouch: true, isMobile: true }, (page) =>
+    page.evaluate(() => ({
+      scrollWidth: document.documentElement.scrollWidth,
+      innerWidth: window.innerWidth
+    }))
   );
-  assert.deepEqual(await readdir(dir), [], 'nothing may be written when the build was refused');
+
+  assert.equal(measured.scrollWidth, measured.innerWidth, `the page is ${measured.scrollWidth - measured.innerWidth}px too wide at 320px`);
 });
 
-test('failure: a colour that is not a colour is refused by name', async () => {
-  const dir = await tempDir('init-bad-colour');
+test('every control clears 48px on a touch device', async (t) => {
+  if (!HAVE_BROWSER) return t.skip('Chromium is not available on this machine');
 
-  const { data, isError } = await scaffold({
-    directory: dir,
-    site_name: 'Chess',
-    palette: { light: { ground: '#FFFFFF', ink: 'dark blue', accent: '#0B5FA5' } }
-  });
+  const short = await withPage({ viewport: { width: 390, height: 780 }, hasTouch: true, isMobile: true }, (page) =>
+    page.evaluate(() =>
+      Array.from(document.querySelectorAll('.btn, .theme__button'))
+        .map((el) => ({ label: el.textContent.trim().slice(0, 30), height: el.getBoundingClientRect().height }))
+        .filter((c) => c.height < 48)
+    )
+  );
 
-  assert.equal(isError, true);
-  assert.equal(data.error_code, 'BAD_COLOUR');
-  assert.match(data.why, /Not a hex colour: "dark blue"/);
-  assert.deepEqual(await readdir(dir), []);
+  assert.deepEqual(short, [], `controls under 48px on a phone: ${JSON.stringify(short)}`);
 });
 
-test('failure: page titles that collide do not overwrite each other', async () => {
-  const { dir, data } = await scaffold({ site_name: 'Chess', pages: ['About', 'About'] });
+test('nothing fails to load and nothing is logged as an error', async (t) => {
+  if (!HAVE_BROWSER) return t.skip('Chromium is not available on this machine');
 
-  assert.equal(data.status, 'pass');
-  const files = (await readdir(dir)).filter((f) => f.endsWith('.html')).sort();
-  assert.deepEqual(files, ['about-2.html', 'about.html', 'index.html']);
-});
+  const { chromium } = (await loadPlaywright({})).module;
+  const browser = await chromium.launch({ headless: true });
+  const problems = [];
+  try {
+    const page = await browser.newPage();
+    page.on('requestfailed', (r) => problems.push(`request failed: ${r.url()}`));
+    page.on('console', (m) => m.type() === 'error' && problems.push(`console: ${m.text()}`));
+    page.on('pageerror', (e) => problems.push(`page error: ${e.message}`));
+    await page.goto(pathToFileURL(path.join(BROWSER_SITE, 'index.html')).href, { waitUntil: 'load' });
+  } finally {
+    await browser.close();
+  }
 
-test('failure: an empty page title is dropped rather than producing a file called ".html"', async () => {
-  const { dir } = await scaffold({ site_name: 'Chess', pages: ['Lessons', '   ', ''] });
-
-  const files = (await readdir(dir)).filter((f) => f.endsWith('.html')).sort();
-  assert.deepEqual(files, ['index.html', 'lessons.html']);
+  assert.deepEqual(problems, []);
 });

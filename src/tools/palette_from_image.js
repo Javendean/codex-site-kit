@@ -300,7 +300,12 @@ export const handler = guard(TOOL, async (args) => {
 
   const unreadable = suggested.contrast.filter((c) => !c.passes);
 
-  const clean = unreadable.length === 0 && corpusAudit.length === 0;
+  // The contrast pairs decide pass or fail, because those are a property of
+  // the palette. The corpus colour bands are reported alongside but do not
+  // fail the tool: a near-greyscale photograph really does yield colourless
+  // neutrals, and that is a fact about the photograph rather than a fault in
+  // reading it. The report says so and says what to do instead.
+  const clean = unreadable.length === 0;
 
   const nextSteps = [];
   if (unreadable.length > 0) {
@@ -330,8 +335,11 @@ export const handler = guard(TOOL, async (args) => {
     tool: TOOL,
     status: clean ? STATUS.PASS : STATUS.FAIL,
     headline: clean
-      ? `${count(swatches.length, 'colour')} read from ${path.basename(args.image)}. Every text pair clears WCAG AA and every token sits inside the corpus colour bands.`
-      : `${count(swatches.length, 'colour')} read from ${path.basename(args.image)}: ${unreadable.length > 0 ? `${count(unreadable.length, 'pair')} cannot carry text` : 'all text pairs read'}, ${corpusAudit.length > 0 ? `${count(corpusAudit.length, 'token')} outside the corpus colour bands` : 'every token inside the colour bands'}.`,
+      ? `${count(swatches.length, 'colour')} read from ${path.basename(args.image)}. Every text pair clears WCAG AA` +
+        (corpusAudit.length > 0
+          ? `, and ${count(corpusAudit.length, 'token')} sits outside the corpus colour bands — that is usually a fact about the photograph rather than a fault, and the report says which.`
+          : ', and every token sits inside the corpus colour bands.')
+      : `${count(swatches.length, 'colour')} read from ${path.basename(args.image)}, but ${count(unreadable.length, 'pair')} cannot carry text.`,
     sections,
     nextSteps,
     data: {

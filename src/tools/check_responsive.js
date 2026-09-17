@@ -159,6 +159,7 @@ function measureInPage() {
    * for. getClientRects() returns one rectangle per line box, so its length IS
    * the line count.
    */
+  const coarse = Boolean(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
   const controls = [];
   for (const el of document.querySelectorAll('a, button, [role="button"], input[type="submit"], input[type="button"], summary')) {
     const style = window.getComputedStyle(el);
@@ -187,7 +188,11 @@ function measureInPage() {
     if (lines > 1 && looksLikeButton) {
       controls.push({ kind: 'wrapped_label', selector: describe(el), label, lines, height: Math.round(rect.height) });
     }
-    if (rect.height > 0 && rect.height < 44 && looksLikeButton) {
+    // The 44px floor is a FINGER measurement. On a device with a mouse it is
+    // not the standard and reporting it there would be a wrong finding, so the
+    // check asks the browser whether this is a coarse pointer rather than
+    // inferring it from the width.
+    if (coarse && rect.height > 0 && rect.height < 44 && looksLikeButton) {
       controls.push({ kind: 'small_target', selector: describe(el), label, lines, height: Math.round(rect.height * 10) / 10 });
     }
   }
@@ -198,6 +203,7 @@ function measureInPage() {
     innerWidth,
     bodyScrollWidth: document.body ? document.body.scrollWidth : 0,
     title: document.title || '',
+    coarsePointer: Boolean(coarse),
     controls: controls.slice(0, 8),
     offenders: outermost
       .sort((a, b) => b.overflow - a.overflow)
@@ -411,14 +417,45 @@ export const handler = guard(TOOL, async (args) => {
   const browser = launch.browser;
 
   try {
-    const context = await browser.newContext({ viewport: { width: widths[0], height } });
-    const page = await context.newPage();
+    /**
+     * Two contexts, because `pointer: coarse` is a real media query and a
+     * browser resized to 390px is still a mouse.
+     *
+     * The 48px tap-target rule and every `@media (hover: hover)` guard are
+     * written for a finger. Measuring them in a context that reports a fine
+     * pointer measures the desktop styles at a phone width, which is a
+     * different page from the one a phone gets — and it would report a
+     * correctly-built site as failing.
+     */
+    const TOUCH_BELOW = 600;
+    const contexts = new Map();
+    const contextFor = async (width) => {
+      const touch = width < TOUCH_BELOW;
+      const key = touch ? 'touch' : 'pointer';
+      if (!contexts.has(key)) {
+        // hasTouch ONLY. `isMobile` additionally turns on Chromium's meta
+        // viewport emulation, which rescales the layout so that scrollWidth
+        // always equals innerWidth — and that would silently disable the one
+        // measurement this whole tool exists to take. Found by a test that
+        // planted a 900px block and watched it start passing.
+        contexts.set(key, await browser.newContext({ viewport: { width, height }, hasTouch: touch }));
+      }
+      return contexts.get(key);
+    };
+
+    const pageFor = new Map();
+    const getPage = async (width) => {
+      const ctx = await contextFor(width);
+      if (!pageFor.has(ctx)) pageFor.set(ctx, await ctx.newPage());
+      return pageFor.get(ctx);
+    };
 
     for (const file of pages) {
       const relFile = rel(dir, file);
       const url = pathToFileURL(file).href;
 
       for (const width of widths) {
+        const page = await getPage(width);
         const failures = [];
         const onFailed = (request) =>
           failures.push(`${request.url().split('/').pop()} (${request.failure()?.errorText ?? 'failed'})`);
@@ -442,7 +479,8 @@ export const handler = guard(TOOL, async (args) => {
             inner_width: m.innerWidth,
             client_width: m.clientWidth,
             overflow_px: overflow,
-            passes: overflow === 0 && (m.controls ?? []).length === 0,
+            touch: width < TOUCH_BELOW,
+          passes: overflow === 0 && (m.controls ?? []).length === 0,
             offenders: overflow > 0 ? m.offenders : [],
             controls: m.controls ?? []
           });
@@ -464,7 +502,7 @@ export const handler = guard(TOOL, async (args) => {
       }
     }
 
-    await context.close();
+    for (const ctx of contexts.values()) await ctx.close();
   } finally {
     await browser.close().catch(() => {});
   }
@@ -571,6 +609,46 @@ export const handler = guard(TOOL, async (args) => {
     nextSteps.push(
       'Shorten the wrapping button labels. A two-line button reads as broken rather than as cheap, which is the worse of the two.'
     );
+  }
+
+  /**
+   * Zero measurements is never a pass.
+   *
+   * This is the single most dangerous line in the tool. "No overflow was found"
+   * and "nothing was measured" render identically in a summary and mean
+   * opposite things, and a tool that confuses them certifies pages nobody
+   * looked at. If every page failed to load, the answer is "skipped", loudly.
+   */
+  if (measurements.length === 0) {
+    return toolResult({
+      tool: TOOL,
+      status: STATUS.SKIPPED,
+      headline: 'Nothing was measured. This is NOT a pass — every page failed to load in the browser.',
+      sections: [
+        {
+          title: 'What happened, per attempt:',
+          body: pageErrors.length
+            ? pageErrors.map((e) => `  ${e.page} at ${e.width}px — ${e.kind}: ${e.detail}`).join('\n')
+            : '  No pages were found to measure.'
+        }
+      ],
+      nextSteps: [
+        'The reason above is the whole story: fix it and run this again.',
+        'Until then, nobody has measured these pages.'
+      ],
+      data: {
+        directory: dir,
+        browser_available: true,
+        browser_from: launch.from ?? null,
+        install_command: null,
+        widths,
+        pages_tested: 0,
+        measurements_taken: 0,
+        overflow_count: 0,
+        measurements: [],
+        page_errors: pageErrors
+      }
+    });
   }
 
   const clean = overflowing.length === 0 && withControlFaults.length === 0;

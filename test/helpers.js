@@ -23,6 +23,8 @@ const scratch = [];
    into the OS temp folder for the whole process. */
 process.env.CODEX_SITE_KIT_STATE =
   process.env.CODEX_SITE_KIT_STATE ?? path.join(tmpdir(), `csk-ledger-${process.pid}`);
+process.env.CODEX_SITE_KIT_LEDGER =
+  process.env.CODEX_SITE_KIT_LEDGER ?? path.join(tmpdir(), `csk-ledger-${process.pid}`, 'ledger.json');
 
 /** A fresh empty folder that is removed when the test file finishes. */
 export async function tempDir(label = 'site') {

@@ -31,7 +31,9 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 
 import { tools } from './tools/index.js';
-import { RULEBOOK } from './rules/index.js';
+import { rulebook } from './lib/rulebook.js';
+
+const RULEBOOK = rulebook().rules;
 
 /**
  * The version is READ from package.json, never typed here.
@@ -75,6 +77,10 @@ const INSTRUCTIONS = [
   '  3. Write the content, replacing the labelled holes.',
   '  4. review_site, check_copy, then check_responsive once there is content to measure.',
   '  5. doctor whenever anything does not work. It prints the exact line to paste.',
+  '',
+  '  check_honesty, check_assets and check_single_source each run one slice on their own,',
+  '  for when you have just changed the words, the images, or a price. learning_path puts the',
+  '  whole rulebook in the order a beginner needs rather than the order a critique needs.',
   '',
   'WHAT THIS KIT HOLDS TO, AND WHY IT IS IN THE TOOLS RATHER THAN THE ADVICE',
   '',

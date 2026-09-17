@@ -5,7 +5,7 @@
  * Neither file is written by hand. A course maintained alongside a linter
  * drifts away from it within a month, and then the course teaches rules the
  * tool does not run — which teaches the reader to distrust the tool. These two
- * documents are projections of src/rules/, and this script fails loudly if the
+ * documents are projections of rules/, and this script fails loudly if the
  * path names a rule that no longer exists.
  *
  *   node scripts/build-docs.js          write the files
@@ -18,7 +18,19 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
 import { STOPS, render, validate } from '../src/lib/learning-path.js';
-import { RULEBOOK, TIERS, TIER_ORDER, GLYPH, SOURCES, CONFIDENCE_NOTE } from '../src/rules/index.js';
+import { rulebook, TIER_LABEL as TIERS, TIER_ORDER, GLYPH, loadSources } from '../src/lib/rulebook.js';
+
+const RULEBOOK = rulebook().rules;
+
+/** Every source a rule cites: the primary one, plus anything in also_in. */
+const sourceNames = (rule) => [rule.source?.name, ...(rule.also_in ?? []).map((a) => a.name)].filter(Boolean);
+const SOURCES = loadSources().sources;
+const CONFIDENCE_NOTE = {
+  DEMONSTRATED: 'The source ships code, a live comparator, production library CSS, or a counted sample.',
+  ASSERTED: 'Expert opinion or practitioner prose. It may well be right. It is not evidence.',
+  MEASURED: 'Measured rather than quoted — the numbers in the finding are the measurement.',
+  INFERRED: 'Reasoning with no source behind it, recorded as reasoning so it is never mistaken for a citation.'
+};
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const check = process.argv.includes('--check');
@@ -76,21 +88,21 @@ function learningPathMarkdown() {
         const rule = RULEBOOK.find((r) => r.id === id);
         out.push(`### \`${id}\` ${GLYPH[rule.severity]} ${rule.title}`);
         out.push('');
-        out.push(`*${TIERS[rule.tier]} · confidence ${rule.confidence}*`);
+        out.push(`*${TIERS[rule.tier]} · confidence ${rule.source?.confidence ?? 'unstated'}*`);
         out.push('');
         out.push(`**What it looks for.** ${rule.threshold}`);
         out.push('');
-        out.push(`**Why it matters.** ${rule.why}`);
+        out.push(`**Why it matters.** ${rule.why_it_matters}`);
         out.push('');
         out.push(`**The better move.** ${rule.fix}`);
         out.push('');
-        if (rule.more) {
-          out.push(`**Also worth knowing.** ${rule.more}`);
+        if (rule.teach) {
+          out.push(`**What it teaches.** ${rule.teach}`);
           out.push('');
         }
-        out.push(`**Who says so.** ${rule.who.map((w) => SOURCES[w].label).join(' · ')}`);
+        out.push(`**Who says so.** ${sourceNames(rule).map((w) => SOURCES[w]?.full_name ?? w).join(' · ')}`);
         out.push('');
-        const caveats = rule.who.map((w) => SOURCES[w]).filter((src) => src.caveat);
+        const caveats = sourceNames(rule).map((w) => SOURCES[w]).filter((src) => src && src.caveat);
         for (const src of caveats) {
           out.push(`> ⚠ **${src.label}** — ${src.caveat}`);
           out.push('');
@@ -132,7 +144,7 @@ function rulesMarkdown() {
   const out = [];
   out.push('# The rulebook');
   out.push('');
-  out.push('*Generated from `src/rules/` by `npm run docs`. Do not edit by hand.*');
+  out.push('*Generated from `rules/` by `npm run docs`. Do not edit by hand.*');
   out.push('');
   out.push(
     `${RULEBOOK.length} rules. Every one names its source, and the kit refuses to load a rule that does not — provenance is a startup error here, not a habit. Run \`explain_rule\` with any id for the full teaching note.`
@@ -150,7 +162,7 @@ function rulesMarkdown() {
     out.push('|---|---|---|---|---|');
     for (const r of rules) {
       out.push(
-        `| ${GLYPH[r.severity]} | \`${r.id}\`<br>${escapeCell(r.title)} | ${escapeCell(firstSentence(r.threshold))} | ${r.confidence} | ${r.who.join(', ')} |`
+        `| ${GLYPH[r.severity]} | \`${r.id}\`<br>${escapeCell(r.title)} | ${escapeCell(firstSentence(r.threshold))} | ${r.source?.confidence ?? 'unstated'} | ${sourceNames(r).join(', ')} |`
       );
     }
     out.push('');

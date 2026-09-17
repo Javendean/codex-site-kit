@@ -885,7 +885,15 @@ function displaySizeFor(el, page) {
 function emptyElement(det, page) {
   const hits = [];
   for (const el of page.elements) {
-    if (['img', 'br', 'hr', 'input', 'svg', 'path', 'source', 'meta', 'link', 'script', 'style'].includes(el.tag)) continue;
+    // Elements that never render a box, plus the raw-text ones whose content
+    // the parser keeps out of `text` — <title> has words in it and would
+    // otherwise be reported as an empty spacer on every page ever checked.
+    if (
+      [
+        'img', 'br', 'hr', 'input', 'svg', 'path', 'source', 'meta', 'link', 'script', 'style',
+        'title', 'template', 'noscript', 'head', 'html', 'base', 'track', 'wbr', 'area', 'col', 'colgroup', 'param'
+      ].includes(el.tag)
+    ) continue;
     if (el.children.length) continue;
     const content = el.text.replace(/[\s ]+/g, '');
     if (content.length) continue;
