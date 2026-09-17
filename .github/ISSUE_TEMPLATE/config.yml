@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Installation help — read this first
+    url: https://github.com/Javendean/codex-site-kit#readme
+    about: The README walks through the whole macOS install and says what each command should print.
+  - name: Run the doctor
+    url: https://github.com/Javendean/codex-site-kit#step-5--check-the-whole-thing
+    about: "`codex-site-kit doctor` diagnoses most problems and prints the exact command to fix them."

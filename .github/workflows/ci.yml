@@ -1,0 +1,115 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------------
+  # The test suite, on every Node this package claims to support.
+  # macOS is in the matrix because that is the only machine the
+  # intended user has.
+  # ---------------------------------------------------------------
+  test:
+    name: test · node ${{ matrix.node }} · ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        node: ['18.17', '20.x', '22.x']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - run: npm ci
+
+      - name: Run tests WITHOUT a browser installed
+        # The no-Playwright path is a supported configuration, not a
+        # degraded one: five of the six tools must work, and
+        # check_responsive must say so clearly rather than fail silently.
+        # Running the suite here with no browser present is what proves it.
+        run: npm test
+
+  # ---------------------------------------------------------------
+  # The same suite with Chromium present, so the measuring path is
+  # exercised too. One job is enough; this is the expensive one.
+  # ---------------------------------------------------------------
+  test-with-browser:
+    name: test · with Chromium
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+
+      - run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - run: npm test
+
+  # ---------------------------------------------------------------
+  # The install path a beginner actually follows, on the machine they
+  # actually have. This job exists because a package that passes its
+  # own tests in its own checkout can still be uninstallable.
+  # ---------------------------------------------------------------
+  install-from-github:
+    name: install from git · macOS
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Install globally, straight from this commit
+        run: npm install -g "git+file://$GITHUB_WORKSPACE"
+
+      - name: The command exists and reports its version
+        run: |
+          which codex-site-kit
+          codex-site-kit --version
+
+      - name: The doctor runs and reports rather than crashing
+        # Exit 1 is the CORRECT result here: this runner has no Codex
+        # config, so the doctor must say so. What is being checked is
+        # that it produces a readable report and a fix, not a stack trace.
+        run: |
+          set +e
+          out=$(codex-site-kit doctor)
+          code=$?
+          echo "$out"
+          echo "doctor exit code: $code"
+          echo "$out" | grep -q "codex mcp add site-kit -- codex-site-kit" \
+            || { echo "::error::doctor did not print the install command"; exit 1; }
+          echo "$out" | grep -qE "node:internal|at Object\." \
+            && { echo "::error::doctor leaked a stack trace to the user"; exit 1; }
+          exit 0
+
+      - name: The installed package contains the doctor and the server
+        # Guards the regression where a files[] edit silently shipped a
+        # package whose doctor did not exist.
+        run: |
+          root=$(npm root -g)/codex-site-kit
+          test -f "$root/scripts/doctor.js" || { echo "::error::doctor missing from the install"; exit 1; }
+          test -f "$root/src/server.js"     || { echo "::error::server missing from the install"; exit 1; }
+          echo "installed tree:"
+          find "$root" -type f -not -path "*/node_modules/*" | sort
+
+      - name: It speaks MCP over stdio
+        # A server nobody handshaked with is not shipped.
+        run: node "$GITHUB_WORKSPACE/scripts/handshake.js" --command codex-site-kit

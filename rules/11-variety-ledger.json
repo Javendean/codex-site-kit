@@ -1,0 +1,258 @@
+{
+  "$comment": "THE VARIETY LEDGER — the deepest tell is not on any single page. It is that every site you ship shares a skeleton. An owner who has seen a competitor's site from the same generator recognises it instantly, and that failure is much harder to recover from than a bad gradient. The corpus is emphatic about the mechanism: variety must be enforced by a LEDGER that records what was emitted last, not merely ENABLED by having options — and it documents a tool's own authors failing exactly this, still emitting one macrostructure with twenty-one themes available.",
+  "tier": "ledger",
+  "design": {
+    "the_problem_as_measured": {
+      "source": "research/08-craft.md §4 and research/08a §3, measured 2026-08-31 across local-site-forge/previews/",
+      "findings": [
+        "sha256 of the <style> block across all 13 previews: 2 distinct values (10 share one, 3 share the other)",
+        "diff of two previews from different verticals: 0 structural CSS differences; all 115 differing lines are copy",
+        "grep -c '<img': 0 for all 13",
+        "palette chosen by the model: ink x10, slate x3 — 4 of 6 available palettes never emitted"
+      ],
+      "re_measured_here": "2026-09-17. The raw <style> sha256 now gives THREE distinct values (10 / 2 / 1), not two — the files moved slightly after the corpus measured them. The finding is unchanged in substance and the discrepancy is recorded rather than smoothed over. More importantly: the value-blind skeleton hash defined below collapses all 13 to ONE value, which is the honest statement of the problem. There are not two stylesheets. There is one, with three hex values substituted."
+    },
+    "why_a_raw_hash_is_the_wrong_fingerprint": "Hashing the stylesheet catches byte-identical output, which is the easy case and the one a generator escapes accidentally the moment a single colour varies. The corpus's own measurement shows the trap: two distinct hashes across thirteen pages LOOKS like variation and is not, because the only difference between the two groups is three hex values. A fingerprint has to be blind to the things that vary trivially and sensitive to the things that do not. So the primary facet strips every VALUE out of the CSS and hashes only the selectors and property names. Under that hash, swapping the accent colour changes nothing — which is correct, because swapping the accent colour changes nothing.",
+    "facets": [
+      {
+        "name": "skeleton",
+        "what_it_fingerprints": "The section spine of the document. For each landmark and each direct child of <main>, emit tag plus its first class or id, plus a shape summary of its own children (tag names with repeat counts collapsed, e.g. `article*8`). Join in document order and hash.",
+        "blind_to": "All text, all colours, all sizes, business names, service counts under the collapse threshold.",
+        "sensitive_to": "Which sections exist, in what order, containing what kinds of thing. This is the facet that catches 'every site shares a skeleton', which the corpus names as the deepest tell.",
+        "weight": 0.35
+      },
+      {
+        "name": "style_skeleton",
+        "what_it_fingerprints": "The stylesheet with every declaration VALUE removed. For each rule: the normalised selector, then its property names sorted alphabetically. At-rule preludes are kept (a media query is structure). Join and hash.",
+        "blind_to": "Every colour, length, duration, font stack and easing curve.",
+        "sensitive_to": "Which selectors exist and what kinds of property each one sets — i.e. the actual shape of the design system.",
+        "why_it_is_primary": "This is the facet that turns the corpus's '2 distinct stylesheets' into the truer '1 distinct stylesheet'. If two sites share this hash, they are the same design with different paint.",
+        "weight": 0.35
+      },
+      {
+        "name": "palette",
+        "what_it_fingerprints": "A vector, not a hash: [ground lightness, ground hue, ink lightness, ink hue, accent hue, accent chroma, count of perceptually distinct colour groups]. Compared by normalised distance rather than by equality.",
+        "blind_to": "Exact hex values.",
+        "sensitive_to": "Whether two sites are actually different colours or the same colours nudged.",
+        "weight": 0.1
+      },
+      {
+        "name": "type",
+        "what_it_fingerprints": "A vector: [primary family name hash, count of distinct families, display weight, display size maximum in rem, display tracking in em, body size in px].",
+        "blind_to": "Copy.",
+        "sensitive_to": "Whether the typographic decisions were made per-project or once.",
+        "weight": 0.1
+      },
+      {
+        "name": "geometry",
+        "what_it_fingerprints": "A vector: [dominant border-radius, shadow layer count, shadow peak alpha, dominant border width, max grid column count]. This is research/08a §3 axis G — radius, shadow and border weight as a TRIPLE, which is what makes two pages read as different studios where any one of them alone carries almost nothing.",
+        "blind_to": "Everything else.",
+        "sensitive_to": "The corner-and-edge language.",
+        "weight": 0.1
+      },
+      {
+        "name": "boilerplate",
+        "what_it_fingerprints": "A hash of the normalised text of every legally-required or template-constant block (banners, disclaimers, footers), with proper nouns masked.",
+        "blind_to": "The business name, which is substituted.",
+        "sensitive_to": "Whether the mandated text is also mandated TYPESETTING. Used only by S-BOILERPLATE-IDENTICAL, which is info-level, because the words genuinely cannot change.",
+        "weight": 0.0
+      }
+    ],
+    "where_the_ledger_lives": {
+      "default_path": "~/.codex-site-kit/ledger.json",
+      "override": "CODEX_SITE_KIT_LEDGER environment variable, or an explicit path argument",
+      "why_not_in_the_project": "Site fourteen is usually built in a new folder. A ledger stored beside the site can only ever see one site, which is exactly the failure mode it exists to prevent: variety enabled rather than enforced. It has to outlive the project directory.",
+      "format": "A JSON object with a `version` and an `entries` array, newest last. Each entry: { id, built_at, label, path_hint, facets: { skeleton, style_skeleton, boilerplate }, vectors: { palette, type, geometry }, declared: { trade, palette_family, radius_language } }.",
+      "privacy": "Local file. Hashes and small numeric vectors only — no page content, no business names, no URLs beyond a local path hint. Never transmitted. This is a rulebook that says it has no telemetry, so the ledger must be readable by its owner and boring.",
+      "retention": "The last 50 entries. Comparison uses the last N (default 12), which is roughly the number of sites in a run where a shared skeleton becomes visible to a buyer who has seen a competitor's."
+    },
+    "how_a_check_uses_it": [
+      "1. Compute all six facets for the page under check.",
+      "2. Load the ledger. Drop any entry with the same `id` — a site being re-checked is not a collision with itself.",
+      "3. Compare against the last N entries. Exact-hash facets fire on equality. Vector facets contribute to an aggregate distance.",
+      "4. Emit findings. Then, and only if the check was invoked in recording mode, append this page's entry.",
+      "5. A check never writes the ledger implicitly. Recording is an explicit act, because a ledger that fills itself with every draft is a ledger of drafts."
+    ],
+    "what_this_design_does_not_do": "It cannot tell you whether two sites LOOK different to a person. It tells you whether they were BUILT differently, which is a proxy. research/08a §3.8 gives the real test and it is cheap: generate twenty sites across four or more verticals, screenshot the top 900 pixels of each, and assemble a contact sheet. If you cannot tell which is which, the variation failed. The stronger version mixes five generated heroes in with five real local-business heroes — if the generated five visibly cluster, you have MEASURED the signature rather than argued about it. The ledger is the cheap continuous check; the contact sheet is the honest one. Run the contact sheet before trusting any threshold in this file."
+  },
+  "rules": [
+    {
+      "id": "V-SKELETON",
+      "tier": "ledger",
+      "category": "variety",
+      "title": "This page has the same section skeleton as one you already shipped",
+      "what_it_is": "The document's section spine — which sections exist, in what order, containing what kinds of element — is identical to a previously recorded build.",
+      "why_it_matters": "This is the deepest tell in the corpus and the hardest failure to recover from. A bad gradient is one page's problem. An owner who recognises a competitor's site in yours has learned something about you that no single page can un-teach. And the corpus is specific that the section INVENTORY and COUNT are what make two pages look like different jobs rather than one job run twice.",
+      "source": {
+        "name": "research_08",
+        "confidence": "MEASURED_HERE",
+        "where": "§4: 'The deepest tell is not on any single page. It is that every site you ship shares a skeleton.'"
+      },
+      "also_in": [
+        {
+          "name": "hallmark",
+          "where": "its authors' own documented 'Specimen fall-through': with 21 themes available the tool still kept emitting one macrostructure"
+        }
+      ],
+      "detector": {
+        "kind": "ledger",
+        "facet": "skeleton",
+        "mode": "exact_collision",
+        "window": 12
+      },
+      "threshold": "The `skeleton` hash equals that of any different site among the last 12 ledger entries.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "fail",
+      "fix": "Change the section inventory, not the colours. Derive it from the trade: a tax office has a deadline strip and a what-to-bring checklist; a plumber has an emergency strip and a service area; a vet has an after-hours note. Do NOT shuffle a fixed list — arbitrary order reads as arbitrary.",
+      "teach": "The most damaging thing about a page built by a tool is not any single detail. It is that the next page the tool builds has the same bones. Someone who has seen one of your sites recognises the next one instantly. The fix is not new colours — it is a different set of sections, chosen because this kind of business needs them.",
+      "chess": "Playing the same opening in every game against every opponent. Eventually someone has seen the game.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 156,
+        "note": "All 13 share ONE skeleton hash, so every page collides with the other twelve: 13 x 12 = 156 findings. The corpus's own summary of these same files, from the other direction: 'The chimney-and-damper supply company and the immigration lawyer receive literally the same page.'"
+      }
+    },
+    {
+      "id": "V-STYLE-SKELETON",
+      "tier": "ledger",
+      "category": "variety",
+      "title": "This stylesheet is a previous one with different values",
+      "what_it_is": "The stylesheet, stripped of every value, is byte-identical to a previously recorded build. Same selectors, same properties, different paint.",
+      "why_it_matters": "This is the facet that shows what a raw hash hides. The corpus measured two distinct stylesheet hashes across thirteen pages and concluded there were two stylesheets. With the values removed there is one — the entire difference between the two groups was three hex values. A generator that changes only values has not produced variety; it has produced one design in several colourways, which is a different and much weaker thing.",
+      "source": {
+        "name": "research_08a",
+        "confidence": "MEASURED_HERE",
+        "where": "§3: '2 distinct values; 0 structural CSS differences; all 115 differing lines are copy'"
+      },
+      "detector": {
+        "kind": "ledger",
+        "facet": "style_skeleton",
+        "mode": "exact_collision",
+        "window": 12
+      },
+      "threshold": "The value-blind `style_skeleton` hash equals that of any different site among the last 12 ledger entries.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "fail",
+      "fix": "Vary the GROUND rather than the accent. Changing the ground colour changes the entire read of the page; changing the accent changes a button — same edit budget, roughly ten times the perceived difference. Then vary density from the content volume, and the corner-shadow-border triple from a stable hash of the business. Motion is the one axis that should NOT vary: fix it once and apply it uniformly, because nobody sees two of your sites side by side except you, and one correct motion system is a competence win.",
+      "teach": "If you take two of your pages and delete every colour and every measurement from both stylesheets, do they become the same file? If so, you have one design, and the differences between your sites are paint. Real variation shows up in which rules exist at all — a different layout, different sections, a different set of decisions.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 12,
+        "hits_total": 132,
+        "note": "REFINED BY THE RUN, and the result is better than what was written. The value-blind hash gives TWO values across 13 pages — the same count the corpus got from a raw sha256, and a different split for a different reason. The corpus's two groups were split by ACCENT COLOUR. These two are split by whether the page received the 2026-08-31 motion fix: 12 pages share one design-system hash (59 rules), and the 13th differs only because the fix genuinely added rules — `:active`, a hover guard, a failsafe keyframe — for 63. So the honest statement is stronger than 'there are two stylesheets': there is ONE design system across thirteen shipped pages, and the only structural variation in the whole set is a bug fix that reached one of them. 12 pages x 11 colliding peers = 132 findings."
+      }
+    },
+    {
+      "id": "V-AGGREGATE-SIMILARITY",
+      "tier": "ledger",
+      "category": "variety",
+      "title": "This page is a near-copy of one you already shipped",
+      "what_it_is": "No single facet matches exactly, but the weighted distance across all five measured facets to the nearest previous build is below the threshold.",
+      "why_it_matters": "Exact-hash rules are evaded by any trivial change. A generator that adds one section, or one extra card, escapes both collision rules while producing a page that is obviously the same page. This rule is the one that survives a generator trying to pass it.",
+      "source": {
+        "name": "measured_here",
+        "confidence": "MEASURED_HERE",
+        "where": "designed for this rulebook, 2026-09-17"
+      },
+      "confidence_note": "The 0.15 distance threshold and the facet weights (skeleton 0.35, style_skeleton 0.35, palette 0.10, type 0.10, geometry 0.10) are ARITHMETIC — nobody published them and no study supports them. They were chosen so that the preview corpus scores near zero and two genuinely different designs from the corpus's own reference set would not collide. Treat the number as a starting position to be tuned against the contact-sheet test in research/08a §3.8, not as a finding. The tool prints the distance alongside the verdict so you can see how close the call was.",
+      "detector": {
+        "kind": "ledger",
+        "facet": "aggregate",
+        "mode": "distance",
+        "max_distance": 0.15,
+        "window": 12,
+        "weights": {
+          "skeleton": 0.35,
+          "style_skeleton": 0.35,
+          "palette": 0.1,
+          "type": 0.1,
+          "geometry": 0.1
+        }
+      },
+      "threshold": "Weighted facet distance to the nearest different site in the last 12 entries below 0.15. Hash facets contribute 0 when equal and 1 when different; vector facets contribute their normalised Euclidean distance, clamped to 1.",
+      "threshold_provenance": "arithmetic",
+      "severity": "warn",
+      "fix": "Look at which facets contributed nothing — the report names them. Those are the axes you are not actually varying.",
+      "teach": "Two pages can avoid being identical in any single way and still obviously be the same page. This check scores the overall similarity rather than looking for exact matches, so adding one extra card does not fool it. It also tells you which parts of the design never change, which is usually the more useful answer.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 12,
+        "hits_total": 12,
+        "note": "12 of 13 pages have a nearest neighbour below the 0.150 threshold. Mean pairwise distance across all 78 pairs: 0.058. The most distant pair in the corpus scores 0.361 — and it is the fixed page against an unfixed one, so the largest measured difference between any two of these thirteen sites is a motion bug fix, not a design decision. The one page that passes is the fixed one, and it passes only because it is the odd one out."
+      }
+    },
+    {
+      "id": "V-PALETTE-MODE-COLLAPSE",
+      "tier": "ledger",
+      "category": "variety",
+      "title": "One palette used far more often than the others, or options never used at all",
+      "what_it_is": "Across the recorded builds, one declared palette family accounts for more than half the output, or two or more declared options have never been emitted.",
+      "why_it_matters": "This is the precise failure the corpus measured and named: having options does not prevent defaulting to one. The generator had six palettes and emitted two — ten times and three times — and never emitted four of them. The mechanism for variation existed and produced mode collapse. That is why a ledger is required and a menu is not sufficient.",
+      "source": {
+        "name": "research_08a",
+        "confidence": "MEASURED_HERE",
+        "where": "A6 and §3 axis H",
+        "quote": "MEASURED HERE: the LLM picked ink 10 of 13 times and never emitted 4 of the 6 palettes."
+      },
+      "detector": {
+        "kind": "ledger",
+        "facet": "declared.palette_family",
+        "mode": "distribution",
+        "max_share": 0.5,
+        "min_options_used_ratio": 0.6,
+        "window": 12
+      },
+      "threshold": "One palette family above 50% of the last 12 builds, or fewer than 60% of the declared options ever used. Requires the project to declare its option set; without one the rule reports that it cannot check and says why.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "warn",
+      "fix": "Stop asking a model to choose. Map the category to the palette deterministically, and seed anything genuinely arbitrary from a stable hash of the business name and address so the same business always regenerates the same site — otherwise you cannot refer to 'the one I sent you'. And the strongest version of this axis is not the palette at all: where a real photograph or a storefront observation exists, derive the accent from the awning, the sign, the van, the tile.",
+      "fix_code": "seed = parseInt(sha256(`${name}|${address}`).slice(0, 8), 16);",
+      "teach": "Giving a tool six colour schemes to choose from does not get you six colour schemes. It gets you whichever one it likes, most of the time. The only way to know is to write down what you used last time and look. That is all a ledger is, and it is the difference between having options and using them.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 26,
+        "note": "Re-measured 2026-09-17 from the emitted accent values: #1f9ecb x10, #4f6bed x3. Two of six, and one of them at 77% share. This matches research/08a's 'ink x10, slate x3' exactly."
+      }
+    },
+    {
+      "id": "V-NO-LEDGER",
+      "tier": "ledger",
+      "category": "variety",
+      "title": "Building repeatedly with no ledger",
+      "what_it_is": "Three or more sites built and no ledger file recording what was emitted.",
+      "why_it_matters": "Variety you cannot measure is variety you do not have. The corpus's instruction is not 'add more themes', it is 'record what was emitted last' — and it says so specifically because a tool with twenty-one themes still shipped one macrostructure. Building the ledger from day one is cheap; retrofitting it after fifty sites means the first fifty are unmeasured.",
+      "source": {
+        "name": "research_08",
+        "confidence": "ASSERTED",
+        "where": "§4",
+        "quote": "Variety must be enforced by a LEDGER that records what was emitted last, not merely enabled by having options."
+      },
+      "confidence_note": "The instruction is asserted, in one sentence, by one source. What gives it weight is not the sentence but the case attached to it: a tool's own authors documenting their tool emitting one macrostructure with twenty-one themes available. The three-build trigger and the twelve-build window are this rulebook's arithmetic and nobody published them.",
+      "detector": {
+        "kind": "ledger",
+        "facet": "existence",
+        "mode": "absent",
+        "min_builds": 3
+      },
+      "threshold": "No ledger file found, or fewer entries in it than the number of sites under this operator's directory. Fires at `info` until three builds, then `warn`.",
+      "threshold_provenance": "arithmetic",
+      "severity": "warn",
+      "fix": "Record every build. It is one small JSON file, it lives outside the project so it survives the next project, and it is the only mechanism that turns 'I have options' into 'I used them'.",
+      "teach": "You cannot tell whether your sites are becoming samey by looking at the one in front of you. You need a note of what the last dozen looked like. Keeping that note is the whole mechanism — without it, having lots of options just means the tool picks its favourite one every time and nobody notices.",
+      "chess": "Nobody improves without a scoresheet. You cannot see your own repetition from inside the game.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "Reports nothing during validation because the validator builds an in-memory ledger from the corpus itself, which is what lets the other four ledger rules run at all. In the real world these thirteen sites were built with no ledger of any kind — which is precisely how the shared skeleton and the palette mode collapse went unnoticed until someone hashed the stylesheets by hand."
+      }
+    }
+  ]
+}

@@ -1,0 +1,467 @@
+{
+  "$comment": "THE TRAP TIER — currently reads as sophisticated, will read as slop soon. research/08 §4 calls this the most strategically important part of the list, because it means the problem cannot be solved once. Every rule here is time-limited BY CONSTRUCTION and carries a review_by date. The engine downgrades an expired rule to `info` and says so in the finding, and suspends one that is two review cycles stale rather than letting it keep firing. A rulebook that cannot admit it rots is lying about what kind of thing it is.",
+  "tier": "trap",
+  "expiry_policy": {
+    "review_horizon_months": 6,
+    "rationale": "febbhav is the only source in the corpus tracking decay, and as of 2026-08-31 it recorded the purple to cream/emerald/italic-serif migration as an ACTIVE shift. The observed cycle from 'novel' to 'universally flagged' in this space runs roughly 12-18 months: indigo was a fresh default around 2023 and is flagged by three independent detectors by 2026; the cream package was tagged 'will read as slop soon' in August 2026 while one of its own components was ALREADY burned at that moment. A six-month review cadence is deliberately SHORTER than the observed migration time, so the rulebook is re-checked before a shift completes rather than after. This number is arithmetic, not a finding, and it says so.",
+    "on_expiry": "Severity is downgraded to `info` and the finding is prefixed with the review date and a statement that nobody has re-checked it.",
+    "on_double_expiry": "At review_by + 180 days the rule is SUSPENDED and not evaluated at all. A taste rule two cycles stale is worse than no rule, because it is confidently wrong.",
+    "what_would_retire_a_rule": "Evidence that the tell has stopped being produced (it is no longer a signal), or evidence that it has become so universal that flagging it is useless. Both require a fresh count, not an opinion."
+  },
+  "rules": [
+    {
+      "id": "TRAP-CREAM-WASH",
+      "tier": "trap",
+      "category": "color",
+      "title": "The warm cream ground",
+      "what_it_is": "A page ground in warm oat, cream or bone — the current escape from purple.",
+      "why_it_matters": "It is already on a detector's trap list, and the corpus records the sharpest possible illustration: a commenter caught the author of the AI-slop STUDY wearing it on the blog post announcing the study. Being the escape hatch is exactly what burns an escape hatch.",
+      "source": {
+        "name": "gesso",
+        "confidence": "DEMONSTRATED",
+        "where": "rule `cream-default-wash`, trap tier",
+        "quote": "recently it's more of the same beige scheme this very blog post is using"
+      },
+      "confidence_note": "This is a rule about a TREND, and its severity is `info` for that reason. A warm ground is not wrong — several reference-tier sites use one, and one of them is among the best pages in the corpus. What is flagged is reaching for it BECAUSE it is the current safe answer. If the ground colour was derived from something real about the business, silence this and record why.",
+      "decay": {
+        "status": "rising",
+        "evidence": "Flagged as an active migration destination by febbhav as of 2026-08-31, and already carried by Gesso as a named trap rule at that date."
+      },
+      "burned_on": null,
+      "review_by": "2027-02-28",
+      "detector": {
+        "kind": "hex_oklch_band",
+        "mode": "ground",
+        "hue": [
+          50,
+          100
+        ],
+        "chroma_min": 0.012,
+        "lightness_min": 0.9
+      },
+      "threshold": "The page's dominant ground colour at OKLCH hue 50-100, chroma above 0.012, lightness above 0.90 — i.e. a visibly warm off-white rather than a barely-tinted one. The 0.012 floor deliberately spares the 0.005-0.015 neutral-tint band that T2-ZERO-CHROMA-GREY requires.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "info",
+      "fix": "Keep it if it came from somewhere — the awning, the paper stock, the tile. Change it if it came from a palette list. The test is whether you can say where it came from.",
+      "teach": "Warm cream backgrounds became popular as the sensible alternative to purple, which means they are now the new default answer. Nothing is wrong with the colour. What matters is whether you chose it or inherited it, and you can tell by whether you can say where it came from.",
+      "chess": "Every refutation becomes a main line eventually, and then it needs refuting too.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "`--bg: #fbfaf8` is hue 84.6 but chroma only 0.0029 — far below the 0.012 floor. It is a barely-warm near-white, not a cream wash. Correctly does not fire."
+      }
+    },
+    {
+      "id": "TRAP-CREAM-PACKAGE",
+      "tier": "trap",
+      "category": "type",
+      "title": "The full cream-and-serif package",
+      "what_it_is": "All three together: a cream or warm-oat ground, a large italic serif display face, and small monospace uppercase labels.",
+      "why_it_matters": "Any one of the three is defensible. All three together is a recognisable house style with a name, and the corpus's verdict is exact: a serif H1 is defensible; a serif H1 on cream with mono uppercase kickers is not. Pick one.",
+      "source": {
+        "name": "research_11",
+        "confidence": "ASSERTED",
+        "where": "§5.6's resolution of a tension it states rather than resolves"
+      },
+      "confidence_note": "The tension is genuine and the corpus says so. A newspaper serif for the H1 buys 'established, local, been here a while' — the register of a family business — and inverts the software-company grotesque dialect that signals a company that will disappear. That is a real argument in favour. The rule is not against the serif; it is against the full package.",
+      "decay": {
+        "status": "rising",
+        "evidence": "Named by febbhav as the active destination of the purple migration, 2026-08-31."
+      },
+      "burned_on": null,
+      "review_by": "2027-02-28",
+      "detector": {
+        "kind": "composite",
+        "all": [
+          {
+            "kind": "hex_oklch_band",
+            "mode": "ground",
+            "hue": [
+              50,
+              100
+            ],
+            "chroma_min": 0.012,
+            "lightness_min": 0.9
+          },
+          {
+            "kind": "font_stack",
+            "mode": "serif_display"
+          },
+          {
+            "kind": "css_decl",
+            "property": "^text-transform$",
+            "value": "uppercase",
+            "selector_hint": "label|kicker|eyebrow|meta|caption"
+          }
+        ]
+      },
+      "threshold": "All three present: a cream ground by the TRAP-CREAM-WASH test, a serif family on display headings, and uppercase monospace or widely-tracked small labels.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Drop one. The uppercase mono labels are the easiest to lose, and they are usually eyebrow kickers anyway, which T2-KICKER-ANY already wants gone.",
+      "teach": "Three specific choices — a cream background, a big italic serif headline, and tiny uppercase labels in a typewriter font — have travelled together so often that together they are now a recognisable look rather than three decisions. Any two of them is fine. All three is a costume.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "TRAP-ITALIC-IN-HEADING",
+      "tier": "trap",
+      "category": "type",
+      "title": "An italic word inside an upright heading",
+      "what_it_is": "One or two words set in italic within an otherwise upright headline, for emphasis.",
+      "why_it_matters": "This one is ALREADY burned, and the corpus says why it matters that it is: this is the current fix for a boring headline, and it is already on a detector's auto-fail list. The escape hatch closed before most people noticed it opened.",
+      "source": {
+        "name": "hallmark",
+        "confidence": "ASSERTED",
+        "where": "gate 38a, which auto-fails it as 'among the most reliable AI tells'"
+      },
+      "confidence_note": "Hallmark states this as an auto-fail gate. The corpus records no count behind it. It is `warn` rather than `fail` for that reason — but note that this is the trap-tier rule with the clearest evidence of already being burned, which is why its burned_on is set rather than null.",
+      "decay": {
+        "status": "burned",
+        "evidence": "Recorded as already-burned at 2026-08-31, at the same moment the corpus was describing it as the current fix for boring headlines."
+      },
+      "burned_on": "2026-08-31",
+      "review_by": "2027-02-28",
+      "detector": {
+        "kind": "html_regex",
+        "pattern": "<h[1-3][^>]*>(?:(?!</h[1-3]>).)*<(?:em|i)\\b",
+        "flags": "is"
+      },
+      "threshold": "An `<em>` or `<i>` element, or a `font-style: italic` rule, inside an `<h1>`, `<h2>` or `<h3>`.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Rewrite the headline so the important word is important because of what it says, not because of how it leans. If the headline needs emphasis to work, the headline needs rewriting.",
+      "teach": "Tilting one word in a headline to make it stand out has become such a common machine-written move that it now reads as machine-written. The underlying problem is usually that the headline is not saying anything, and a slanted word will not fix that.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "TRAP-SAFE-GREEN",
+      "tier": "trap",
+      "category": "color",
+      "title": "Emerald as the not-purple accent",
+      "what_it_is": "The specific emerald `#10B981`, or a very close neighbour, used as the accent.",
+      "why_it_matters": "It is the other escape from purple, and it is already on a detector's trap list for exactly that reason. It also carries a second problem for this audience specifically: the green-tick-on-a-rounded-square grammar is the visual language of security-scan spam and automated audit email, and 'free website' plus automated email is already a recognised scam signature to a small-business owner.",
+      "source": {
+        "name": "gesso",
+        "confidence": "DEMONSTRATED",
+        "where": "rule `safe-green-default`, trap tier"
+      },
+      "also_in": [
+        {
+          "name": "research_11a",
+          "where": "§1.3, on the green-check mark as scanner-spam grammar"
+        }
+      ],
+      "confidence_note": "The Gesso rule is a published detector. The scam-signature association is a reading of this specific market recorded in the source project's own research and is not measured.",
+      "decay": {
+        "status": "rising",
+        "evidence": "Named alongside cream as an active migration destination, 2026-08-31."
+      },
+      "burned_on": null,
+      "review_by": "2027-02-28",
+      "detector": {
+        "kind": "hex_oklch_band",
+        "hue": [
+          150,
+          175
+        ],
+        "chroma_min": 0.12,
+        "lightness": [
+          0.6,
+          0.8
+        ],
+        "role_hint": "accent",
+        "exact_hexes": [
+          "#10b981",
+          "#34d399",
+          "#059669"
+        ]
+      },
+      "threshold": "The exact emerald hexes, or an accent at OKLCH hue 150-175 with chroma above 0.12 and lightness 0.60-0.80. Calibration: `#10B981` is hue 162.5, chroma 0.149, lightness 0.696. A deeper forest green — which the corpus treats favourably — sits well below the lightness floor and correctly does not fire.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "info",
+      "fix": "If green is right for the business, go deeper and less bright — a forest rather than a mint. Deep green on cream is structurally identical to the enterprise pattern yet reads hospitable rather than corporate when the copy is a human voice and the neutrals are warm.",
+      "teach": "Bright emerald green became the standard answer to 'not purple', so it is now its own default. It also looks like the tick in an automated security scan, which is not the association you want on a page a small business owner was not expecting. A deeper, quieter green does the same job without either problem.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "TRAP-SECTION-NUMBERS",
+      "tier": "trap",
+      "category": "layout",
+      "title": "Editorial section numbering",
+      "what_it_is": "Sections marked 01 / 02 / 03 in a small tracked label.",
+      "why_it_matters": "Named by a detector rule and by an independent design skill. It signals an editorial or agency register that the page has not earned, and it implies a sequence — most pages do not have one.",
+      "source": {
+        "name": "gesso",
+        "confidence": "DEMONSTRATED",
+        "where": "rule `numbered-section-markers`, trap tier"
+      },
+      "also_in": [
+        {
+          "name": "impeccable",
+          "where": "craft-floor.md, Refuse: 'Section numbers (01 / 02 / 03) unless the sequence itself carries information the reader needs.'",
+          "note": "impeccable adds the exception that makes the rule usable: a genuine sequence earns its numbers"
+        }
+      ],
+      "decay": {
+        "status": "stable",
+        "evidence": "Carried by two independent sources as of 2026-08-31 and 2026-09; no decay signal either way."
+      },
+      "burned_on": null,
+      "review_by": "2027-02-28",
+      "detector": {
+        "kind": "text_regex",
+        "pattern": "^\\s*0[1-9]\\s*$|^\\s*0[1-9]\\s*[/—–-]\\s*",
+        "flags": "gm",
+        "scope": "short_labels",
+        "min_count": 2
+      },
+      "threshold": "Two or more zero-padded section numbers used as labels. One is not a pattern.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "info",
+      "fix": "Delete them — unless the sections genuinely are steps that must be done in order, in which case number them plainly (1, 2, 3) and say what the sequence is.",
+      "teach": "Numbering your sections 01, 02, 03 looks editorial, and it promises the reader an order that usually is not there. If the sections really are steps in a process, number them and say so. If they are just sections, the numbers are decoration.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "TRAP-BENTO",
+      "tier": "trap",
+      "category": "layout",
+      "title": "The bento grid as the default layout",
+      "what_it_is": "A grid of modular blocks of varying size — the modular asymmetric card layout named after Japanese lunch boxes.",
+      "why_it_matters": "This is the clearest case in the whole rulebook of a recommendation ageing inside its own corpus, and it is worth stating plainly because it is the model for how to read everything in this tier. research/04 §3 selected this vocabulary DELIBERATELY in August 2026 because it 'reads as 2026'. research/08 §4, written the same month, records the correction: in 2026, 'reads as 2026' and 'reads as AI-generated' are the same set, because the AI generators are what standardised 2026. That is not a contradiction between the two files; it is what changed between them.",
+      "source": {
+        "name": "research_04",
+        "confidence": "ASSERTED",
+        "where": "§3: 'Bento grids — the dominant 2026 layout'"
+      },
+      "also_in": [
+        {
+          "name": "research_08",
+          "where": "§4, which lists a bento grid among the cluster identifying a page as the 2026 generated house style"
+        }
+      ],
+      "confidence_note": "The two sources in this rulebook's own corpus disagree, three weeks apart, and the later one wins. The 'modern' list in research/04 is directional consensus from design publications, not measurement. Do not read this rule as 'bento is bad'. Read it as: a layout chosen because it is current is a layout chosen by the trend, and the trend is what the detectors are trained on.",
+      "decay": {
+        "status": "burned",
+        "evidence": "Described as the dominant 2026 layout and as part of the generated house style in the same month, by two files in the same research corpus."
+      },
+      "burned_on": "2026-08-31",
+      "review_by": "2027-02-28",
+      "detector": {
+        "kind": "css_cooccur",
+        "mode": "bento",
+        "min_columns": 4,
+        "requires_span_variation": true
+      },
+      "threshold": "A grid of 4 or more columns where child items use two or more different `grid-column: span N` values. A plain equal grid is not a bento and does not fire.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "info",
+      "fix": "Choose the layout from the amount of content, not from the year — see S-DENSITY-MISMATCH. Under five items, one column and bigger type beats any grid.",
+      "teach": "The grid of differently-sized blocks was the fashionable layout of 2026, which is exactly why it is now one of the things that marks a page as machine-made — the generators all learned it at once. The lesson is bigger than this one layout: choosing a shape because it is current means choosing whatever the generators are also choosing.",
+      "chess": "The sharpest line in the book is the line everyone has prepared against.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 13,
+        "note": "`.bento { grid-template-columns: repeat(6,1fr) }` with cards at span 2, span 3 and span 1/-1, on all 13. The generator was following research/04's recommendation faithfully, and research/08 retracted it three weeks later. This is the single best illustration in the corpus of why the trap tier needs a review date."
+      }
+    },
+    {
+      "id": "TRAP-KINETIC-TYPE",
+      "tier": "trap",
+      "category": "type",
+      "title": "Viewport-scaled kinetic display type",
+      "what_it_is": "Huge headline type driven by viewport width, described in 2026 design writing as the primary architectural element of the year.",
+      "why_it_matters": "Same mechanism as the bento grid. It came into the corpus from the 'what reads as modern' list and then collided with the measured type findings: the reference tier caps its headlines around 56px and runs weight 400-510, while the pages that shout are the cheap ones.",
+      "source": {
+        "name": "research_04",
+        "confidence": "ASSERTED",
+        "where": "§3: 'Kinetic typography — called the primary architectural element of 2026'"
+      },
+      "also_in": [
+        {
+          "name": "research_11",
+          "where": "§5.1 and §5.2, which measure the opposite: cap at 56px, weight 450, and note that restraint is invisible to an untrained eye, which is exactly why it is safe"
+        }
+      ],
+      "confidence_note": "The two sources conflict and the measured one wins. Note that research/11's H1 measurement of a top reference site fits a LINEAR viewport interpolation rather than breakpoint steps — so viewport-scaled type is not the problem. The SIZE is.",
+      "decay": {
+        "status": "stable",
+        "evidence": "No decay signal. The conflict is between a trend list and a set of measurements, not a change over time."
+      },
+      "burned_on": null,
+      "review_by": "2027-02-28",
+      "detector": {
+        "kind": "css_decl",
+        "property": "^font-size$",
+        "value": "clamp\\([^)]*\\b([5-9]|\\d{2,})(?:\\.\\d+)?rem",
+        "selector_hint": "h1|h2|\\.hero|\\.display"
+      },
+      "threshold": "A display `font-size` whose clamp maximum is 5rem (80px) or greater.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "info",
+      "fix": "Cap at 3.5rem — see TY-H1-CAP. Keep the fluid interpolation; lose the size.",
+      "teach": "Enormous headlines that scale with the window were the signature move of 2026 design writing. The pages that actually read as expensive do the opposite: a moderate size at a light weight with careful spacing. Very large type reads as a magazine cover, and a magazine cover reads as a budget you do not have.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 26,
+        "note": "`clamp(2.4rem, 7.2vw, 5.2rem)` on the hero, on all 13. Also fires TY-H1-CAP."
+      }
+    },
+    {
+      "id": "TRAP-LUCIDE-FIVE",
+      "tier": "trap",
+      "category": "imagery",
+      "title": "The five predictable icon glyphs",
+      "what_it_is": "Sparkles for AI, a lightning bolt for fast, a shield for secure, a tick for a benefit, a bar chart for analytics, an arrow for the call to action.",
+      "why_it_matters": "This is a subtle and useful finding: even CORRECTLY hand-inlined icons carry a fingerprint if you pick the obvious glyph. The problem is not the icon library. It is the mapping from concept to symbol, which every generator makes the same way.",
+      "source": {
+        "name": "febbhav",
+        "confidence": "ASSERTED",
+        "where": "the 'Lucide five' finding, quoted in research/08 §4's constructive inverse"
+      },
+      "confidence_note": "A catalogue observation, not a count. It is listed as a trap rather than a tell because it is a mapping habit that could shift as quickly as it formed.",
+      "decay": {
+        "status": "stable",
+        "evidence": "No decay tracking on this specific finding."
+      },
+      "burned_on": null,
+      "review_by": "2027-02-28",
+      "detector": {
+        "kind": "html_regex",
+        "pattern": "(?:lucide|feather|heroicon)[^\"']*(?:sparkles|zap|shield|check|bar-?chart|arrow-right)|data-icon=\"(?:sparkles|zap|shield|check|bar-chart-3|arrow-right)\"",
+        "flags": "i",
+        "min_count": 2
+      },
+      "threshold": "Two or more of the named glyphs, by class or icon name.",
+      "threshold_provenance": "from_source",
+      "severity": "info",
+      "fix": "Draw the icon for the actual thing. A plumber's emergency callout is not a lightning bolt, it is a tap. The best answer is often no icons at all — most feature lists do not need them.",
+      "teach": "Even when you draw your icons by hand, choosing the obvious symbol gives the game away: sparkles means clever, a lightning bolt means fast, a shield means safe. Every generator makes the same choice. Draw the thing you actually do instead, or skip the icons.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "No icon library. The glyphs are emoji and Unicode geometry, which fire T1-EMOJI-ICON and T1-GLYPH-REGISTER instead."
+      }
+    },
+    {
+      "id": "TRAP-GLASSMORPHISM",
+      "tier": "trap",
+      "category": "material",
+      "title": "Glassmorphism as a design language",
+      "what_it_is": "Translucent frosted panels used throughout as the page's material, rather than as one specific effect.",
+      "why_it_matters": "It arrived in this corpus from the 'what reads as modern in 2026' list and is contradicted by everything measured afterwards: the blur is a named generated-page tell, it repaints on scroll, and it degrades text rendering. This is the third rule in this file where research/04's modern list and research/08's tell list name the same thing.",
+      "source": {
+        "name": "research_04",
+        "confidence": "ASSERTED",
+        "where": "§3: 'Glassmorphism, organic shapes, subtle 3D, bold color — rounding out the expressive turn'"
+      },
+      "also_in": [
+        {
+          "name": "research_08",
+          "where": "§4 Tier 2 and §7.1, where backdrop-filter is a named tell and a forbidden technique"
+        }
+      ],
+      "confidence_note": "Directional secondary-source consensus, superseded within the same corpus. See T2-BACKDROP-BLUR for the executable version with the measured objections.",
+      "decay": {
+        "status": "burned",
+        "evidence": "Listed as modern and as a machine-made tell by two files in the same corpus, in the same month."
+      },
+      "burned_on": "2026-08-31",
+      "review_by": "2027-02-28",
+      "detector": {
+        "kind": "css_regex",
+        "pattern": "backdrop-filter",
+        "flags": "i",
+        "min_count": 2
+      },
+      "threshold": "Two or more `backdrop-filter` declarations, i.e. used as a material rather than once as an effect.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "info",
+      "fix": "See T2-BACKDROP-BLUR. A solid surface with a hairline is more confident and has no failure modes.",
+      "teach": "Frosted-glass panels were on every 2026 'what's modern' list, which means every page generator learned them at the same time. They also cost the phone real work and make the text on them slightly blurrier. Two reasons to stop, arriving from different directions.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "TRAP-MODERN-BY-LIST",
+      "tier": "trap",
+      "category": "structure",
+      "title": "A design chosen from a what-is-modern list",
+      "what_it_is": "Not a single element. A page whose choices all come from the same year's trend list — bento grid, kinetic type, glassmorphism, scroll animation, a gradient, a pill button, a sticky blurred nav.",
+      "why_it_matters": "This is the general form of the whole trap tier and it deserves its own rule. The corpus states it exactly: in 2026, 'reads as 2026' and 'reads as AI-generated' are the same set, BECAUSE the AI generators are what standardised 2026. Any choice made because it is current is a choice made by whatever the generators were trained on. The corpus measured this cluster in one of its own pages: a blurred sticky nav, a radial-gradient hero glow, three pill radii, nine clamps, balanced text wrapping, three colour-mixes, tight hero tracking, a bento grid and a gradient initials mark — all in one file, and it names that cluster as the 2026 house style of the major AI page builders.",
+      "source": {
+        "name": "research_08",
+        "confidence": "MEASURED_HERE",
+        "where": "§4, 'What the current generator emits'",
+        "quote": "In 2026, 'reads as 2026' and 'reads as AI-generated' are the same set, because the AI generators are what standardised 2026."
+      },
+      "confidence_note": "The cluster was counted in a real file. The inference that a viewer reads the cluster as machine-made is asserted. What makes this rule worth keeping despite that is that it is the only rule in the book that looks at the page as a WHOLE rather than at an element.",
+      "decay": {
+        "status": "rising",
+        "evidence": "The set of elements in the cluster changes every year. The pattern does not."
+      },
+      "burned_on": null,
+      "review_by": "2027-02-28",
+      "detector": {
+        "kind": "composite",
+        "mode": "cluster",
+        "members": [
+          "TRAP-BENTO",
+          "TRAP-KINETIC-TYPE",
+          "T2-BACKDROP-BLUR",
+          "T2-HERO-GLOW",
+          "T2-PILL-CTA",
+          "T2-UNIVERSAL-FADEUP",
+          "T2-AVATAR-GRADIENT",
+          "T2-TIGHT-TRACKING"
+        ],
+        "min_members_firing": 5
+      },
+      "threshold": "5 or more of the eight named cluster members firing on the same page. The member list is expected to change; the count is the rule.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "warn",
+      "fix": "There is no single fix and that is the point. Pick the one thing on the page that came from the business rather than from a list — a colour taken from the shopfront, a section that exists because this trade needs it, a photograph — and build outward from that. Then remove whichever cluster members are not doing work.",
+      "teach": "Any one fashionable choice is fine. A page where every choice is the fashionable one for that year was assembled by the fashion, not by you — and since the page generators were trained on the same fashion, your page and theirs converge. The way out is to start from something true about this particular business and let that decide the rest.",
+      "chess": "A whole game of book moves is not your game. At some point you have to play a position nobody prepared.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 13,
+        "note": "Fires on all 13. The cluster members firing are the bento grid, viewport-scaled display type, backdrop-filter, the blurred hero glow, the pill CTA, the universal reveal, the gradient initials mark and the tight hero tracking. This is the rulebook's strongest single finding and it matches the corpus's own written diagnosis of these exact files — a cluster it names as the 2026 house style of the major AI page builders."
+      }
+    }
+  ]
+}

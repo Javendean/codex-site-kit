@@ -1,0 +1,370 @@
+{
+  "$comment": "COLOUR — verified by COUNTING rather than by describing. research/11 §7's strongest move is to dump the hex frequency of a reference page and confirm that three values dominate: Eve runs #0A0A0A 304 times, #187C9B 205, #F6F6F3 133, and nothing else with presence. Mercury is #272735 426 against #535461 12. Vercel's served HTML contains one hex. Teenage Engineering's whole document contains four. That is what colour discipline looks like when it is measured.",
+  "tier": "craft",
+  "rules": [
+    {
+      "id": "C-HEX-CENSUS",
+      "tier": "craft",
+      "category": "color",
+      "title": "More than three colours with presence",
+      "what_it_is": "A page whose colour census shows more than three values doing real work — ink, ground, and one accent are the whole budget.",
+      "why_it_matters": "This is the single most checkable rule in the corpus, and the method matters as much as the threshold: dump your own hex frequency and confirm that three values dominate, the way the reference sites were verified. The discipline is not to add a fourth.",
+      "source": {
+        "name": "research_11",
+        "confidence": "MEASURED_HERE",
+        "where": "§7 colour dominance table; §8.2 item 4: 'The three-token page. Ink, ground, one accent, and the discipline not to add a fourth.'"
+      },
+      "confidence_note": "The counts are measured from live production CSS. The inference that three is the right number for YOUR page is a reading of what good pages do, not a tested rule. A palette with a light ground, a sunk ground and an edge ground — three off-whites — is a well-known reference-tier pattern and should not be penalised. This rule counts colours with PRESENCE, not distinct declarations, which is why the threshold is on usage rather than on count alone.",
+      "detector": {
+        "kind": "hex_census",
+        "max_with_presence": 5,
+        "presence_min_uses": 3,
+        "group_by_perceptual_distance": 0.04
+      },
+      "threshold": "More than 5 perceptually distinct colour groups each used 3 or more times, after grouping colours within OKLAB distance 0.04 of each other (so a five-step off-white ramp counts as one group, which is what it is).",
+      "threshold_provenance": "calibrated_here",
+      "severity": "info",
+      "fix": "Cut to ink, ground and one accent. Where you need more surfaces, get them from layered off-whites rather than from new hues — two off-whites instead of white cards on a grey page is the cheapest exit from the template look.",
+      "teach": "Count the colours on your page. Really count them — write down every one and how often it is used. The sites that look the most expensive almost all come down to three: the text colour, the background colour, and one accent. Everything else they need, they get by nudging the background slightly lighter or darker.",
+      "chess": "A strong plan uses few pieces well. Adding a fourth colour is developing a piece with no square for it.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "8 declared tokens per theme, but after perceptual grouping they collapse to about 4 groups: a warm off-white ramp, a cool near-black, a cool mid-grey, and the accent. Passes the count — and fails C-WARM-COOL-SPLIT, which is the more serious problem."
+      }
+    },
+    {
+      "id": "C-WARM-COOL-SPLIT",
+      "tier": "craft",
+      "category": "color",
+      "title": "Warm grounds with cool greys",
+      "what_it_is": "The page's backgrounds and the page's text greys carry opposite hues — a warm ground with cool grey type, or the reverse.",
+      "why_it_matters": "The corpus states the symptom exactly: a page with a warm accent and cool grey body copy looks wrong and most people cannot name why. This rulebook found that condition in the preview corpus by measurement, which is what makes it worth encoding as its own rule rather than folding it into the chroma band.",
+      "source": {
+        "name": "hallmark",
+        "confidence": "ASSERTED",
+        "where": "color.md neutrals: 'A page with a warm accent and cool grey body copy looks wrong and most people can't name why.'"
+      },
+      "also_in": [
+        {
+          "name": "research_11",
+          "where": "§7: 'Warm grey body copy, never #666' — five measured production examples, one of which drops a single warm value into an otherwise cool ramp and the corpus names that single value as the reason the page is not clinical"
+        }
+      ],
+      "confidence_note": "The perceptual claim is asserted. The MEASUREMENT is straightforward and reproducible, which is why the rule can be executable even though the claim behind it is not proven.",
+      "detector": {
+        "kind": "hex_relation",
+        "compare": "ground_vs_neutral_hue",
+        "max_delta_degrees": 45,
+        "chroma_floor": 0.002
+      },
+      "threshold": "The circular hue distance between the page's dominant ground colour and its dominant neutral text colour exceeds 45 degrees, when both carry chroma of at least 0.004.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "warn",
+      "fix": "Rebuild the neutral ramp from one anchor hue. Pick the hue from the accent or from the ground and derive every grey from it, at chroma 0.005-0.015.",
+      "teach": "Greys carry a faint colour, even when they look neutral. If your backgrounds lean warm and your text greys lean cool, the page feels subtly wrong in a way nobody can point at. Build every grey from the same underlying hue and the whole thing settles.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 65,
+        "note": "MEASURED 2026-09-17, 5 findings per page. The ground `--bg: #fbfaf8` sits at OKLCH hue 84.6 (warm) while `--fg` #14161c is at 270.7 and `--fg-2` #5a6070 at 269.1 (cool) — a 184-degree split between the paper and the ink, on every one of the 13. `--bg-3` and `--line` are warm with the ground. This is a finding the corpus predicted in prose ('a page with a warm accent and cool grey body copy looks wrong and most people can't name why') and nobody had measured. Note the calibration: the chroma floor had to be lowered to 0.002 to see it, because the ground's own chroma is 0.0029 — itself below the recommended minimum, which T2-ZERO-CHROMA-GREY reports separately."
+      }
+    },
+    {
+      "id": "C-ACCENT-COVERAGE",
+      "tier": "craft",
+      "category": "color",
+      "title": "The accent covering too much of the screen",
+      "what_it_is": "The accent colour occupying more than about 3-5% of a viewport.",
+      "why_it_matters": "An accent works by being rare. Past a few percent it stops accenting and becomes a second ground, and the page loses its one point of emphasis.",
+      "source": {
+        "name": "hallmark",
+        "confidence": "ASSERTED",
+        "where": "research/08 §6.4: 'Accent: chroma 0.12-0.22, occupying <= 3-5% of a viewport'"
+      },
+      "also_in": [
+        {
+          "name": "research_11",
+          "where": "§7, repeated as a composition value"
+        }
+      ],
+      "confidence_note": "Asserted, no sample. The corroborating measurement is indirect: the reference sites' hex counts show the accent as the second or third most common value, never the first.",
+      "detector": {
+        "kind": "browser",
+        "what": "percentage of rendered viewport pixels within OKLAB distance 0.06 of the accent",
+        "widths": [
+          375,
+          1440
+        ]
+      },
+      "threshold": "Accent-coloured pixels above 5% of the first viewport.",
+      "threshold_provenance": "from_source",
+      "severity": "info",
+      "fix": "Reserve it for the one action you want taken. Everything else is ink on ground.",
+      "teach": "Your accent colour is the thing the eye goes to first, so it should appear in very few places — ideally the one button you want pressed. Spread it across headings, borders, icons and links and the eye has nowhere to land.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": null,
+        "hits_total": null,
+        "note": "NOT RUN over this corpus: this detector needs a live render or a person."
+      }
+    },
+    {
+      "id": "C-DARK-HUE-SHIFT",
+      "tier": "craft",
+      "category": "color",
+      "title": "The accent changes character in dark mode",
+      "what_it_is": "An accent whose hue moves between the light and dark themes — an authoritative forest green becoming a mint, or a deep red becoming a salmon.",
+      "why_it_matters": "Never shift the hue between modes. The corpus caught a real site doing it and named the consequence precisely: the green went from authoritative forest to a mint that reads as a success toast, and the red went to a tone that reads as an error notification. The brand changes character depending on the visitor's phone setting.",
+      "source": {
+        "name": "research_08",
+        "confidence": "ASSERTED",
+        "where": "§6.4 dark mode: 'reduce body weight by 50 units, reduce accent chroma 0.02-0.04, raise accent lightness 5-10%, elevate with +3% lightness per level not shadow, never shift the hue between modes'"
+      },
+      "also_in": [
+        {
+          "name": "research_11a",
+          "where": "§1.7, the specific case with both before-and-after hex values"
+        }
+      ],
+      "confidence_note": "The dark-mode recipe (hold the hue, reduce chroma 0.02-0.04, raise lightness 5-10%) is asserted by Hallmark with no sample. The corroborating evidence is a single worked case in the corpus where a real site's forest green became a mint that reads as a success notification -- one example, described, not counted.",
+      "detector": {
+        "kind": "hex_relation",
+        "compare": "theme_hue_shift",
+        "max_delta_degrees": 12,
+        "token_pattern": "accent|brand|primary|pass|dead|success|error"
+      },
+      "threshold": "A custom property whose value in the dark theme differs in OKLCH hue from its light value by more than 12 degrees.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Keep the hue fixed. Reduce chroma by 0.02-0.04 and raise lightness by 5-10%, and no more. Signal elevation in dark mode with lightness, about +3% per level, not with shadow.",
+      "teach": "In dark mode a colour needs to be a little lighter and a little less intense to stay readable, but it should stay the SAME colour. Swapping a deep green for a bright mint means your brand is one thing by day and another by night, and the bright version usually reads as a system notification rather than as you.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "The accent is not redefined in the dark block at all — only the grounds and inks are. That is the conservative choice and it passes. Contrast of the accent against the dark ground should still be checked, which A-CONTRAST-BODY does."
+      }
+    },
+    {
+      "id": "C-DARK-SHADOW-ELEVATION",
+      "tier": "craft",
+      "category": "color",
+      "title": "Shadow used for depth on a dark background",
+      "what_it_is": "Box-shadows carrying the elevation system on a dark surface.",
+      "why_it_matters": "A shadow is an absence of light, and on a near-black ground there is no light to remove, so the shadow does nothing but add blur cost. Raised surfaces in dark mode read as raised because they are LIGHTER.",
+      "source": {
+        "name": "research_08",
+        "confidence": "ASSERTED",
+        "where": "§8.1: 'On dark surfaces, signal elevation with lightness (+~3% per level), not shadow.'"
+      },
+      "confidence_note": "Asserted. The mechanism is not contested -- a shadow is an absence of light and there is little light on a near-black ground -- but the +3% lightness-per-level figure is a recommendation nobody measured.",
+      "detector": {
+        "kind": "css_decl",
+        "property": "^box-shadow$",
+        "inAtRule": "prefers-color-scheme\\s*:\\s*dark",
+        "value": "^(?!none)"
+      },
+      "threshold": "A `box-shadow` other than `none` defined inside a dark-theme block.",
+      "threshold_provenance": "from_source",
+      "severity": "info",
+      "fix": "Set shadows to `none` in the dark theme and add a lightness step to the raised surface instead — about 3% per level.",
+      "teach": "Shadows work by showing where light has not reached. On a nearly black page there is no light to block, so a shadow is invisible work. Make the raised thing slightly lighter instead; that is how depth reads in the dark.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "The dark block redefines `--shadow` to `0 1px 2px rgba(0,0,0,.5), 0 18px 44px -20px rgba(0,0,0,.85)` — a heavier shadow on a dark ground, which also fires T2-PUFFY-SHADOW at alpha 0.85."
+      }
+    },
+    {
+      "id": "C-THEME-CONTRACT",
+      "tier": "craft",
+      "category": "color",
+      "title": "The three-state theme pattern not followed",
+      "what_it_is": "A theme implementation that does not define all three states: the complete light palette on bare `:root`, the dark overrides under `prefers-color-scheme: dark` GUARDED as `:root:not([data-theme=\"light\"])`, and the dark overrides again under `:root[data-theme=\"dark\"]`.",
+      "why_it_matters": "There are three states, not two: explicit light, explicit dark, and the default of following the system. Getting the guard wrong means a visitor who has explicitly chosen light mode still gets a dark page when their phone is dark. Defining a colour ONLY inside a media query means it is undefined for everyone else.",
+      "source": {
+        "name": "chess_tee_forge",
+        "confidence": "DEMONSTRATED",
+        "where": "the storefront's shipped stylesheet pattern, carried into this project's own artifact conventions"
+      },
+      "detector": {
+        "kind": "css_absent",
+        "mode": "theme_contract",
+        "require": [
+          "bare_root_palette",
+          "media_dark_guarded",
+          "attr_dark"
+        ]
+      },
+      "threshold": "Any of the three states missing; or a custom property whose ONLY definition is inside a media query or an attribute selector; or a `prefers-color-scheme: dark` block not guarded with `:root:not([data-theme=\"light\"])`.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Define the complete light palette on bare `:root`. Redefine only the tokens that change inside the guarded media query. Redefine them a third time under the explicit dark attribute so a toggle wins in both directions. Give `body` an explicit background token — a transparent body borrows whatever is behind it.",
+      "fix_code": ":root { --paper: #F6F5E8; --ink: #171615; }\n@media (prefers-color-scheme: dark) {\n  :root:not([data-theme=\"light\"]) { --paper: #141413; --ink: #EDE6D6; }\n}\n:root[data-theme=\"dark\"] { --paper: #141413; --ink: #EDE6D6; }",
+      "teach": "There are three situations, not two: the visitor has chosen light, has chosen dark, or has chosen nothing and is following their phone. Handling only two of them means one group of people gets the wrong page. Write the light colours plainly first, then override them twice — once for the system setting, once for an explicit choice.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "All three states present and correctly guarded on all 13. This is the pattern done right — although nothing on these pages ever sets `data-theme`, which is the next rule."
+      }
+    },
+    {
+      "id": "C-THEME-DEAD-CODE",
+      "tier": "craft",
+      "category": "color",
+      "title": "Theme scaffolding with no toggle behind it",
+      "what_it_is": "`[data-theme]` rules in the stylesheet when nothing in the page ever sets the attribute — no toggle, no script, no stored preference.",
+      "why_it_matters": "Not a bug, but dead code that looks like a feature. The corpus found about twenty lines of it in a real site and the verdict is clean: either ship a toggle or delete the blocks. Do not leave scaffolding for a feature that does not exist.",
+      "source": {
+        "name": "research_11a",
+        "confidence": "MEASURED_HERE",
+        "where": "§1.7"
+      },
+      "confidence_note": "There is a legitimate exception worth recording: a published artifact whose theme attribute is stamped on the root element by its HOST rather than by the page's own script. In that case the blocks are live even though the page never sets them. The rule cannot tell the difference, so it is `info`.",
+      "detector": {
+        "kind": "composite",
+        "all": [
+          {
+            "kind": "css_regex",
+            "pattern": "\\[data-theme"
+          }
+        ],
+        "none": [
+          {
+            "kind": "text_regex",
+            "scope": "script",
+            "pattern": "data-theme|dataset\\.theme|setAttribute\\(\\s*['\"]data-theme"
+          }
+        ]
+      },
+      "threshold": "`[data-theme]` selectors present in CSS with no script reference to the attribute anywhere in the page.",
+      "threshold_provenance": "from_source",
+      "severity": "info",
+      "fix": "Ship the toggle, or delete the blocks. If the attribute is set by a host outside the page, leave a comment saying so.",
+      "teach": "If your stylesheet has rules for a dark-mode switch but there is no switch anywhere, those rules never run. It is harmless and it is misleading — the next person to read the file will think the feature exists.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 26,
+        "note": "`:root[data-theme=\"dark\"]` blocks on all 13 with no script that ever sets the attribute. About 6 lines of dead CSS per page."
+      }
+    },
+    {
+      "id": "C-OKLCH-LITERAL",
+      "tier": "craft",
+      "category": "color",
+      "title": "oklch() shipped without a hex fallback",
+      "what_it_is": "`oklch()` or `lab()` colour literals in a stylesheet that will be opened on an unknown phone, with no preceding fallback declaration.",
+      "why_it_matters": "An unparseable colour causes the browser to DROP the declaration entirely, and on a bad in-app web view that can mean invisible text. The corpus's instruction is precise and worth following exactly: author in OKLCH, emit hex. Compute at generation time.",
+      "source": {
+        "name": "research_08",
+        "confidence": "ASSERTED",
+        "where": "§6.4: 'Author in OKLCH, emit hex. Do not ship oklch() literals to an unknown phone.'"
+      },
+      "confidence_note": "Browser support for `oklch()` is broad in 2026 and this rule is conservative. It matters most for the single-file delivery case, where the page is opened from a downloads folder inside whatever web view the messaging app uses. On a hosted site with normal browsers it is `info`.",
+      "detector": {
+        "kind": "css_regex",
+        "pattern": "\\boklch\\(|\\blab\\(|\\blch\\(|\\boklab\\(",
+        "flags": "i",
+        "require_fallback_before": true
+      },
+      "threshold": "An `oklch()`, `oklab()`, `lch()` or `lab()` value with no hex or rgb declaration of the same property immediately preceding it in the same rule.",
+      "threshold_provenance": "from_source",
+      "severity": "info",
+      "applies_to": [
+        "single_file"
+      ],
+      "fix": "Compute the hex at build time and emit that. Keep the OKLCH value in a comment so the intent survives.",
+      "fix_code": "/* oklch(96% 0.01 85) */\n--paper: #F6F3EC;",
+      "teach": "Newer ways of writing colours are easier to reason about but not every phone browser understands them, and when a browser does not understand a colour it ignores that line completely — which can leave text with no colour at all. Work in the new format while designing and write out the old format in the file.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "Hex throughout. Passes. The pages do use `color-mix()` in three places, which has the same failure shape and is worth noting as an adjacent risk."
+      }
+    },
+    {
+      "id": "C-HUE-ONLY-STATE",
+      "tier": "craft",
+      "category": "a11y",
+      "title": "Meaning carried by colour alone",
+      "what_it_is": "A status, a result or a difference shown only by changing a colour — red numerals against a green button, a chart series distinguished only by hue, a state dot with no label.",
+      "why_it_matters": "Around one man in twelve has some degree of red-green colour deficiency, so the distinction disappears for them. And there is a second reason that matters more for this audience: the real viewing condition is a phone screen in daylight on a sidewalk, where hue differences wash out for everybody. The corpus's fix is to encode in LUMINANCE — off versus lit — which survives both.",
+      "source": {
+        "name": "research_11a",
+        "confidence": "ASSERTED",
+        "where": "§1.3: 'It encodes state in hue only. Encode in luminance — off vs lit — which reads for red-green colour deficiency and survives a sun-washed phone screen on a sidewalk.'"
+      },
+      "also_in": [
+        {
+          "name": "wcag",
+          "where": "SC 1.4.1 Use of Colour"
+        }
+      ],
+      "confidence_note": "The corpus flags the ~8% prevalence figure as unverified in its own text. The WCAG criterion is normative regardless of the exact prevalence.",
+      "detector": {
+        "kind": "manual",
+        "what": "Whether any status or category is distinguished only by colour",
+        "needs": "A reading pass. The tool lists every element whose only distinguishing property is its colour and asks whether a word or a shape accompanies it.",
+        "heuristic": "Custom properties named pass/fail/success/error/dead/alive that appear as a colour with no adjacent text label are surfaced first."
+      },
+      "threshold": "Reported, not gated.",
+      "threshold_provenance": "arithmetic",
+      "severity": "warn",
+      "fix": "Add a word. The corpus's own good example is a results table where the states are spelled DEAD, PARKED, GONE, NO ANSWER, ALIVE — colour is decoration there, not information, so it is fine. The failure case in the same project was red numerals in a headline with no text label at all.",
+      "teach": "If the only difference between 'good' and 'bad' on your page is red versus green, then for about one man in twelve there is no difference, and in bright sunlight there is no difference for anyone. Write the word as well. Colour can still carry the feeling — it just cannot be the only carrier of the fact.",
+      "chess": "You would not annotate a game using only the colours of the arrows.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": null,
+        "hits_total": null,
+        "note": "NOT RUN over this corpus: this detector needs a live render or a person."
+      }
+    },
+    {
+      "id": "C-LAYERED-OFFWHITES",
+      "tier": "craft",
+      "category": "color",
+      "title": "White cards on a grey page",
+      "what_it_is": "Surfaces separated by putting pure white cards on a light grey background.",
+      "why_it_matters": "It is the single most common way a page announces it came from a component library. The alternative is measured and it is free: layered off-whites. One reference retailer runs two off-whites, #F6F5E8 and #FFFEF2, with no pure white anywhere. Another runs a five-step warm ramp and zero #FFF grounds.",
+      "source": {
+        "name": "research_11",
+        "confidence": "MEASURED_HERE",
+        "where": "§7: 'Layered off-whites, not white-cards-on-grey' with both production examples"
+      },
+      "detector": {
+        "kind": "hex_relation",
+        "compare": "white_card_on_grey",
+        "card_hex": "#ffffff",
+        "ground_lightness_max": 0.97
+      },
+      "threshold": "A card or panel background of pure white sitting on a page ground darker than OKLCH lightness 0.97.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "info",
+      "fix": "Move both. Make the page ground a warm or cool off-white and the card one step lighter — still not white. The difference in the final render is small and the difference in how the page reads is not.",
+      "teach": "The standard look — white boxes floating on a pale grey page — is what every component library gives you for free, which is why it is everywhere. Using two very slightly different off-whites instead reads as a decision, and the reader will not be able to say what changed.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "`--bg-2: #ffffff` cards on a `--bg: #fbfaf8` ground. Exactly this pattern, on all 13."
+      }
+    }
+  ]
+}

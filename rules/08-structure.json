@@ -1,0 +1,283 @@
+{
+  "$comment": "STRUCTURE — what sections a page has, in what order, and what is above the fold. research/08a §3.1 ranks this as the HIGHEST-carry axis of variation and notes the generator it was auditing had none of it: the chimney-and-damper supply company and the immigration lawyer received literally the same page. The identity and COUNT of sections is what makes two pages look like different jobs rather than one job run twice.",
+  "tier": "structure",
+  "rules": [
+    {
+      "id": "S-SECTION-INVENTORY",
+      "tier": "structure",
+      "category": "structure",
+      "title": "The same section inventory regardless of trade",
+      "what_it_is": "A page whose sections are a fixed generic list — hero, services, about, contact — rather than derived from what this kind of business actually needs to tell someone.",
+      "why_it_matters": "This is the largest single differentiator available and it is a CONTENT decision, not a styling one. Practitioners who own this market ship per-industry design packs rather than one template with a palette switch. A tax office needs a deadline strip and a what-to-bring checklist. A plumber needs an emergency strip and a service area. A vet needs an after-hours policy — the single most-searched fact for that trade, and checkable.",
+      "source": {
+        "name": "citrous_oyster",
+        "confidence": "DEMONSTRATED",
+        "where": "the structural audit of 18 live client sites across 13 trades; per-industry packs for restaurants, mechanics, gyms, wedding photographers, dentists, beauty, construction and architecture"
+      },
+      "also_in": [
+        {
+          "name": "research_08a",
+          "where": "§3 axis A, with a worked lookup table of nine trades"
+        }
+      ],
+      "confidence_note": "DEMONSTRATED that practitioners treat verticals as structurally different. The specific section lists are ASSERTED, and the corpus flags a coverage gap that matters: its audited sample contains no barber, no nail salon and no auto repair — three of the five largest lead categories — so every per-trade claim about those three is EXTRAPOLATED from adjacent trades (a tattoo studio, a med-spa, a dent-repair shop). Treat accordingly.",
+      "detector": {
+        "kind": "manual",
+        "what": "Whether the section list was chosen for this trade",
+        "needs": "The trade, and the section list. The tool prints the page's section inventory beside the corpus's reference inventory for that trade, if one exists, and flags that the barber / nail / auto rows are extrapolated."
+      },
+      "threshold": "Reported, not gated. Also fires automatically when a project builds more than one site and two sites in different trades share an identical section skeleton — see V-SKELETON.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Derive the inventory from the trade with a lookup table, and let every section that references a per-business fact DEGRADE TO OMISSION when the data is absent — never to a filled-in guess. Do not shuffle a fixed list to create variety; arbitrary order reads as arbitrary.",
+      "teach": "Two businesses in different trades should not get the same set of sections. An accountant's customers need to know what to bring and when the deadline is. A plumber's customer has a burst pipe and needs a number. Deciding what sections exist, before deciding what they look like, is the single biggest thing that makes two pages look like two jobs.",
+      "chess": "You do not play the same opening against every opponent regardless of what they do. The move order comes from the position.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": null,
+        "hits_total": null,
+        "note": "NOT RUN over this corpus: this detector needs a live render or a person."
+      }
+    },
+    {
+      "id": "S-DENSITY-MISMATCH",
+      "tier": "structure",
+      "category": "layout",
+      "title": "A dense layout holding thin content",
+      "what_it_is": "A multi-column or bento grid used for a page that has very little content — two or three services, no hours, a sentence of about.",
+      "why_it_matters": "The emptiness reads as a template with the fields not filled in, which is precisely the accusation being avoided. The corpus measured this exactly: one preview with 2 services, 0 proof points, 0 hours and 75 characters of about text rendered into a six-column grid holding four cards.",
+      "source": {
+        "name": "research_08a",
+        "confidence": "MEASURED_HERE",
+        "where": "C13 / §3 axis B, with the computed density function"
+      },
+      "detector": {
+        "kind": "dom_repeated_siblings",
+        "mode": "density",
+        "grid_columns_min": 3,
+        "content_items_max": 4
+      },
+      "threshold": "A grid declaring 3 or more columns while the page's total content item count is 4 or fewer. Content items = services + proof points + hours block + about block.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Compute the density and pick the layout from it. Under 5 items: a single column, larger type, generous rhythm, and no grid at all. 5 to 9: two columns. 10 or more: the full grid. It is about fifteen lines.",
+      "fix_code": "n = services.length + proofPoints.length + (hours ? 1 : 0) + (about ? 1 : 0);\ndensity = n < 5 ? 'sparse' : n <= 9 ? 'medium' : 'dense';",
+      "teach": "A grid designed for twelve things looks wrong holding four, and the wrongness reads as 'they did not finish filling this in'. Count what you actually have first, then choose the layout. Very little content looks best as one wide column with bigger type — which is also less work.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "CORRECTED BY THE RUN. Written as firing on two pages; it fires on none, because every page has 5 to 9 cards and the threshold is 4 or fewer. The corpus's 'four cards' description of `simple-pay-inc-9e46f19674` counts SERVICE cards; the rendered grid holds 5 articles once hours, find-us and about are added. Both statements are true and they count different things, which is exactly why the rule states its counting basis explicitly."
+      }
+    },
+    {
+      "id": "S-TEL-PRIMARY",
+      "tier": "structure",
+      "category": "structure",
+      "title": "No phone link, or a form as the primary action",
+      "what_it_is": "A local-business page with no `tel:` link, or one whose main call to action is a contact form.",
+      "why_it_matters": "For a trade, the purchase IS a phone call; a contact form is a second-choice path. And the corpus's reference-set audit found the omission at the top of the market as well: one barbershop chain and one legal-AI company both ship zero `tel:` links, and it calls that their mistake rather than their sophistication. The two trade sites that actually convert both ship a phone number in the markup.",
+      "source": {
+        "name": "citrous_oyster",
+        "confidence": "ASSERTED",
+        "where": "research/08 §5.2 phone treatment"
+      },
+      "also_in": [
+        {
+          "name": "research_11",
+          "where": "§8.4 item 2, which adds that the digits must be rendered as TEXT, not only as an href"
+        }
+      ],
+      "confidence_note": "ASSERTED. The corpus is explicit that NOT ONE CONTROLLED TEST EXISTS anywhere in it: no A/B on section order, no test of a sticky call bar versus a header phone number, no conversion data at all. Everything here is either a count of what practitioners shipped or practitioner assertion.",
+      "detector": {
+        "kind": "html_attr",
+        "tag": "a",
+        "attr": "href",
+        "mode": "required",
+        "value_pattern": "^tel:"
+      },
+      "threshold": "No `<a href=\"tel:\">` anywhere in the document.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Put the number in the header, in the hero, and in a sticky bar under 768px. And render the digits as visible text as well as in the link — people at a door read them aloud.",
+      "teach": "For a shop or a trade, the sale happens on the phone. A form is something the visitor has to fill in and then wait for. Put the number where a thumb can reach it, write it out so it can be read aloud, and make it the most obvious thing on the page.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "`tel:` in the nav and in the hero on all 13, with the digits also rendered as visible text in the button sub-label and in the find-us card. Correct — and note the pages ship no forms at all, which is the recommendation."
+      }
+    },
+    {
+      "id": "S-STICKY-CALL-BAR",
+      "tier": "structure",
+      "category": "structure",
+      "title": "No way to call from the middle of the page on a phone",
+      "what_it_is": "A phone number in the header and in the footer, with nothing between them, on a narrow screen.",
+      "why_it_matters": "The corpus's observation is simple arithmetic: on mobile, everything between the hero and the footer has no way to call. That is most of the page, and calling is the close.",
+      "source": {
+        "name": "research_11a",
+        "confidence": "MEASURED_HERE",
+        "where": "§1.5"
+      },
+      "also_in": [
+        {
+          "name": "research_11",
+          "where": "§8.4 item 2: a sticky bar under 768px, 56px tall or less, with matching body padding"
+        }
+      ],
+      "detector": {
+        "kind": "css_absent",
+        "property": "^position$",
+        "value": "^(fixed|sticky)$",
+        "selector_hint": "call|phone|tel|action-bar",
+        "require_at_rule": "max-width"
+      },
+      "threshold": "No fixed or sticky call affordance defined inside a narrow-viewport media query, on a page that has a `tel:` link.",
+      "threshold_provenance": "from_source",
+      "severity": "info",
+      "fix": "A sticky bar under 768px, no taller than 56px, with matching padding at the bottom of the body so it does not cover the last line of content.",
+      "teach": "Someone scrolling through the middle of your page on a phone should never have to scroll back to the top to find the number. A small bar pinned to the bottom of the screen solves it. Remember to add the same amount of padding under the page content, or the bar sits on top of your last paragraph.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 13,
+        "note": "Absent from all 13. The nav is sticky and does carry the call button, which mitigates it — but the nav is offset behind a sticky banner (see F-STICKY-COLLISION), so on a narrow screen the call button may be partly covered."
+      }
+    },
+    {
+      "id": "S-ABOVE-FOLD",
+      "tier": "structure",
+      "category": "structure",
+      "title": "The first screen does not say who, what, where and how to call",
+      "what_it_is": "A first viewport at 375x667 that does not carry the business name, the trade, the neighbourhood, and a tappable number.",
+      "why_it_matters": "That is the whole job of the first screen for this kind of business. A full-height centred statement wastes it. The corpus also observes that a geography-led headline is what the two trade sites in its reference set do — one leads with 'Your Local Sydney...'.",
+      "source": {
+        "name": "citrous_oyster",
+        "confidence": "ASSERTED",
+        "where": "research/08 §5.2: 'Above the fold, on a 375x667 screen: business name, trade, neighbourhood, tappable number.'"
+      },
+      "confidence_note": "ASSERTED. No source tested what a non-technical owner responds to in five seconds — research/08 §9.4 lists that as a question it could NOT answer from any source. Treat the whole four-item list as a testable hypothesis.",
+      "detector": {
+        "kind": "browser",
+        "what": "which of the four elements are within the first 667px at 375px width",
+        "widths": [
+          375
+        ]
+      },
+      "threshold": "Fewer than 4 of: business name, trade descriptor, neighbourhood or address, tappable phone number, rendered within the first 667 CSS pixels at 375px width.",
+      "threshold_provenance": "from_source",
+      "severity": "info",
+      "fix": "Put all four up there and nothing else. The corpus's own strongest suggestion goes further: promote the single sharpest piece of genuinely per-business information above the fold too, in body-text colour at body-text weight, rather than leaving it in a grey box at the bottom.",
+      "teach": "On a phone, the first screen is about six hundred pixels tall. Four things have to fit in it: who you are, what you do, where you are, and a number to tap. Everything else can wait. A big centred statement that fills the screen with a slogan spends the most valuable space on the page.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": null,
+        "hits_total": null,
+        "note": "NOT RUN — needs a browser. Statically all four elements are present near the top: the nav carries the name and the address, the hero carries the trade and a call button. The most per-business content on the page — the specific findings about the owner's current site — sits in a grey box at the very bottom in muted text, which research/08a A3 names as the cheapest large win available."
+      }
+    },
+    {
+      "id": "S-LOCALBUSINESS-SCHEMA",
+      "tier": "structure",
+      "category": "structure",
+      "title": "No LocalBusiness structured data",
+      "what_it_is": "No `LocalBusiness` JSON-LD block carrying the real name, street address, phone number and hours.",
+      "why_it_matters": "Two of the reference set's local businesses ship one — a restaurant group and a plumbing company — and none of the award-winning brand sites do, which the corpus calls their mistake. There is also a practical observation worth repeating: the postal address this schema needs is very often the SAME value as an address required elsewhere in the business, so supplying it once can clear two problems.",
+      "source": {
+        "name": "research_11",
+        "confidence": "MEASURED_HERE",
+        "where": "§8.4 item 4"
+      },
+      "detector": {
+        "kind": "html_regex",
+        "pattern": "\"@type\"\\s*:\\s*\"(?:LocalBusiness|Store|Restaurant|ProfessionalService|HealthAndBeautyBusiness|AutoRepair|Dentist|Attorney|Accounting|Plumber)\"",
+        "flags": "i",
+        "mode": "required"
+      },
+      "threshold": "No JSON-LD block with a LocalBusiness-family `@type`.",
+      "threshold_provenance": "from_source",
+      "severity": "info",
+      "fix": "About fifteen lines of JSON-LD with the real address, phone, hours and geo. Only emit fields you actually have — an invented opening time is a worse problem than a missing one.",
+      "teach": "Search engines and map apps read a small block of hidden data on the page that says, in a standard format, 'this is a business, here is its address and phone number and opening hours'. Without it they have to guess from the visible text, and they often get it wrong.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 13,
+        "note": "Fires on all 13 during validation because the validator does not declare these pages speculative. It should be suppressed for them, and the rule carries `suppress_when: speculative` so that it is: these are unofficial concept pages carrying `noindex` and a takedown promise, and publishing structured data claiming to describe the real business is exactly what that mitigation set exists to prevent. Recorded here rather than hidden, because a rule that fires on the right thing in the wrong context is still a wrong finding."
+      },
+      "suppress_when": "speculative"
+    },
+    {
+      "id": "S-SHARE-PREVIEW",
+      "tier": "structure",
+      "category": "structure",
+      "title": "No link preview image or theme colour",
+      "what_it_is": "No `og:image` and no `theme-color` meta.",
+      "why_it_matters": "The actual sales motion for this kind of page is 'let me text you the link'. Without an `og:image` that text message renders a blank preview card. `theme-color` makes the Android address bar match the page, on the exact device the page will be demonstrated on.",
+      "source": {
+        "name": "research_11a",
+        "confidence": "MEASURED_HERE",
+        "where": "§1.5"
+      },
+      "detector": {
+        "kind": "html_tag",
+        "tag": "meta",
+        "attr_match": {
+          "property": "^og:image$"
+        },
+        "mode": "required"
+      },
+      "threshold": "No `og:image`, or no `theme-color`. Reported separately.",
+      "threshold_provenance": "from_source",
+      "severity": "info",
+      "fix": "One PNG and two lines. Generate the preview image from the page's own hero at build time so it can never drift from what the page looks like.",
+      "teach": "When someone texts a link, the messaging app shows a little card with a picture. If you have not supplied one, the card is blank, and a blank card looks like a dead link. Two lines in the head fix it.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 13,
+        "note": "Same suppression as S-LOCALBUSINESS-SCHEMA. Neither `og:image` nor `theme-color` is present on any of the 13, and for a speculative page that is arguably correct — these pages deliberately set `referrer: no-referrer` and `noindex`. An `og:image` clearly labelled 'unofficial concept' would resolve the tension."
+      },
+      "suppress_when": "speculative"
+    },
+    {
+      "id": "S-BOILERPLATE-IDENTICAL",
+      "tier": "structure",
+      "category": "variety",
+      "title": "Required boilerplate that is byte-identical across every build",
+      "what_it_is": "Legal notices, disclaimers, concept banners and footers that are the same text, in the same place, in the same style, on every page a tool produces.",
+      "why_it_matters": "These blocks usually CANNOT be removed — they are mandated. That makes them the loudest remaining 'these all came from one place' element on the page. The corpus's answer is not to delete them but to typeset them as part of the design system rather than as a bolted-on disclaimer bar.",
+      "source": {
+        "name": "research_08a",
+        "confidence": "MEASURED_HERE",
+        "where": "§6, 'Do NOT remove — these are mandated', with the note that they are byte-identical across all 13 pages"
+      },
+      "detector": {
+        "kind": "ledger",
+        "facet": "boilerplate",
+        "mode": "exact_collision",
+        "window": 12
+      },
+      "threshold": "A required-boilerplate block whose normalised text is byte-identical to the same block in a previously-built site in the ledger.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "info",
+      "fix": "Vary the typesetting, not the text. The words have to be constant; the placement, the type treatment, and whether it reads as designed or as bolted on do not.",
+      "teach": "There are lines you are required to put on every page and cannot change. That makes them the most repeated thing you ship. You cannot change the words, but you can stop them looking like a sticker — set them in the page's own typography and put them where they belong in the layout.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 10,
+        "hits_total": 90,
+        "note": "10 of 13 collide with at least one other page on the normalised boilerplate hash; 4 distinct hashes across the set. The concept banner and the two-paragraph footer disclaimer are the same sentences everywhere, which they have to be — they are mandated. The finding is not 'change the words'. It is that these blocks are also the only sticky element and the only thing at the foot of every page, so the most-repeated text on the site is also the most structurally prominent."
+      }
+    }
+  ]
+}

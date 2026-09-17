@@ -1,0 +1,281 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Javendean/codex-site-kit/rules/schema.json",
+  "title": "codex-site-kit rule",
+  "description": "One rule in the rulebook. Every field except the optional ones is load-bearing: a finding printed to a beginner must be able to answer WHAT it is, WHY it matters, WHO says so with what strength of evidence, and WHAT TO DO. A rule that cannot fill those four is not shippable.",
+  "type": "object",
+  "required": [
+    "id",
+    "tier",
+    "category",
+    "title",
+    "what_it_is",
+    "why_it_matters",
+    "source",
+    "detector",
+    "threshold",
+    "severity",
+    "fix",
+    "teach"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9]*-[A-Z0-9-]+$",
+      "description": "Stable identifier. Never reused, never renumbered. A finding in a report from six months ago must still resolve."
+    },
+    "tier": {
+      "enum": [
+        1,
+        2,
+        3,
+        "floor",
+        "craft",
+        "honesty",
+        "trap",
+        "ledger"
+      ],
+      "description": "1/2/3 are the corpus's own tiers, ranked by how fast a non-technical owner clocks the tell on a phone. `floor` is the mobile/performance floor: not aesthetics, the failures that make a page look broken. `craft` is quality that raises competence without being a tell. `honesty` is truthfulness of claims. `trap` currently reads as sophisticated and will not. `ledger` is cross-build."
+    },
+    "category": {
+      "enum": [
+        "color",
+        "type",
+        "layout",
+        "motion",
+        "copy",
+        "imagery",
+        "honesty",
+        "a11y",
+        "performance",
+        "responsive",
+        "structure",
+        "material",
+        "variety"
+      ],
+      "description": "What part of the craft this belongs to. Used to group a report."
+    },
+    "title": {
+      "type": "string",
+      "maxLength": 80,
+      "description": "The name of the move, the way a chess book names an opening. Short enough to scan in a list."
+    },
+    "what_it_is": {
+      "type": "string",
+      "description": "The observable thing, described so someone could point at it on a screen. No judgement in this field."
+    },
+    "why_it_matters": {
+      "type": "string",
+      "description": "The consequence. Preferably the mechanism, not the adjective: what actually goes wrong, for whom, on what device."
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "name",
+        "confidence",
+        "where"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "A key in sources.json. Validation fails otherwise."
+        },
+        "confidence": {
+          "enum": [
+            "DEMONSTRATED",
+            "ASSERTED",
+            "MEASURED_HERE",
+            "ADJUDICATED",
+            "INFERRED"
+          ]
+        },
+        "where": {
+          "type": "string",
+          "description": "The section, gate number or rule name inside that source."
+        },
+        "quote": {
+          "type": "string",
+          "description": "The source's own words, where they are the clearest statement of the rule."
+        }
+      }
+    },
+    "also_in": {
+      "type": "array",
+      "description": "Independent corroboration. Two tools agreeing by copying each other is not corroboration; this field is only for sources that arrived at the rule separately.",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "where"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "where": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "confidence_note": {
+      "type": "string",
+      "description": "REQUIRED whenever source.confidence is ASSERTED or INFERRED. States plainly what is not proven, so the tool can print it and the reader can discount it. This is how a hypothesis is stopped from hardening into a gate."
+    },
+    "detector": {
+      "type": "object",
+      "required": [
+        "kind"
+      ],
+      "description": "How to test it. `kind` selects an evaluator in engine.js; the remaining properties are that evaluator's parameters. Two kinds never run automatically and say so: `browser` needs a live render, `manual` needs a human or a vision model.",
+      "properties": {
+        "kind": {
+          "enum": [
+            "css_decl",
+            "css_regex",
+            "css_absent",
+            "css_cooccur",
+            "hex_set",
+            "hex_oklch_band",
+            "hex_relation",
+            "hex_census",
+            "box_shadow",
+            "gradient_stops",
+            "easing_census",
+            "html_regex",
+            "html_tag",
+            "html_attr",
+            "heading_order",
+            "dom_precedes_heading",
+            "dom_repeated_siblings",
+            "dom_nested",
+            "text_lexicon",
+            "text_regex",
+            "text_measure",
+            "contrast",
+            "font_stack",
+            "weight_census",
+            "ledger",
+            "browser",
+            "manual",
+            "composite"
+          ]
+        }
+      }
+    },
+    "threshold": {
+      "type": "string",
+      "description": "The exact trigger, written so a person can check the tool's arithmetic. 'Puffy' is not a threshold. '>= 3 blurred non-inset layers, OR >= 2 where any alpha > 0.12, OR 1 blurred layer with alpha > 0.30' is."
+    },
+    "threshold_provenance": {
+      "enum": [
+        "from_source",
+        "calibrated_here",
+        "arithmetic"
+      ],
+      "description": "Where the NUMBER came from, which is often not where the RULE came from. `from_source`: the cited source published this number. `calibrated_here`: the source named the tell without a number and the number was fitted against the preview corpus. `arithmetic`: defensible reasoning, nobody published it. The corpus's own `--stagger: 45ms` is the cautionary case."
+    },
+    "severity": {
+      "enum": [
+        "fail",
+        "warn",
+        "info"
+      ],
+      "description": "`fail` = the corpus treats it as a hard gate. `warn` = real but contestable, or context-dependent. `info` = worth knowing, never blocking. An ASSERTED rule may not be `fail` unless the corpus itself gates on it."
+    },
+    "fix": {
+      "type": "string",
+      "description": "The better move. Concrete enough to apply without a second search: the replacement value, the deletion, or the named alternative."
+    },
+    "fix_code": {
+      "type": "string",
+      "description": "The literal replacement, where one exists and is short."
+    },
+    "teach": {
+      "type": "string",
+      "description": "Two or three sentences for a complete beginner. Every technical word either avoided or defined in place. This is the field that makes the linter a curriculum rather than a scoreboard."
+    },
+    "chess": {
+      "type": "string",
+      "description": "Optional. A chess analogy, only where it genuinely clarifies the idea rather than decorating it. Used sparingly and deliberately."
+    },
+    "burned_on": {
+      "type": "string",
+      "format": "date",
+      "description": "Trap tier only. The date the corpus recorded this signal as already burned — read as slop rather than as sophistication."
+    },
+    "review_by": {
+      "type": "string",
+      "format": "date",
+      "description": "The date after which this rule must be re-validated against fresh evidence or retired. Past it, engine.js downgrades the rule to `info` and prints that nobody has re-checked it. Rules about taste rot; rules about arithmetic do not. Only the ones that rot carry this."
+    },
+    "decay": {
+      "type": "object",
+      "description": "What is happening to this tell over time. febbhav is the only source in the corpus tracking decay, which is why most rules leave this empty rather than guessing.",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "rising",
+            "stable",
+            "decaying",
+            "burned"
+          ]
+        },
+        "evidence": {
+          "type": "string"
+        }
+      }
+    },
+    "applies_to": {
+      "type": "array",
+      "description": "Delivery contexts this rule governs. A rule written for a one-file page AirDropped to a phone does not automatically govern a hosted multi-file site, and the corpus supersedes three of its own rules on exactly that boundary.",
+      "items": {
+        "enum": [
+          "single_file",
+          "hosted",
+          "any"
+        ]
+      }
+    },
+    "supersedes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Rule ids this one replaces in a given delivery context."
+    },
+    "measured": {
+      "type": "object",
+      "description": "What this detector actually found when run over the preview corpus on 2026-09-17. Present only where it was run. A rulebook that claims to catch slop and finds none in a corpus already proven slop-ridden is wrong, and this field is where that gets checked.",
+      "additionalProperties": false,
+      "properties": {
+        "corpus": {
+          "type": "string"
+        },
+        "pages_total": {
+          "type": "integer"
+        },
+        "pages_firing": {
+          "type": "integer"
+        },
+        "hits_total": {
+          "type": "integer"
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "suppress_when": {
+      "type": "string",
+      "description": "A project-context flag under which this rule does not apply. A rule that fires on the right thing in the wrong context is still a wrong finding: publishing LocalBusiness structured data is the cheapest win on a real site and precisely what the mitigation set forbids on an unsolicited concept page. The engine skips the rule and says why."
+    }
+  }
+}

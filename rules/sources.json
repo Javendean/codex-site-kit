@@ -1,0 +1,203 @@
+{
+  "$comment": "The named sources every rule cites. A rule whose `source.name` is not a key here fails validation. This file is the provenance backbone: it records WHO says a thing, WHAT class of evidence they offer, and WHERE it was read. Nothing in the rulebook may cite a source that is not described here, and no source may be described more warmly than the corpus describes it.",
+  "generated_from": "C:/Users/javen/OneDrive/Desktop/local-site-forge/research/ + corpus/ + C:/Users/javen/OneDrive/Desktop/chess-tee-forge/store/ + impeccable 4.3.1",
+  "read_on": "2026-09-17",
+  "confidence_scale": {
+    "DEMONSTRATED": "The source ships runnable code, a live comparator, production library CSS, or a counted sample. Verifiable without trusting anyone.",
+    "ASSERTED": "Expert opinion, blog prose, forum anecdote, or reasoning. May be right; is not evidence.",
+    "MEASURED_HERE": "Produced by inspecting real artifacts in this project's own corpus. Reproducible from the commands recorded on the rule.",
+    "ADJUDICATED": "Two or more sources made incompatible claims and the corpus settled it against a stored artifact.",
+    "INFERRED": "A conclusion the corpus drew itself and explicitly flagged as inference rather than a finding."
+  },
+  "sources": {
+    "gesso": {
+      "full_name": "Gesso Build — @gessobuild/anti-slop",
+      "what_it_is": "A deterministic HTML/CSS design linter. 73 rules, CI-runnable, most with an idempotent auto-fix.",
+      "why_it_is_trusted": "Every rule is an executable detector with an exact numeric threshold. The only source in the corpus giving falsifiable trigger conditions rather than adjectives. Independent of Hallmark; overlapping conclusions.",
+      "default_confidence": "DEMONSTRATED",
+      "url": "https://raw.githubusercontent.com/Gesso-Build/skills/main/skills/anti-slop/references/rules.md",
+      "caveat": "An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.",
+      "read_via": "research/08-craft.md §1, §4, §8"
+    },
+    "hallmark": {
+      "full_name": "Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents",
+      "what_it_is": "~45 named anti-patterns each with a why and a fix, plus 58 numbered pass/fail gates. 27.6k stars, MIT.",
+      "why_it_is_trusted": "The densest catalogue of named tells with fixes. Its core tells match Krebs's independent count.",
+      "default_confidence": "ASSERTED",
+      "url": "https://raw.githubusercontent.com/Nutlope/hallmark/main/skills/hallmark/references/anti-patterns.md",
+      "caveat": "Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.",
+      "read_via": "research/08-craft.md §1, §4, §6.4, §8"
+    },
+    "krebs": {
+      "full_name": "Adrian Krebs — Design Slop",
+      "what_it_is": "The only empirical study of AI-design tells in the corpus: 1,590 Show HN landing pages scored with Playwright plus deterministic DOM checks. Tier breakdowns published, code open-sourced.",
+      "why_it_is_trusted": "Counted sample, published method, self-reported 5-10% false-positive rate, honest against his own thesis.",
+      "default_confidence": "DEMONSTRATED",
+      "url": "https://www.adriankrebs.ch/blog/design-slop/",
+      "caveat": "An HN commenter caught his own blog post wearing the cream/warm-oat trap. The study is sound; the author is not outside the trend he measured.",
+      "read_via": "research/08-craft.md §1, §4"
+    },
+    "kowalski": {
+      "full_name": "Emil Kowalski — design engineer at Linear, ex-Vercel; author of Sonner and Vaul",
+      "what_it_is": "The strongest motion source in the corpus, and uniquely checkable: he publishes numeric rules in prose AND ships the libraries where you can read the CSS and confirm he follows them.",
+      "why_it_is_trusted": "Side-by-side interactive comparators; the same values recur in shipped production library source.",
+      "default_confidence": "DEMONSTRATED",
+      "url": "https://emilkowal.ski/ui/7-practical-animation-tips",
+      "caveat": "His own Sonner ships close to the `prefers-reduced-motion` nuclear reset that Comeau argues against. Practitioners genuinely disagree there.",
+      "read_via": "research/08-craft.md §2.1"
+    },
+    "comeau": {
+      "full_name": "Josh W. Comeau — independent educator, interactive CSS tutorials",
+      "what_it_is": "Every claim sits next to a live control. The load-bearing source on compositor-safe properties, on shadow design, and on `prefers-reduced-motion`.",
+      "why_it_is_trusted": "Demonstrated with runnable playgrounds rather than asserted.",
+      "default_confidence": "DEMONSTRATED",
+      "url": "https://www.joshwcomeau.com/css/designing-shadows/",
+      "caveat": null,
+      "read_via": "research/08-craft.md §2.1, §8.1"
+    },
+    "citrous_oyster": {
+      "full_name": "Ryan / u/Citrous_Oyster — Oak Harbor Web Designs, founder of CodeStitch",
+      "what_it_is": "The only practitioner school in the corpus that demonstrably owns the local-business market. 18,000 Reddit comments 2021-2026, plus 18 inspectable live client sites across 13 trades.",
+      "why_it_is_trusted": "His methods and his shipped artifacts agree: client HTML carries CodeStitch stitch IDs and the CSS matches the numbers he quotes.",
+      "default_confidence": "ASSERTED",
+      "url": "https://reddit.com/r/Entrepreneur/comments/qknzjx/im_a_web_developer_and_i_wanted_to_share_some/",
+      "caveat": "His revenue claims are self-reported with no ledger and are not relied on anywhere. His accessibility advice contains a real error: he says contrast 'should be at least 3:1'. WCAG 2.x AA requires 4.5:1 for normal-size body text. Do not copy that number. Section-order claims are DEMONSTRATED as 'this is what these people shipped' and ASSERTED as to why.",
+      "read_via": "research/08-craft.md §5"
+    },
+    "febbhav": {
+      "full_name": "febbhav — Signs of AI Design",
+      "what_it_is": "A ~44 KB catalogue of AI tells across web, image, video and copy.",
+      "why_it_is_trusted": "The only source in the corpus that tracks which tells have DECAYED, which is what makes a review-by date possible at all.",
+      "default_confidence": "ASSERTED",
+      "url": "https://raw.githubusercontent.com/febbhav/signs-of-ai-design/main/README.md",
+      "caveat": "Catalogues rather than demonstrates.",
+      "read_via": "research/08-craft.md §1, §4"
+    },
+    "freiberg": {
+      "full_name": "Rauno Freiberg — design engineer at Vercel; Web Interface Guidelines",
+      "what_it_is": "Framing and judgement rather than parameters. His one concrete contribution is the 90/10 novelty rule.",
+      "why_it_is_trusted": "It is the most useful strategic idea in the corpus for a generator, and he is honest that it is an essay rather than a study.",
+      "default_confidence": "ASSERTED",
+      "url": "https://rauno.me/craft/novelty",
+      "caveat": "He says himself: 'This essay is not a tutorial nor a collection of guidelines.'",
+      "read_via": "research/08-craft.md §1, §2.1"
+    },
+    "impeccable": {
+      "full_name": "impeccable 4.3.1 — design skill and PostToolUse detector hook",
+      "what_it_is": "An installed design skill with a craft floor (Verify / Refuse) and a binary detector that runs on every Edit/Write.",
+      "why_it_is_trusted": "Its hook caught a real WCAG contrast failure in a page written on 2026-09-17 in this environment. Its rules are enforced, not merely published.",
+      "default_confidence": "ASSERTED",
+      "url": "local: ~/.claude/plugins/cache/impeccable/impeccable/4.3.1/skills/impeccable/reference/craft-floor.md",
+      "caveat": "Its detector is a compiled binary, so its exact thresholds were not readable. Rules credited here are transcribed from the craft floor's prose, which states bans and defaults without numbers. Where this rulebook attaches a number to an impeccable ban, the number comes from Gesso or from measurement here, and says so.",
+      "read_via": "reference/craft-floor.md, SKILL.md, hooks/hooks.json"
+    },
+    "chess_tee_forge": {
+      "full_name": "chess-tee-forge storefront — DESIGN-SYSTEM.md and store/",
+      "what_it_is": "A real storefront whose design system encodes honesty rules, measured verification, and a single-source-of-truth discipline.",
+      "why_it_is_trusted": "Its rules were written after the bugs they prevent actually shipped. It advertised one price and charged another; it set a name under a quotation that had no verified attribution. Rules from here are scar tissue, not theory.",
+      "default_confidence": "DEMONSTRATED",
+      "url": "local: chess-tee-forge/store/DESIGN-SYSTEM.md",
+      "caveat": "Its own font delivery links fonts.googleapis.com, which research/11 §5.4 rejects. Take the honesty rules; do not take the font route.",
+      "read_via": "DESIGN-SYSTEM.md §1, §4, §7, §8; store/styles.css"
+    },
+    "research_08": {
+      "full_name": "local-site-forge research/08-craft.md",
+      "what_it_is": "The 915-line craft reference: the ranked sourced AI-slop tell list, the motion budget, the performance floor, the detail catalogue, and an explicit coverage-gaps section.",
+      "why_it_is_trusted": "It tiers every claim with a confidence tag, flags its own unsourced numbers, and re-measures this project's own output rather than arguing about it.",
+      "default_confidence": "MEASURED_HERE",
+      "url": "local: local-site-forge/research/08-craft.md",
+      "caveat": "Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.",
+      "read_via": "read in full 2026-09-17"
+    },
+    "research_08a": {
+      "full_name": "local-site-forge research/08a-sitegen-spec.md",
+      "what_it_is": "The work order derived from 08: KEEP / CHANGE / ADD / REJECT, the motion token set with locked parameters, the variation axes, and an implementation log with a corrected measurement.",
+      "why_it_is_trusted": "It contains a correction against itself: C1's LCP magnitude was overstated and the controlled A/B is recorded rather than buried.",
+      "default_confidence": "MEASURED_HERE",
+      "url": "local: local-site-forge/research/08a-sitegen-spec.md",
+      "caveat": "Its `--stagger: 45ms` has no practitioner source and the file says so. Do not attribute it to anyone.",
+      "read_via": "read in full 2026-09-17"
+    },
+    "research_04": {
+      "full_name": "local-site-forge research/04-design-language.md",
+      "what_it_is": "What reads modern vs dated in 2026, and the two-tier detector: Tier 1 technical age (parse the HTML) and Tier 2 aesthetic age (needs a screenshot and a vision model).",
+      "why_it_is_trusted": "It opens with a statistic-integrity warning naming the exact misattribution most sources in this space repeat.",
+      "default_confidence": "ASSERTED",
+      "url": "local: local-site-forge/research/04-design-language.md",
+      "caveat": "Its §3 'what reads as modern' list (bento, kinetic type, glassmorphism) is directional secondary-source consensus, and research/08 §4 later records that in 2026 'reads as 2026' and 'reads as AI-generated' are the same set. Where 04 and 08 conflict, 08 wins and the rule says so.",
+      "read_via": "read in full 2026-09-17"
+    },
+    "research_11": {
+      "full_name": "local-site-forge research/11-reference-tier.md",
+      "what_it_is": "The reference set with counted hex frequencies, the document-tier ceiling, material quality in code with measured costs, the typography system, and the register problem.",
+      "why_it_is_trusted": "Colour dominance, type weights and easing counts are counted from live production CSS rather than described. It also adjudicates a dispute between its own collect agents against a stored screenshot.",
+      "default_confidence": "MEASURED_HERE",
+      "url": "local: local-site-forge/research/11-reference-tier.md",
+      "caveat": "Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.",
+      "read_via": "read in full 2026-09-17"
+    },
+    "research_11a": {
+      "full_name": "local-site-forge research/11a-verity-build-spec.md",
+      "what_it_is": "A rebuild spec that audits a real shipped site against the rest of the corpus, including its own author's detectors.",
+      "why_it_is_trusted": "It catches the Android synthetic-weight collapse, six of its own banned kickers, and an evidence block that does not reconcile — all on a page whose thesis is checkability.",
+      "default_confidence": "MEASURED_HERE",
+      "url": "local: local-site-forge/research/11a-verity-build-spec.md",
+      "caveat": null,
+      "read_via": "read §0-§3 2026-09-17"
+    },
+    "research_05_synthesis": {
+      "full_name": "local-site-forge research/05-practitioner-corpus.md and corpus/SYNTHESIS.md",
+      "what_it_is": "The epistemic frame for the whole corpus: harvest mechanics, discount outcomes, and treat convergence as shared incentive until proven otherwise.",
+      "why_it_is_trusted": "It revises its own earlier 'one convergent finding' as wrong, in writing.",
+      "default_confidence": "ASSERTED",
+      "url": "local: local-site-forge/corpus/SYNTHESIS.md",
+      "caveat": "Seven of ten primary harvest entries are the same author; nearly every source earns from a tool referral. Convergence in that corpus is weak evidence and nothing in this rulebook rests on it alone.",
+      "read_via": "headings and §1-§2 2026-09-17"
+    },
+    "govuk": {
+      "full_name": "GOV.UK Design System type scale",
+      "what_it_is": "A tested type scale for the least technical audience in the English-speaking world. Body text is 19px, not 16px.",
+      "why_it_is_trusted": "Public-sector scale, tested against a more diverse and less technical population than any agency will reach.",
+      "default_confidence": "DEMONSTRATED",
+      "url": "https://design-system.service.gov.uk/styles/type-scale/",
+      "caveat": null,
+      "read_via": "research/11-reference-tier.md §1.2, §5.2"
+    },
+    "wcag": {
+      "full_name": "WCAG 2.1 / 2.2 AA",
+      "what_it_is": "The contrast and target-size success criteria.",
+      "why_it_is_trusted": "A published normative standard with a computable definition of relative luminance.",
+      "default_confidence": "DEMONSTRATED",
+      "url": "https://www.w3.org/TR/WCAG21/#contrast-minimum",
+      "caveat": null,
+      "read_via": "research/08-craft.md §5.6; impeccable craft-floor Verify"
+    },
+    "web_dev_cwv": {
+      "full_name": "web.dev Core Web Vitals",
+      "what_it_is": "LCP <= 2.5s, INP <= 200ms, CLS <= 0.1, all at p75 across mobile and desktop.",
+      "why_it_is_trusted": "Vendor-published thresholds with a defined measurement method.",
+      "default_confidence": "DEMONSTRATED",
+      "url": "https://web.dev/vitals/",
+      "caveat": null,
+      "read_via": "research/11-reference-tier.md §7"
+    },
+    "css_tricks_grain": {
+      "full_name": "CSS-Tricks — Grainy Gradients (Jimmy Chion)",
+      "what_it_is": "The feTurbulence grain recipe, with `stitchTiles='stitch'` as the part that makes it tile seamlessly.",
+      "why_it_is_trusted": "Copy-pasteable verified code; research/11 §4.1 added measured paint costs to it.",
+      "default_confidence": "DEMONSTRATED",
+      "url": "https://css-tricks.com/grainy-gradients/",
+      "caveat": null,
+      "read_via": "research/08-craft.md §8.7; research/11 §4.1"
+    },
+    "measured_here": {
+      "full_name": "Measured in this rulebook, 2026-09-17",
+      "what_it_is": "A number produced by running a detector over the thirteen generated pages in local-site-forge/previews/ on 2026-09-17, with the command recorded on the rule.",
+      "why_it_is_trusted": "Reproducible. Run `node rules/validate.js <dir>` and compare.",
+      "default_confidence": "MEASURED_HERE",
+      "url": "local: local-site-forge/previews/",
+      "caveat": "Thirteen pages from one generator across two verticals (tax/accounting and law) is a narrow sample. A threshold calibrated only against it is calibrated against one failure mode.",
+      "read_via": "self"
+    }
+  }
+}

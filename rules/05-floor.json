@@ -1,0 +1,646 @@
+{
+  "$comment": "THE FLOOR — not aesthetics. These are the failures that make a page look BROKEN on the phone in the owner's hand, plus the accessibility floor beneath them. research/08 §7 is blunt: nothing above this matters if these fail. Total cost of the seven mobile checks is under 20 lines of CSS, which is trivially cheap relative to the failure mode.",
+  "tier": "floor",
+  "rules": [
+    {
+      "id": "F-VIEWPORT-META",
+      "tier": "floor",
+      "category": "responsive",
+      "title": "No viewport meta tag",
+      "what_it_is": "The `<head>` contains no `<meta name=\"viewport\">`.",
+      "why_it_matters": "Without it a phone renders the page at desktop width and shrinks it, so every word is unreadable until the visitor pinches. The corpus names this the strongest single signal of a dated site, which is exactly why shipping it yourself is unforgivable.",
+      "source": {
+        "name": "research_04",
+        "confidence": "DEMONSTRATED",
+        "where": "§5 Tier 1 technical age: 'Missing viewport meta — renders desktop-width on mobile. Strongest single signal.'"
+      },
+      "detector": {
+        "kind": "html_tag",
+        "tag": "meta",
+        "attr_match": {
+          "name": "^viewport$"
+        },
+        "mode": "required"
+      },
+      "threshold": "No `<meta name=\"viewport\">` in the document.",
+      "threshold_provenance": "from_source",
+      "severity": "fail",
+      "fix": "Add the tag to the <head>. Exactly this, with nothing else in the content attribute -- no fixed width, no maximum-scale, no user-scalable=no.",
+      "fix_code": "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">",
+      "teach": "This one line tells a phone to use its own width instead of pretending to be a desktop monitor. Without it, your page opens zoomed out to unreadable size. It is the single most consequential line in the head of the document.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "F-VIEWPORT-LOCKED",
+      "tier": "floor",
+      "category": "a11y",
+      "title": "Zooming disabled",
+      "what_it_is": "A viewport meta containing `user-scalable=no` or `maximum-scale=1`, or a fixed pixel width like `width=1024`.",
+      "why_it_matters": "It takes zoom away from people who need it, which is an accessibility harm rather than a style choice, and it is a dated practice besides. A fixed width forces a desktop layout onto a phone.",
+      "source": {
+        "name": "research_04",
+        "confidence": "DEMONSTRATED",
+        "where": "§5 Tier 1 technical age"
+      },
+      "also_in": [
+        {
+          "name": "wcag",
+          "where": "SC 1.4.4 Resize Text"
+        }
+      ],
+      "detector": {
+        "kind": "html_attr",
+        "tag": "meta",
+        "attr": "content",
+        "mode": "forbidden",
+        "value_pattern": "user-scalable\\s*=\\s*(?:no|0)|maximum-scale\\s*=\\s*1(?:\\.0)?\\b|width\\s*=\\s*\\d+",
+        "only_when_attr": {
+          "name": "viewport"
+        }
+      },
+      "threshold": "`user-scalable=no`, `maximum-scale=1`, or a numeric `width=` in the viewport meta.",
+      "threshold_provenance": "from_source",
+      "severity": "fail",
+      "fix": "Use `width=device-width, initial-scale=1` and nothing else.",
+      "teach": "Pinch-to-zoom is how a lot of people read anything small, including most people over fifty. Turning it off removes their only workaround. There is no good reason to.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "F-OVERFLOW-CLIP",
+      "tier": "floor",
+      "category": "responsive",
+      "title": "No horizontal-overflow guard, or the wrong one",
+      "what_it_is": "`overflow-x` not set to `clip` on BOTH `html` and `body` — or set to `hidden` instead.",
+      "why_it_matters": "Two separate points. The guard catches sideways scroll, which reads as broken. And the choice between `clip` and `hidden` is not cosmetic: `hidden` creates a scroll container, which breaks `position: sticky` inside it and can trap keyboard focus. `clip` does not.",
+      "source": {
+        "name": "research_08",
+        "confidence": "DEMONSTRATED",
+        "where": "§7.2 check 1",
+        "quote": "overflow-x: clip on both html and body — clip, not hidden: hidden creates a scroll container that breaks position: sticky and can trap focus"
+      },
+      "detector": {
+        "kind": "css_absent",
+        "property": "^overflow-x$",
+        "value": "^clip$",
+        "require_all_selectors": [
+          "html",
+          "body"
+        ],
+        "wrong_value_pattern": "^hidden$"
+      },
+      "threshold": "`overflow-x: clip` absent from `html` or from `body`. `overflow-x: hidden` on either is reported as the wrong fix rather than as a missing one.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Add it to both. And treat it as a belt, not a solution — find the element that is actually too wide as well.",
+      "fix_code": "html, body { overflow-x: clip; }",
+      "teach": "This stops the page sliding sideways when something on it is too wide. There are two ways to write it and only one is safe: `clip` simply cuts the overflow off, while `hidden` secretly turns the page into a scrolling box, which breaks anything that is supposed to stick to the top and can trap keyboard users.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 26,
+        "note": "Neither property set on any of the 13, and every page has a sticky banner and a sticky nav that would be broken by the `hidden` version. Adding the correct one is two lines."
+      }
+    },
+    {
+      "id": "F-BARE-1FR",
+      "tier": "floor",
+      "category": "responsive",
+      "title": "Grid tracks written as bare 1fr",
+      "what_it_is": "`grid-template-columns` using `1fr` rather than `minmax(0, 1fr)`.",
+      "why_it_matters": "The corpus calls this the sneakiest bug in its list, and it is right. Bare `1fr` means `minmax(auto, 1fr)`, and that `auto` minimum is the content's intrinsic width — for an image, its natural pixel width. A 1024px photo forces a 1024px minimum track and pushes the layout off a 375px screen. It looks perfect on a desktop, fails only on a phone, and only when an image is present, so it survives casual testing. One character fixes it.",
+      "source": {
+        "name": "research_08",
+        "confidence": "DEMONSTRATED",
+        "where": "§7.2 check 3"
+      },
+      "detector": {
+        "kind": "css_decl",
+        "property": "^grid-template-columns$|^grid-auto-columns$",
+        "value": "(?<!minmax\\(0,\\s?)\\b\\d*\\.?\\d*fr\\b",
+        "exclude_value": "minmax\\(\\s*0"
+      },
+      "threshold": "A `fr` track in `grid-template-columns` or `grid-auto-columns` not wrapped in `minmax(0, ...)`. `repeat(n, 1fr)` counts.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Wrap every fr track.",
+      "fix_code": "grid-template-columns: repeat(6, minmax(0, 1fr));",
+      "teach": "Grid columns written as `1fr` promise to share space equally, but they quietly refuse to shrink below the natural width of whatever is inside them. Put a photo in one and the column refuses to go below the photo's real size, and your layout falls off the side of the phone. Writing `minmax(0, 1fr)` says the column really may shrink.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 52,
+        "note": "4 findings per page: `repeat(6,1fr)` on the bento, `repeat(2,1fr)` and `1fr` at the two breakpoints, and `1fr` on the hours list. Harmless today because there are zero images — and a guaranteed off-screen layout the moment the first photograph ships. Fix it before the photo, not after."
+      }
+    },
+    {
+      "id": "F-TAP-TARGET",
+      "tier": "floor",
+      "category": "a11y",
+      "title": "No minimum tap target on touch devices",
+      "what_it_is": "No `@media (pointer: coarse)` rule setting buttons and links-as-buttons to a minimum height of 48px.",
+      "why_it_matters": "A finger is not a mouse pointer. 48px is the practitioner floor and it costs two lines. On a page whose entire purpose is that someone taps the call button, the call button has to be tappable.",
+      "source": {
+        "name": "research_08",
+        "confidence": "DEMONSTRATED",
+        "where": "§7.2 check 7; §5.2 phone treatment"
+      },
+      "also_in": [
+        {
+          "name": "wcag",
+          "where": "SC 2.5.8 Target Size (Minimum) sets 24px as the AA floor; 48px is the practitioner recommendation and the stricter of the two"
+        }
+      ],
+      "detector": {
+        "kind": "css_absent",
+        "property": "^min-height$",
+        "value_numeric": {
+          "unit": "px",
+          "min": 48
+        },
+        "require_at_rule": "pointer\\s*:\\s*coarse"
+      },
+      "threshold": "No rule inside `@media (pointer: coarse)` setting `min-height` of 48px or more on an interactive selector.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Two lines.",
+      "fix_code": "@media (pointer: coarse) { .btn, .ghost, button, a.btn { min-height: 48px; } }",
+      "teach": "Buttons that are comfortable to click with a mouse are often too small to hit with a thumb, especially for older hands. Setting a minimum height that only applies on touch screens fixes it without changing the desktop design at all.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 13,
+        "note": "Absent from all 13. Measured button height is about 46px (11px padding top and bottom plus a 15px label plus an 11.5px sub-label), so this is close but under."
+      }
+    },
+    {
+      "id": "F-HOVER-UNGUARDED",
+      "tier": "floor",
+      "category": "responsive",
+      "title": "A hover effect with no touch guard",
+      "what_it_is": "A `:hover` rule that changes position, scale or shadow, not wrapped in `@media (hover: hover) and (pointer: fine)`.",
+      "why_it_matters": "On Android Chrome the hover state STICKS after a tap, so the button stays visibly lifted after the visitor has pressed it. To a non-technical viewer that is a rendering bug, arriving in the exact moment the pitch is 'tap the call button'. The corpus measured this absent from all thirteen of its own generated pages.",
+      "source": {
+        "name": "research_08a",
+        "confidence": "MEASURED_HERE",
+        "where": "C5, and §8.4's two-line fix"
+      },
+      "confidence_note": "The `@media (hover: hover)` guard itself is flagged in research/08 §9.5 as asserted by the sweep with no practitioner citation retrieved — though the browser behaviour is well documented and trivially reproducible. The STUCK STATE on Android Chrome is the observed part.",
+      "detector": {
+        "kind": "css_decl",
+        "property": "^(transform|box-shadow|translate|scale)$",
+        "selector": ":hover",
+        "notInAtRule": "hover\\s*:\\s*hover",
+        "ignore_resets": true,
+        "ignore_reduced_motion": true
+      },
+      "threshold": "A `:hover` rule changing transform, translate, scale or box-shadow, outside `@media (hover: hover)`.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Guard the hover AND add a press state in the same change. Guarding hover alone leaves touch users with no feedback at all, which is worse than the stuck state it fixes. These two must ship together.",
+      "fix_code": "@media (hover: hover) and (pointer: fine) {\n  .btn:hover { transform: translateY(-2px); }\n}\n/* write the FULL transform — a bare scale() would clobber the hover translateY */\n.btn:active { transform: translateY(0) scale(.97); }",
+      "teach": "Hovering does not exist on a phone, but phones try to emulate it, and the result is that a button stays stuck in its hover state after being tapped. Wrapping hover effects so they only apply to real mouse pointers fixes it — but you must add a press effect at the same time, or touch users get no response at all.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 12,
+        "hits_total": 24,
+        "note": "12 of 13 ship `.btn:hover { transform: translateY(-2px) }` with no `(hover: hover)` guard, twice each (the lift and its box-shadow). On Android Chrome that lift STICKS after a tap, leaving the call button visibly raised in the exact moment the pitch is 'tap it'."
+      }
+    },
+    {
+      "id": "F-NO-PRESS",
+      "tier": "floor",
+      "category": "responsive",
+      "title": "No press feedback on the primary action",
+      "what_it_is": "No `:active` rule giving buttons a visible response when pressed.",
+      "why_it_matters": "This is named the highest-value single item in the corpus's whole work order. The demo is literally 'here, tap the call button' — and right now nothing happens until the dialer opens. `transform: scale()` is composite-only, so the acknowledgement lands within one frame even while the main thread is still parsing: it is arguably the only animation on the page guaranteed to be smooth on a cheap phone. The interface should feel as if it is listening to the user.",
+      "source": {
+        "name": "kowalski",
+        "confidence": "DEMONSTRATED",
+        "where": "tip #1, with a live example; the scale value is visible in shipped Linear and Vercel UI",
+        "quote": "The interface should feel as if it's listening to the user."
+      },
+      "also_in": [
+        {
+          "name": "research_08a",
+          "where": "A1, ranked #1 by impact divided by lines of code"
+        }
+      ],
+      "detector": {
+        "kind": "css_absent",
+        "property": "^transform$|^scale$",
+        "selector": ":active"
+      },
+      "threshold": "No `:active` rule setting a transform on an interactive selector.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Three lines. The scale floor is 0.95 — below that it reads as collapse rather than depression. Apply it only to real buttons and links, never to cards, or you imply tappability that is not there. Note that `:active` on iOS Safari needs a real `<button>` or `<a>`; a plain `<div>` does not get it.",
+      "fix_code": ".btn { transition: transform 120ms cubic-bezier(0.33, 1, 0.68, 1); }\n.btn:active { transform: scale(.97); }",
+      "teach": "When you tap a button on a phone, something should happen immediately — before the call connects, before the page changes. A tiny shrink is enough, and it is the one animation that stays smooth even when the phone is busy, because it is handled separately from everything else. It is three lines and it is worth more than every scroll animation on the page.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 12,
+        "hits_total": 12,
+        "note": "12 of 13 have no `:active` state at all. A1 is ranked the highest-value single item in the corpus's whole work order — the demo is literally 'tap the call button' — and it is present in one shipped file out of thirteen."
+      }
+    },
+    {
+      "id": "F-INPUT-16PX",
+      "tier": "floor",
+      "category": "responsive",
+      "title": "Form input text below 16px",
+      "what_it_is": "An `<input>`, `<select>` or `<textarea>` with a font-size under 16px.",
+      "why_it_matters": "Below 15px, iOS zooms the page when the field receives focus, and it does not zoom back out. It is a hard floor, not a suggestion.",
+      "source": {
+        "name": "research_08",
+        "confidence": "DEMONSTRATED",
+        "where": "§7.2 check 6"
+      },
+      "also_in": [
+        {
+          "name": "freiberg",
+          "where": "Web Interface Guidelines: 16px minimum input font-size"
+        }
+      ],
+      "detector": {
+        "kind": "css_decl",
+        "property": "^font-size$",
+        "value_numeric": {
+          "unit": "px",
+          "max": 15.99
+        },
+        "selector_hint": "input|select|textarea|form"
+      },
+      "threshold": "`font-size` below 16px on an input, select or textarea selector.",
+      "threshold_provenance": "from_source",
+      "severity": "fail",
+      "fix": "Set inputs to 16px or larger. If the design needs smaller-looking fields, reduce the padding rather than the text.",
+      "teach": "If text inside a form field is smaller than 16 pixels, iPhones zoom in the moment someone taps it, and they do not zoom back out. The visitor is now looking at a page that is too big for the screen and has to fix it themselves.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "No forms on these pages — the call-to-action is a phone link, which is the corpus's own recommendation."
+      }
+    },
+    {
+      "id": "F-STICKY-COLLISION",
+      "tier": "floor",
+      "category": "layout",
+      "title": "Two sticky elements that will overlap",
+      "what_it_is": "Two or more elements at `position: sticky; top: 0`, or a sticky element offset by a hardcoded pixel value guessed from another element's height.",
+      "why_it_matters": "Easy to hit and it looks badly broken. Both stick at the same place during scroll and the deeper-in-DOM one paints over the other. The hardcoded-offset version is worse because it works on the developer's screen: a two-line banner on a narrow phone is taller than the guessed number.",
+      "source": {
+        "name": "research_08",
+        "confidence": "DEMONSTRATED",
+        "where": "§8.5 sticky-element gate, including the specific defect found in this project's own generator"
+      },
+      "detector": {
+        "kind": "css_cooccur",
+        "mode": "sticky_collision"
+      },
+      "threshold": "Two or more rules setting `position: sticky` with `top: 0`; or a sticky `top` given as a literal pixel value rather than a custom property.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Measure the first element's height in script and write it to a custom property, then offset the second by that property. Give the top element the higher z-index.",
+      "fix_code": ":root { --banner-h: 44px; }\n.banner { position: sticky; top: 0; z-index: 50; }\n.nav    { position: sticky; top: var(--banner-h); z-index: 40; }\n/* and set --banner-h from the real measured height on load and resize */",
+      "teach": "Two bars that both stick to the top of the screen will land in the same place and cover each other. If you offset the second one by a number you guessed, it will be wrong on a narrow phone where the first bar wraps to two lines. Measure it instead.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 13,
+        "note": "`.concept` is sticky at top:0 and `header.nav` is sticky at a hardcoded `top: 36px`. The banner is a two-line sentence; on a 320px screen it is taller than 36px and the nav overlaps it. z-index is correctly ordered (50 over 40), so the failure is a gap or an overlap rather than a hidden banner."
+      }
+    },
+    {
+      "id": "F-WRAP-ANYWHERE",
+      "tier": "floor",
+      "category": "responsive",
+      "title": "Display headings with no overflow guard",
+      "what_it_is": "A large heading without `overflow-wrap: anywhere` and `min-width: 0`.",
+      "why_it_matters": "A long hyphenated word or a URL in a heading overflows its container at large sizes, and on a narrow screen there is nowhere for it to go.",
+      "source": {
+        "name": "research_08",
+        "confidence": "DEMONSTRATED",
+        "where": "§7.2 check 4"
+      },
+      "detector": {
+        "kind": "css_absent",
+        "property": "^overflow-wrap$|^word-break$",
+        "selector_hint": "h1|h2|\\.hero|\\.display"
+      },
+      "threshold": "No `overflow-wrap: anywhere` (or `break-word`) on display-heading selectors.",
+      "threshold_provenance": "from_source",
+      "severity": "info",
+      "fix": "Add both. `min-width: 0` matters when the heading is a flex or grid child, because those default to a minimum of their content width.",
+      "fix_code": "h1, h2 { overflow-wrap: anywhere; min-width: 0; }",
+      "teach": "A single very long word in a big headline has nowhere to break, so it runs off the edge of a phone. One line of CSS lets it break wherever it has to. You will not notice you needed it until a business has a long name.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 13,
+        "note": "Absent from all 13. These pages carry real business names from scraped data, including hyphenated and multi-word ones, so the risk is live."
+      }
+    },
+    {
+      "id": "F-LAZY-HERO",
+      "tier": "floor",
+      "category": "performance",
+      "title": "The hero image set to load lazily",
+      "what_it_is": "`loading=\"lazy\"` on the first and largest image on the page.",
+      "why_it_matters": "It delays the exact thing the browser measures as the page's largest paint. Lazy loading is for images below the fold.",
+      "source": {
+        "name": "research_08",
+        "confidence": "ASSERTED",
+        "where": "§5.5 and §8.6: 'Never lazy-load the hero image'"
+      },
+      "confidence_note": "Asserted by the corpus as an instruction. The mechanism is not in dispute: lazy loading defers a fetch until the image approaches the viewport, and the hero is already in it. No source measured the size of the penalty.",
+      "detector": {
+        "kind": "html_attr",
+        "tag": "img",
+        "attr": "loading",
+        "mode": "forbidden",
+        "value_pattern": "lazy",
+        "position": "first_in_document"
+      },
+      "threshold": "`loading=\"lazy\"` on the first `<img>` in the document, or on an image inside the hero region.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Remove it from the hero image, and add `fetchpriority=\"high\"`. Keep it on everything below the fold.",
+      "teach": "Lazy loading tells the browser to wait until an image is nearly on screen before fetching it. That is exactly right for images further down and exactly wrong for the first one, which is already on screen and is what the browser is timing.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "No images at all."
+      }
+    },
+    {
+      "id": "A-IMG-ALT",
+      "tier": "floor",
+      "category": "a11y",
+      "title": "An image with no alt attribute",
+      "what_it_is": "An `<img>` with no `alt`, as distinct from `alt=\"\"`.",
+      "why_it_matters": "`alt` is mandatory. A missing attribute makes a screen reader announce the filename; an empty one correctly says nothing, which is right for decoration. The two are different and the difference matters.",
+      "source": {
+        "name": "research_08",
+        "confidence": "DEMONSTRATED",
+        "where": "§8.6: 'alt is mandatory'"
+      },
+      "also_in": [
+        {
+          "name": "wcag",
+          "where": "SC 1.1.1 Non-text Content"
+        }
+      ],
+      "detector": {
+        "kind": "html_attr",
+        "tag": "img",
+        "attr": "alt",
+        "mode": "required"
+      },
+      "threshold": "Any `<img>` with no `alt` attribute. `alt=\"\"` passes and is the correct value for a purely decorative image.",
+      "threshold_provenance": "from_source",
+      "severity": "fail",
+      "fix": "Write what the image shows, in a sentence. If it shows nothing a reader needs, write `alt=\"\"` deliberately.",
+      "teach": "Every image needs an alt attribute — a short description for people who cannot see it. If the image is purely decorative, give it an empty one on purpose: that tells the screen reader to skip it. Leaving the attribute off entirely makes it read out the filename instead.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "No images."
+      }
+    },
+    {
+      "id": "A-CONTRAST-BODY",
+      "tier": "floor",
+      "category": "a11y",
+      "title": "Body text below 4.5:1 contrast",
+      "what_it_is": "Normal-size text whose contrast ratio against its background is below 4.5 to 1.",
+      "why_it_matters": "This is the standard, and the corpus records a practitioner in this exact market getting it wrong: he says contrast should be at least 3:1. WCAG AA requires 4.5:1 for normal-size body text — 3:1 covers only large text (24px and up, or 18.66px bold) and non-text interface elements. Do not copy that number. And there is a viewing-condition argument on top of the standard: the real reading environment is a phone screen in daylight on a sidewalk. Low-contrast tinted greys that look refined indoors vanish outdoors.",
+      "source": {
+        "name": "wcag",
+        "confidence": "DEMONSTRATED",
+        "where": "SC 1.4.3 Contrast (Minimum)"
+      },
+      "also_in": [
+        {
+          "name": "research_08",
+          "where": "§5.6, which corrects the practitioner error explicitly, and §6.4, which says to bias contrast higher than a desktop design would"
+        },
+        {
+          "name": "impeccable",
+          "where": "craft-floor.md, Verify: 'body and placeholder text >= 4.5:1, large text >= 3:1'. Its hook caught a real contrast failure in this environment on 2026-09-17."
+        }
+      ],
+      "detector": {
+        "kind": "contrast",
+        "min_ratio": 4.5,
+        "scope": "body"
+      },
+      "threshold": "Computed WCAG 2.1 contrast ratio below 4.5:1 for text under 24px (or under 18.66px bold), against its resolved background. Computed for every token pair the stylesheet declares, in light mode and dark mode separately.",
+      "threshold_provenance": "from_source",
+      "severity": "fail",
+      "fix": "Darken the text or lighten the ground until it passes. On a coloured surface, tint the secondary text from that surface's hue or from the foreground colour — never with a plain grey.",
+      "teach": "Contrast is the measured difference in brightness between text and its background, and there is a legal-grade standard for it: ordinary text needs a ratio of at least 4.5 to 1. Be careful of advice saying 3 to 1 is enough — that only applies to large headings. And remember the real reading conditions: a phone held outside in sunlight, by someone in their fifties.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "Computed from the declared tokens: --fg #14161c on --bg #fbfaf8 is 16.4:1, and --fg-2 #5a6070 on --bg is 6.6:1. Both pass comfortably in light mode; dark mode also passes. A real pass."
+      }
+    },
+    {
+      "id": "A-CONTRAST-LARGE",
+      "tier": "floor",
+      "category": "a11y",
+      "title": "Large text or interface elements below 3:1",
+      "what_it_is": "Headings at 24px and above (or 18.66px bold), and non-text interface elements like borders and icons, below 3:1 against their background.",
+      "why_it_matters": "The AA floor for large text and for the parts of the interface that carry meaning without words.",
+      "source": {
+        "name": "wcag",
+        "confidence": "DEMONSTRATED",
+        "where": "SC 1.4.3 and SC 1.4.11 Non-text Contrast"
+      },
+      "detector": {
+        "kind": "contrast",
+        "min_ratio": 3.0,
+        "scope": "large"
+      },
+      "threshold": "Contrast below 3:1 for text at 24px or above, or 18.66px bold, or for a non-text element that carries meaning.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "As above. Hairlines that are purely decorative are exempt; a border that is the only thing distinguishing a form field is not.",
+      "teach": "Big text needs less contrast than small text to be readable, so the standard relaxes to 3 to 1 — but only for genuinely large sizes. The same 3 to 1 applies to things like the outline of a form field, where the line is the only thing telling you the field is there.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "A-NO-FOCUS-VISIBLE",
+      "tier": "floor",
+      "category": "a11y",
+      "title": "No visible focus indicator",
+      "what_it_is": "The stylesheet defines no `:focus-visible` (or `:focus`) styling for interactive elements.",
+      "why_it_matters": "Somebody navigating with a keyboard has no way to see where they are. Browsers supply a default ring, but a page that restyles buttons heavily often loses it by accident, and nobody notices because nobody tests with the Tab key.",
+      "source": {
+        "name": "wcag",
+        "confidence": "DEMONSTRATED",
+        "where": "SC 2.4.7 Focus Visible"
+      },
+      "also_in": [
+        {
+          "name": "impeccable",
+          "where": "craft-floor.md, Verify / States: 'keyboard focus'; and Browser surfaces: 'focus rings ship with browser defaults that belong to no design system'"
+        },
+        {
+          "name": "chess_tee_forge",
+          "where": "DESIGN-SYSTEM.md §7: ':focus-visible in the accent colour at 3px offset', listed among the measured accessibility facts"
+        }
+      ],
+      "detector": {
+        "kind": "css_absent",
+        "selector": ":focus-visible|:focus"
+      },
+      "threshold": "No rule in the stylesheet whose selector contains `:focus-visible` or `:focus`.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Style it from the palette, do not just leave the default. And do not animate it — see T2-FOCUS-FADE.",
+      "fix_code": ":focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }",
+      "teach": "Press the Tab key on your page and watch. A visible outline should jump from one button to the next. Plenty of people navigate entirely that way, and a page that heavily restyles its buttons often loses the outline without anyone noticing.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 13,
+        "note": "No focus styling of any kind in any of the 13. The browser default survives on the anchors, but it was never a decision."
+      }
+    },
+    {
+      "id": "A-HEADING-ORDER",
+      "tier": "floor",
+      "category": "a11y",
+      "title": "Heading levels out of order, or an h1 that is not the subject",
+      "what_it_is": "A document with no `<h1>`, with more than one, with a skipped level, or whose `<h1>` is the site's wordmark in the navigation rather than what the page is about.",
+      "why_it_matters": "Headings are how a screen-reader user skims. A wordmark as the h1 means the page announces its own brand as its subject and the real headline is demoted. It also quietly disables the narrower version of the eyebrow detector (T2-KICKER-H1), which looks specifically at what precedes the primary h1.",
+      "source": {
+        "name": "wcag",
+        "confidence": "DEMONSTRATED",
+        "where": "SC 1.3.1 Info and Relationships; SC 2.4.6 Headings and Labels"
+      },
+      "detector": {
+        "kind": "heading_order",
+        "require_single_h1": true,
+        "forbid_skips": true,
+        "flag_h1_in_nav": true
+      },
+      "threshold": "Zero or more than one `<h1>`; a jump of more than one level going down; or an `<h1>` inside `<nav>` or `<header>` whose text matches the site wordmark.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "One `<h1>`, and it is the main headline of the page. The business name in the navigation is a link, or a `<p>`, or a `<div>` — not a heading.",
+      "teach": "Headings are numbered from one, and the number one heading should say what the page is about. Putting the business name in the navigation as the number one heading means screen readers announce your logo as the topic. Move it down and promote the real headline.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 13,
+        "note": "`<h1>` is the business name inside `header.nav`; the actual page headline is an `<h2>`; card titles are `<h3>` alongside the section `<h3 class=\"sec\">`. Three distinct problems in one structure."
+      }
+    },
+    {
+      "id": "F-DARK-MODE-MISSING",
+      "tier": "floor",
+      "category": "color",
+      "title": "No dark mode",
+      "what_it_is": "No `prefers-color-scheme: dark` block, so the page renders light regardless of the visitor's setting.",
+      "why_it_matters": "Dark mode is table stakes in 2026, not a feature. A page that ignores the phone's own setting reads as dated — and on a phone set to dark at night, a full-brightness white page is genuinely unpleasant.",
+      "source": {
+        "name": "research_04",
+        "confidence": "ASSERTED",
+        "where": "§3: 'Dark mode — table stakes, not a feature. Sites that ship light-mode-only look dated in 2026.'"
+      },
+      "confidence_note": "Directional secondary-source consensus from design publications, not a study. Note that research/08 later warns that much of research/04's 'what reads as modern' list is now the same set as 'what reads as AI-generated' — dark mode is one of the items on that list that survives, because it is a response to a user setting rather than a style.",
+      "detector": {
+        "kind": "css_absent",
+        "at_rule": "prefers-color-scheme\\s*:\\s*dark"
+      },
+      "threshold": "No `@media (prefers-color-scheme: dark)` block in the stylesheet.",
+      "threshold_provenance": "from_source",
+      "severity": "info",
+      "fix": "See C-THEME-CONTRACT for the shape it should take.",
+      "teach": "Phones have a light and a dark setting and most people have chosen one. A page that respects the choice feels current; one that always blazes white at 11pm does not.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "All 13 ship a dark block, correctly guarded. Passes."
+      }
+    },
+    {
+      "id": "F-PAGE-BUDGET",
+      "tier": "floor",
+      "category": "performance",
+      "title": "Page weight over budget",
+      "what_it_is": "The total first-view transfer exceeding the budget for the delivery context.",
+      "why_it_matters": "For a page whose pitch is that the competitor's site does not load, a slow page is not a technical shortcoming, it is a credibility contradiction the buyer can feel without being told. It is also the one demo you can run today with no clients and no portfolio: your page next to a dead one, same phone, same connection, at the door.",
+      "source": {
+        "name": "research_11",
+        "confidence": "MEASURED_HERE",
+        "where": "§7 practical page budget: HTML+CSS <= 30 KB, fonts <= 25 KB subsetted, one photo <= 40 KB, JS <= 3 KB, video 0 bytes until tapped, total first view under ~200 KB"
+      },
+      "also_in": [
+        {
+          "name": "web_dev_cwv",
+          "where": "LCP <= 2.5s, INP <= 200ms, CLS <= 0.1, all at p75"
+        }
+      ],
+      "detector": {
+        "kind": "browser",
+        "what": "total transfer size and Core Web Vitals under throttling",
+        "budget": {
+          "html_css_kb": 30,
+          "fonts_kb": 25,
+          "photo_kb": 40,
+          "js_kb": 3,
+          "total_kb": 200
+        }
+      },
+      "threshold": "First-view transfer above 200 KB, or any single category above its line. Measured under a mid-range Android profile on a throttled connection, not on a desktop.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "The categories are in priority order. Fonts before images; images before scripts. If the budget is tight, ship one display face for headings only and let body text use the system stack — about 43 KB, and it buys most of the visual difference.",
+      "teach": "There is a size budget for a page, and it is much smaller than most sites respect. Around 200 kilobytes total for everything a visitor downloads on their first look. That is enough for one photograph, one font and all your text — and it loads instantly on a cheap phone, which is the whole argument.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": null,
+        "hits_total": null,
+        "note": "13.2-17.6 KB per page, entirely self-contained, zero requests. Far under budget. This is the corpus's strongest technical result and it is worth saying so in any report."
+      }
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+version: 2
+updates:
+  # The MCP SDK is the one dependency whose drift can silently break the
+  # handshake, so it is worth tracking. Monthly, to keep the noise low for a
+  # single-maintainer repo.
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3
+    groups:
+      dev-dependencies:
+        dependency-type: development
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 2

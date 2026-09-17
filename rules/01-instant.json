@@ -1,0 +1,582 @@
+{
+  "$comment": "TIER 1 — recognised in under five seconds, by someone with no design vocabulary at all. This tier is ordered by how fast a non-technical business owner clocks the tell on a phone, which is NOT the order a designer would give. research/08 §4 is explicit that the tiering itself is ASSERTED: nobody has studied what non-technical owners notice. Treat the ORDER as a hypothesis and the individual TELLS as evidenced.",
+  "tier": 1,
+  "rules": [
+    {
+      "id": "T1-INDIGO-HEX",
+      "tier": 1,
+      "category": "color",
+      "title": "The indigo nobody chose",
+      "what_it_is": "One of ten specific purple-blue hex values, straight out of Tailwind's default palette, used as the site's accent colour — on buttons, links, icon tiles or a gradient.",
+      "why_it_matters": "Nobody picked this colour. It is what you get when you do not pick one. Krebs's designers named it 'VibeCode Purple' after counting it across 1,590 landing pages; three independent sources flag the same ten values. It is the single fastest way to tell a viewer that a machine chose the palette.",
+      "source": {
+        "name": "gesso",
+        "confidence": "DEMONSTRATED",
+        "where": "rule `indigo-accent`; corroborated by Krebs's 1,590-page count and by Hallmark",
+        "quote": "VibeCode Purple"
+      },
+      "also_in": [
+        {
+          "name": "krebs",
+          "where": "Design Slop, tier breakdown",
+          "note": "counted independently across 1,590 Show HN landing pages"
+        },
+        {
+          "name": "hallmark",
+          "where": "anti-patterns.md, colour section"
+        }
+      ],
+      "detector": {
+        "kind": "hex_set",
+        "hexes": [
+          "#6366f1",
+          "#818cf8",
+          "#4f46e5",
+          "#4338ca",
+          "#3730a3",
+          "#8b5cf6",
+          "#7c3aed",
+          "#6d28d9",
+          "#a78bfa",
+          "#5b21b6"
+        ]
+      },
+      "threshold": "Any of those ten hex values appearing anywhere in the CSS or markup. Exact match, case-insensitive, 3- and 6-digit forms.",
+      "threshold_provenance": "from_source",
+      "severity": "fail",
+      "fix": "Derive the accent from something real about the business — the awning, the van, the sign, the tile, the product. Failing that, pick any hue outside 255-305 degrees and commit to it. The fix is not 'a different purple'.",
+      "teach": "Purple-blue is the colour a design tool gives you when you never chose one, so it now reads as 'nobody was here'. Pick your colour from something that physically exists in the business — a photo of the shopfront will hand it to you. That one move is both the fix for this and the most persuasive thing on the page, because it proves you looked.",
+      "chess": "It is the move an engine plays when the position is equal and nothing is forced. Correct, and it tells your opponent you had no plan.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "IMPORTANT NEGATIVE RESULT. Zero hits. The generator's two accents are #1f9ecb and #4f6bed, neither on the list — and #4f6bed is OKLCH hue 270.0, sitting squarely inside the banned cluster (276.9-293.5). An exact-hex list alone would have passed this corpus. That is why T1-INDIGO-NEAR exists."
+      }
+    },
+    {
+      "id": "T1-INDIGO-NEAR",
+      "tier": 1,
+      "category": "color",
+      "title": "An indigo that dodged the list",
+      "what_it_is": "An accent colour that is not one of the ten named hexes but sits in the same perceptual place: the violet-blue band, at a saturation high enough to read as a brand colour.",
+      "why_it_matters": "A hex allowlist is trivially evaded by nudging one digit, and a generator nudges digits constantly. The viewer does not see hex codes; they see purple. Detecting the colour rather than the string is the difference between a rule and a lookup table.",
+      "source": {
+        "name": "measured_here",
+        "confidence": "MEASURED_HERE",
+        "where": "OKLCH conversion of the ten Gesso hexes plus the two accents emitted across previews/, 2026-09-17"
+      },
+      "confidence_note": "The BAND is this rulebook's extrapolation, not anyone's published threshold. What is demonstrated is the ten hexes; what is asserted is that the perceptual neighbourhood around them carries the same signal. Calibration, so you can check it: all ten banned hexes fall at hue 276.9-293.5 with chroma 0.158-0.247. The preview corpus's #4f6bed falls at hue 270.0 / chroma 0.198 and fires. Its other accent #1f9ecb falls at hue 228.5 and correctly does not. A band this wide will occasionally catch a deliberate violet — that is why this is `warn`, not `fail`.",
+      "detector": {
+        "kind": "hex_oklch_band",
+        "hue": [
+          255,
+          305
+        ],
+        "chroma_min": 0.09,
+        "lightness": [
+          0.3,
+          0.8
+        ],
+        "exclude_ids": [
+          "T1-INDIGO-HEX"
+        ],
+        "role_hint": "accent"
+      },
+      "threshold": "A hex whose OKLCH hue is 255-305 degrees, chroma >= 0.09, lightness 0.30-0.80, used as an accent (assigned to a custom property matching /accent|brand|primary/, or used as a background/border/fill on an interactive element). Greys are excluded by the chroma floor.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "warn",
+      "fix": "Same as T1-INDIGO-HEX. If the violet is a deliberate brand decision made by a human with a reason, record it and silence this rule for the project — but write the reason down, because 'it looked nice' is what the generator would have said.",
+      "teach": "Colours can be compared by how they LOOK rather than by how they are spelled. This check converts every colour on your page into a form where 'how purple is it' is a number, then flags anything sitting where the tell-tale purples sit. It catches the near-misses a fixed list of colours would wave through.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 3,
+        "hits_total": 6,
+        "note": "#4f6bed and its soft variant #7d92f5 (hue 272.9, chroma 0.147) in 3 of 13 pages. The other 10 pages use a cyan at hue 228.5 and correctly pass."
+      }
+    },
+    {
+      "id": "T1-GRADIENT-3STOP",
+      "tier": 1,
+      "category": "color",
+      "title": "The third gradient stop",
+      "what_it_is": "A `linear-gradient`, `radial-gradient` or `conic-gradient` with three or more colour stops.",
+      "why_it_matters": "Two stops is a transition. Three is a decision to be interesting, and it is the decision a generator makes because more stops look like more effort. The corpus's phrasing is exact: the third stop is vanity.",
+      "source": {
+        "name": "gesso",
+        "confidence": "DEMONSTRATED",
+        "where": "rule `gradient-text` and the gradient section of the Tier 1 table",
+        "quote": "the third stop is vanity"
+      },
+      "also_in": [
+        {
+          "name": "research_08",
+          "where": "§6.4 Colour: 'Gradients: two stops maximum'"
+        }
+      ],
+      "detector": {
+        "kind": "gradient_stops",
+        "max_stops": 2
+      },
+      "threshold": "Any gradient function whose argument list contains 3 or more colour stops, counting a bare colour or a colour with a position as one stop. Direction keywords, `in oklch` interpolation hints and `transparent` endpoints are not counted as stops.",
+      "threshold_provenance": "from_source",
+      "severity": "fail",
+      "fix": "Cut to two stops, or replace the gradient with a flat colour. If you need depth, layer two very close off-whites rather than sweeping through three hues.",
+      "fix_code": "background: linear-gradient(180deg, #F6F5E8, #FFFEF2);",
+      "teach": "A gradient blends one colour into another. Adding a third colour rarely adds meaning — it adds decoration, and decoration is the thing that reads as filler. Two colours, or none.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "The generator's gradients are all two-stop. A true negative, and worth keeping in the report: rules that never fire are how you know the ones that do fire mean something."
+      }
+    },
+    {
+      "id": "T1-GRADIENT-CLICHE",
+      "tier": 1,
+      "category": "color",
+      "title": "The three cliché gradient pairs",
+      "what_it_is": "A gradient running purple-to-cyan, purple-to-blue, or orange-to-pink.",
+      "why_it_matters": "These three pairs are named outright in the corpus as banned. Purple-to-blue on the diagonal is called the universal generated-site signature; it is what every AI image header and every default hero glow has used since 2023.",
+      "source": {
+        "name": "gesso",
+        "confidence": "DEMONSTRATED",
+        "where": "Tier 1 table: 'Purple to cyan, purple to blue, orange to pink gradients banned outright'"
+      },
+      "also_in": [
+        {
+          "name": "research_11",
+          "where": "§4.5: 'never the purple-to-blue diagonal, which is the universal generated-site signature'"
+        }
+      ],
+      "detector": {
+        "kind": "gradient_stops",
+        "mode": "pairs",
+        "chroma_min": 0.07,
+        "min_hue_separation": 25,
+        "banned_pairs": [
+          {
+            "from_hue": [
+              255,
+              305
+            ],
+            "to_hue": [
+              180,
+              230
+            ],
+            "name": "purple to cyan"
+          },
+          {
+            "from_hue": [
+              255,
+              305
+            ],
+            "to_hue": [
+              230,
+              270
+            ],
+            "name": "purple to blue"
+          },
+          {
+            "from_hue": [
+              30,
+              70
+            ],
+            "to_hue": [
+              320,
+              360
+            ],
+            "name": "orange to pink"
+          }
+        ]
+      },
+      "threshold": "A two-or-more stop gradient whose first and last stops fall in one of the three named hue pairs, either direction, with both stops at chroma >= 0.07.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "fail",
+      "fix": "Pull both stops from one hue family and vary only lightness, or use a flat colour. If the gradient is carrying meaning, it is probably a chart and belongs in a chart.",
+      "teach": "Three specific colour pairings have been used so heavily by AI image and site generators that they now read as a watermark. Purple into blue is the worst of them. If you want a gradient, keep both ends in the same colour family and change only how light they are.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "Zero, after a calibration fix. It initially fired on 3 pages against `linear-gradient(140deg, var(--accent), var(--accent-soft))` — #4f6bed at hue 270.0 into #7d92f5 at hue 272.9 — because both ends landed inside two overlapping bands. That is one hue, not a two-hue cliche. The detector now requires 25 degrees of real separation. The gradient is still caught, correctly, by T1-INDIGO-NEAR."
+      }
+    },
+    {
+      "id": "T1-GRADIENT-TEXT",
+      "tier": 1,
+      "category": "type",
+      "title": "Gradient text",
+      "what_it_is": "A headline filled with a gradient, usually via `background-clip: text` plus a transparent text colour.",
+      "why_it_matters": "Two independent sources ban it outright: Gesso as a detector rule, impeccable as a flat refusal. Emphasis in typography comes from weight and size. A gradient headline also breaks text selection, fails to inherit a readable colour when the background fails to paint, and is invisible to a high-contrast mode user.",
+      "source": {
+        "name": "gesso",
+        "confidence": "DEMONSTRATED",
+        "where": "rule `gradient-text`"
+      },
+      "also_in": [
+        {
+          "name": "impeccable",
+          "where": "craft-floor.md, Refuse / Surface habits",
+          "note": "'Gradient text. Emphasis comes from weight or size.' Arrived at independently; impeccable gives no number, Gesso gives the detector."
+        }
+      ],
+      "detector": {
+        "kind": "css_regex",
+        "pattern": "background-clip\\s*:\\s*text|-webkit-background-clip\\s*:\\s*text",
+        "flags": "i"
+      },
+      "threshold": "Any `background-clip: text` or `-webkit-background-clip: text` declaration.",
+      "threshold_provenance": "from_source",
+      "severity": "fail",
+      "fix": "Delete the gradient and the clip. If the headline needs more presence, raise its size or its weight — but see TY-DISPLAY-WEIGHT before reaching for weight.",
+      "teach": "Filling letters with a colour fade is one of the most copied effects on the web and it does not make a headline say more. It also breaks in ordinary ways: you cannot select the text cleanly, and readers who need high contrast lose it entirely. Size and weight are the honest controls.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "T1-EMOJI-ICON",
+      "tier": 1,
+      "category": "imagery",
+      "title": "Emoji standing in for icons",
+      "what_it_is": "An emoji used as the icon of a feature card, a value proposition, a numbered step, or a pricing tier. The recognisable set is a rocket, sparkles, a lightning bolt, fire, a target, a green tick.",
+      "why_it_matters": "Two things at once. It is a named Tier 1 tell in three independent sources. And on Android — the phone most of your visitors hold — emoji render in Google's set, which looks nothing like the Apple emoji the page was almost certainly eyeballed against. So a page checked on a Mac differs from the shipped page in exactly the places the emoji appear.",
+      "source": {
+        "name": "hallmark",
+        "confidence": "DEMONSTRATED",
+        "where": "gate 30; Gesso rule `emoji-icon`; scored independently by Krebs"
+      },
+      "also_in": [
+        {
+          "name": "impeccable",
+          "where": "craft-floor.md, Refuse: 'Unicode glyphs or emoji standing in for an icon system. Icons are drawn, from a real library or authored SVG, in one consistent stroke and weight.'"
+        },
+        {
+          "name": "research_08",
+          "where": "§7.2: 'Emoji render as Google's blob set on Android'"
+        }
+      ],
+      "detector": {
+        "kind": "dom_repeated_siblings",
+        "mode": "emoji_icon",
+        "note": "Counted per ICON SLOT, not per code point. A flag or a skin-tone emoji is several code points and one icon; a code-point count inflated this by 22% on the preview corpus."
+      },
+      "threshold": "One or more emoji code points used as the entire content of an element in an icon position. Emoji inside running prose are spared.",
+      "threshold_provenance": "from_source",
+      "severity": "fail",
+      "fix": "Hand-author the icon as inline SVG — three to eight lines, 200-500 bytes each. Or ship no icons at all: most feature lists do not need them. Watch the adjacent trap, TRAP-LUCIDE-FIVE.",
+      "teach": "An emoji is a picture from someone else's font, and it changes shape depending on the phone. Drawn icons, even crude ones, are yours and look the same everywhere. The cheapest correct answer is usually to delete the icons and let the words carry the list.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 59,
+        "note": "Every single page, 59 icon slots in total, between 3 and 7 per page, all in feature-card icon positions. Counted per SLOT, not per code point: an earlier code-point count gave 72 because a flag or a variation-selector emoji is several code points and one icon."
+      }
+    },
+    {
+      "id": "T1-GLYPH-REGISTER",
+      "tier": 1,
+      "category": "imagery",
+      "title": "Two icon registers in one grid",
+      "what_it_is": "Two visually incompatible kinds of mark used side by side in the same set of cards — for instance colour emoji next to monochrome geometric glyphs, or two icon libraries on one page.",
+      "why_it_matters": "This is worse than either register alone, because it proves nobody looked at the finished grid. A viewer cannot name it, but the row reads as assembled rather than designed. Gesso and Hallmark both fail two icon libraries on one page; the corpus caught this exact defect in its own generator.",
+      "source": {
+        "name": "research_08a",
+        "confidence": "MEASURED_HERE",
+        "where": "P2 / R8: 'the emitted pages mix emoji (writing hand, scales, umbrella) with geometric marks (clock, crosshair, bars) in the same grid'"
+      },
+      "also_in": [
+        {
+          "name": "hallmark",
+          "where": "gate 30, second clause: two icon libraries on one page"
+        }
+      ],
+      "detector": {
+        "kind": "dom_repeated_siblings",
+        "mode": "icon_register",
+        "min_count": 3
+      },
+      "threshold": "Within one repeated card/list set of 3 or more items, icon slots drawn from more than one register, where a register is one of: colour emoji, monochrome Unicode geometry, inline SVG, icon-font glyph, `<img>`.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "fail",
+      "fix": "Pick one register and validate every icon against it at build time. An allow-list of permitted glyphs is about six lines of code and closes this permanently.",
+      "teach": "Icons on a page should all look like they were drawn by the same hand. Mixing colourful emoji with plain geometric symbols in one row is the visual equivalent of mixing two handwritings in one sentence — most people cannot say what is wrong, but everyone sees that something is.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 13,
+        "note": "Every page mixes colour emoji with the geometric glyphs clock / crosshair / bars in the same bento grid."
+      }
+    },
+    {
+      "id": "T1-UNIFORM-CARDS",
+      "tier": 1,
+      "category": "layout",
+      "title": "Identical icon-topped cards as the page structure",
+      "what_it_is": "Three or more cards of the same size, each an icon above a heading above a short paragraph, laid out in an even grid.",
+      "why_it_matters": "The tell is UNIFORMITY, not the number three — four identical cards is the same page. It also misrepresents most businesses: a plumber's emergency callout is the money and drain cleaning is not, so equal cards are commercially wrong as well as visually generic.",
+      "source": {
+        "name": "krebs",
+        "confidence": "DEMONSTRATED",
+        "where": "counted across 1,590 pages; Gesso rule `icon-topped-feature-card`; Hallmark",
+        "quote": "AI tends to spit out a bullet point list of features, then puts them in a grid of rounded rects."
+      },
+      "also_in": [
+        {
+          "name": "impeccable",
+          "where": "craft-floor.md, Refuse / Page scaffolds: 'Same-size cards of icon plus heading plus text as the page structure. Cards are the lazy container; nested cards are always wrong.'"
+        }
+      ],
+      "confidence_note": "The tell is DEMONSTRATED. The FIXES are ASSERTED — no source tested whether unequal card weight actually converts better, only that it is more truthful about the business.",
+      "detector": {
+        "kind": "dom_repeated_siblings",
+        "mode": "icon_heading_text",
+        "min_count": 3
+      },
+      "threshold": ">= 3 sibling elements sharing the same tag and class list, each containing an icon-position element followed by a heading followed by a paragraph, all occupying equal grid tracks.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Give them unequal weight. Make the one that earns the money twice the size, drop the icons, and let the others be a plain list. Less work and more honest about the business.",
+      "teach": "A row of identical boxes says every one of these things matters exactly the same amount, which is almost never true. Decide which one actually brings in the money and make it bigger. The page gets more useful and less generic in the same edit.",
+      "chess": "Equal cards are like giving every piece the same value in your notes. The board does not work that way, and neither does a business.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 13,
+        "note": "5 to 9 identical `article.card` siblings per page, every one an icon-plus-h3-plus-p in an equal bento track."
+      }
+    },
+    {
+      "id": "T1-HSCROLL",
+      "tier": 1,
+      "category": "responsive",
+      "title": "The page scrolls sideways",
+      "what_it_is": "At some viewport width the document is wider than the window, so the page can be dragged left and right.",
+      "why_it_matters": "It reads as BROKEN, not as cheap, which is worse. And it is measurable rather than arguable: compare `document.scrollWidth` against `window.innerWidth` at each width.",
+      "source": {
+        "name": "hallmark",
+        "confidence": "DEMONSTRATED",
+        "where": "responsive gates"
+      },
+      "also_in": [
+        {
+          "name": "chess_tee_forge",
+          "where": "DESIGN-SYSTEM.md §7: 'No horizontal overflow: document.scrollWidth === window.innerWidth at 414px and at 1440px'",
+          "note": "the measured form of the same check, run in-browser rather than asserted"
+        }
+      ],
+      "detector": {
+        "kind": "browser",
+        "what": "document.scrollWidth > window.innerWidth",
+        "widths": [
+          320,
+          375,
+          414,
+          768,
+          1024,
+          1440,
+          1920
+        ]
+      },
+      "threshold": "`document.scrollWidth` exceeds `window.innerWidth` by more than 1 CSS pixel at any of 320 / 375 / 414 / 768 / 1024 / 1440 / 1920.",
+      "threshold_provenance": "from_source",
+      "severity": "fail",
+      "fix": "First find the element that is too wide — it is usually an image without `max-width`, a grid track that is `1fr` instead of `minmax(0, 1fr)` (see F-BARE-1FR), or a long unbroken word. Then set `overflow-x: clip` on both `html` and `body` as a belt — `clip`, never `hidden`.",
+      "teach": "A page should only ever scroll up and down. If it also slides sideways, something on it is wider than the phone, and to anyone looking it simply looks broken. This one is measured rather than judged: the tool compares how wide the page is against how wide the screen is, at seven widths.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": null,
+        "hits_total": null,
+        "note": "NOT RUN. Needs a real browser. Playwright is an optional peer dependency of this kit; without it this check reports `not_run` rather than guessing. What CAN be said statically is that 13 of 13 pages ship neither `overflow-x: clip` nor `minmax(0,1fr)` — see F-OVERFLOW-CLIP and F-BARE-1FR."
+      }
+    },
+    {
+      "id": "T1-BUTTON-WRAP",
+      "tier": 1,
+      "category": "responsive",
+      "title": "A button label wrapping to two lines",
+      "what_it_is": "The text inside a button or a link-styled-as-a-button breaks onto a second line at some width.",
+      "why_it_matters": "Same family as sideways scroll: it reads as a fault rather than as a style. And the primary call-to-action is the one element on a local business page that has to survive every width, because tapping it is the entire point.",
+      "source": {
+        "name": "hallmark",
+        "confidence": "DEMONSTRATED",
+        "where": "responsive gates; research/08 §5.2 'The label must never wrap to two lines. At any width.'"
+      },
+      "detector": {
+        "kind": "browser",
+        "what": "clientRects().length > 1 on button/a.btn text",
+        "widths": [
+          320,
+          375,
+          414,
+          768
+        ]
+      },
+      "threshold": "Any element matching `button, [role=button], a[class*=btn]` whose text node occupies more than one client rect at 320 / 375 / 414 / 768.",
+      "threshold_provenance": "from_source",
+      "severity": "fail",
+      "fix": "Shorten the label first. `white-space: nowrap` is the second choice, not the first — it hides the problem rather than solving it, and can then push the button off the screen.",
+      "teach": "If the words inside a button spill onto a second line, the button stops looking like a button. Shorten the words. 'Call us' beats 'Get in touch with our team today' on a phone, and it is also the truer instruction.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": null,
+        "hits_total": null,
+        "note": "NOT RUN — needs a browser. Statically: the primary CTA is a two-line button BY DESIGN (`display:inline-flex; flex-direction:column`, label above a phone number). That is a deliberate stack, not a wrap, and this detector must not confuse the two — which is exactly why it is a rendered check and not a regex."
+      }
+    },
+    {
+      "id": "T1-PLACEHOLDER-SRC",
+      "tier": 1,
+      "category": "imagery",
+      "title": "A placeholder image service in a shipped page",
+      "what_it_is": "An `<img>` whose `src` points at pravatar, picsum, placehold.co, via.placeholder, dummyimage, loremflickr, or an empty/`#` src.",
+      "why_it_matters": "It is an auto-fail in the corpus and it is unambiguous: a placeholder in a shipped page means the page was never finished. It also makes a network request to a third party from a page that claims to make none.",
+      "source": {
+        "name": "research_08",
+        "confidence": "DEMONSTRATED",
+        "where": "§8.6: 'alt is mandatory; empty or placeholder src (pravatar, picsum) is an auto-fail'"
+      },
+      "detector": {
+        "kind": "html_attr",
+        "tag": "img",
+        "attr": "src",
+        "mode": "forbidden",
+        "value_pattern": "pravatar|picsum|placehold|placeimg|dummyimage|loremflickr|unsplash\\.it|^\\s*$|^#$"
+      },
+      "threshold": "Any `<img src>` matching a known placeholder host, or empty, or `#`.",
+      "threshold_provenance": "from_source",
+      "severity": "fail",
+      "fix": "Use a real photograph of the real thing, or remove the image and the block around it. A labelled empty space is honest; a stranger's face is not.",
+      "teach": "Placeholder image services hand you a random stock face or a grey rectangle so you can see the layout while building. Shipping one means a visitor is looking at a stranger and being told it is you. If you have no photo yet, delete the image and say so in words.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "Zero hits because there are zero images at all — see T1-NO-IMAGES. A clean pass here is not a good sign; it is the absence of the thing being checked."
+      }
+    },
+    {
+      "id": "T1-STOCK-PEOPLE",
+      "tier": 1,
+      "category": "imagery",
+      "title": "Generated or stock people",
+      "what_it_is": "Photographs of people who are not the business's actual people: AI-generated faces, or stock library portraits. The generated kind shows waxy poreless skin, mismatched earrings, bad hands, garbled background signage, and the same mid-twenties face recurring.",
+      "why_it_matters": "The corpus's sharpest line on this is about near-misses: a generic barbershop photo is CLOSE ENOUGH to his barbershop to invite comparison and lose it. Near-miss specificity reads as deception; total abstraction reads as design. The one person best equipped to spot the fake is the owner you are showing it to.",
+      "source": {
+        "name": "febbhav",
+        "confidence": "ASSERTED",
+        "where": "Part II, ~25 catalogued tells"
+      },
+      "confidence_note": "febbhav catalogues rather than demonstrates. And febbhav ITSELF records this tell decaying: human detection accuracy on uncanny generated faces is now around 62%, barely above a coin flip. The visual tells are going away. The argument that survives is not 'it looks fake' but 'it is not his shop' — which does not decay at all.",
+      "decay": {
+        "status": "decaying",
+        "evidence": "febbhav: uncanny-face detection at ~62% human accuracy, barely above chance."
+      },
+      "detector": {
+        "kind": "manual",
+        "what": "Whether the people in the photographs are the business's actual people",
+        "needs": "A human, or the person who took the photograph. No automated check is honest here.",
+        "heuristic": "An `<img src>` matching /unsplash|pexels|shutterstock|istock|gettyimages|thispersondoesnotexist|generated/ is reported as evidence, not as proof."
+      },
+      "threshold": "Reported, not gated. The tool surfaces every photograph of a person and asks one question: did you take this photograph of these people?",
+      "threshold_provenance": "arithmetic",
+      "severity": "warn",
+      "fix": "One real photograph of that shopfront or those people, taken on a phone, tightly cropped, biased left or right rather than centred, desaturated about 8% to sit with the page. Or no people at all. Never a library photo of someone else's version of the same business.",
+      "teach": "A stock photo of a barbershop shown to a barber is not neutral — he knows what his own shop looks like, and yours is not it. A slightly-wrong picture is worse than no picture, because it invites the comparison and loses it. Take one photo on your phone, or show none.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": null,
+        "hits_total": null,
+        "note": "Zero images of any kind."
+      }
+    },
+    {
+      "id": "T1-NO-IMAGES",
+      "tier": 1,
+      "category": "imagery",
+      "title": "No photographs at all",
+      "what_it_is": "The page contains zero `<img>` elements and no meaningful CSS background photography.",
+      "why_it_matters": "Zero images is itself a signal that nobody visited. On a page whose whole claim is 'I looked at your business', the absence of any picture of that business is the loudest possible contradiction. The corpus caught this in its own output and called it out by name.",
+      "source": {
+        "name": "research_08",
+        "confidence": "MEASURED_HERE",
+        "where": "§5.5: 'all 13 previews contain zero <img> tags... Zero images is itself a signal that nobody visited.'"
+      },
+      "also_in": [
+        {
+          "name": "research_11a",
+          "where": "§1.5: 'the man whose entire differentiator is that he is a person is invisible on his own site'"
+        }
+      ],
+      "detector": {
+        "kind": "html_tag",
+        "tag": "img",
+        "mode": "min_count",
+        "min": 1
+      },
+      "threshold": "Zero `<img>` elements, counting `<picture><img>` but not counting decorative inline SVG or the grain texture.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "One photograph. Maximum one, if the page must be a single self-contained file — a 1200px-wide WebP encoded into the page costs 40-80 KB, comparable to an entire font budget, and two or three push the page past half a megabyte. Make it the storefront, or the person.",
+      "teach": "A page about a real place with no picture of that place reads as a form letter. One photograph, taken on your phone, does more for believability than every other item on this list combined — and it is the one thing on the page the owner can verify is true.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 13,
+        "note": "13 of 13. Re-measured 2026-09-17, confirming research/08 §5.5."
+      }
+    },
+    {
+      "id": "T1-FAKE-CHROME",
+      "tier": 1,
+      "category": "layout",
+      "title": "A drawn browser window, phone frame or terminal",
+      "what_it_is": "A decorative mock-up of a browser (three coloured dots and an address bar), a phone bezel, or a terminal window, drawn in HTML around a screenshot or some text.",
+      "why_it_matters": "The corpus's image for this is exact: the user already has the chrome. Redrawing it inside the page is like printing a photograph of a picture frame inside a real picture frame. On a phone it also eats horizontal space that the actual content needs.",
+      "source": {
+        "name": "hallmark",
+        "confidence": "DEMONSTRATED",
+        "where": "gate 47",
+        "quote": "The user already has the chrome... Redrawing it in a page is like printing a photograph of a picture frame inside a real picture frame."
+      },
+      "also_in": [
+        {
+          "name": "febbhav",
+          "where": "tell #32"
+        }
+      ],
+      "detector": {
+        "kind": "css_regex",
+        "pattern": "(?:traffic-light|browser-chrome|window-controls|fake-browser|mac-?dots|terminal-header|device-frame|phone-frame|mockup-bar)",
+        "flags": "i"
+      },
+      "threshold": "A class name or id matching the known chrome-mockup vocabulary, or three circular elements of ~12px sitting in a row above a bordered content box. The class-name form is what this detector tests; the geometric form needs a render.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "warn",
+      "fix": "Show the screenshot on its own with a hairline border. If the point is 'this is a website', the visitor already knows — they are on one.",
+      "teach": "Drawing a fake browser window around a picture is a habit borrowed from software marketing. It wastes width on a phone and tells the viewer nothing they did not already know. Show the picture; skip the frame.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    }
+  ]
+}

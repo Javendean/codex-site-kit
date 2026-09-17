@@ -1,0 +1,11 @@
+node_modules/
+*.log
+.DS_Store
+test/.tmp/
+coverage/
+
+# The variety ledger is per-machine state, not source. It records which page
+# shapes were emitted last so the next scaffold can differ from them; committing
+# it would make every clone believe it had already built those sites.
+.codex-site-kit/
+variety-ledger.json

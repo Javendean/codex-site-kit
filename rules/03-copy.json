@@ -1,0 +1,450 @@
+{
+  "$comment": "TIER 3 — the words. research/08 §4 says this tier 'for this audience may matter most of all', and the corpus's single most useful sentence is here: 'Search your meeting notes' beats 'Unlock your knowledge' because it can be true. Every rule in this file is a way of asking one question — can this sentence be true or false?",
+  "tier": 3,
+  "rules": [
+    {
+      "id": "W-FALSIFIABILITY",
+      "tier": 3,
+      "category": "copy",
+      "title": "A sentence that cannot be true or false",
+      "what_it_is": "A claim with no checkable content. 'Quality service you can trust.' 'Excellence in everything we do.' 'Your partner in success.'",
+      "why_it_matters": "This is the governing rule of the whole corpus, not a copy tip. The test is one question: can this sentence be true or false? 'Quality service you can trust' cannot be. 'We open at 7 so you can get a cut before work' can. Every claim on the page should be falsifiable BY THE OWNER, because he is the reader — and for this audience, 'bespoke' does not mean aesthetically unique, it means 'this person looked at MY business'. That is a content property. No amount of palette variation produces it; a single specific fact does.",
+      "source": {
+        "name": "gesso",
+        "confidence": "ASSERTED",
+        "where": "quoted in research/08 §5.3 as the single most useful sentence found in the entire sweep",
+        "quote": "'Search your meeting notes' beats 'Unlock your knowledge' because it can be true."
+      },
+      "also_in": [
+        {
+          "name": "research_11",
+          "where": "§8.5, where it is applied to a real headline and catches it being false for at least 523 of the 1,184 cases it describes"
+        }
+      ],
+      "confidence_note": "This is a principle, not a measurement. Nobody tested whether falsifiable copy converts better. What the corpus DOES demonstrate is the downside: it caught its own proposed headline being untrue and traced exactly which 523 rows refuted it.",
+      "detector": {
+        "kind": "manual",
+        "what": "Whether each headline and subheading states something that could be shown to be false",
+        "needs": "A reading pass. The tool lists every heading and lede on the page and asks the question once per sentence.",
+        "heuristic": "Sentences containing no proper noun, no number, no time, no place and no named service are surfaced first."
+      },
+      "threshold": "Reported, not gated. Every heading and lede is listed with the question attached. Sentences with no concrete anchor at all are surfaced at the top of the list.",
+      "threshold_provenance": "arithmetic",
+      "severity": "warn",
+      "fix": "Replace the claim with a fact the owner could confirm or deny. Opening times, a neighbourhood, a licence number, the makes of car serviced, what to bring to an appointment, the after-hours policy. Each is concrete, each is checkable, and each is more persuasive than an adjective.",
+      "teach": "Ask of every sentence on the page: could someone prove this wrong? 'We deliver excellence' cannot be proven wrong, which is why it means nothing. 'We open at 7' can, which is why it is worth reading. The sentences that could be wrong are the only ones doing any work.",
+      "chess": "An annotation that says 'White stands better' teaches nothing. 'White stands better because the knight on d5 cannot be dislodged' can be checked, argued with, and learned from.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": null,
+        "hits_total": null,
+        "note": "NOT RUN over this corpus: this detector needs a live render or a person."
+      }
+    },
+    {
+      "id": "W-BENEFIT-SPEAK",
+      "tier": 3,
+      "category": "copy",
+      "title": "Benefit-speak",
+      "what_it_is": "A specific lexicon: elevate, supercharge, streamline, empower, effortless, seamless, revolutionize, game-changer, world-class, next-level, unleash, turbocharge, and 'unlock the/your/a/new'.",
+      "why_it_matters": "It is a published gate with a named word list, which makes it one of the few copy rules that is genuinely executable. Every one of these words describes an effect on the reader rather than a thing the business does, so none of them can be checked.",
+      "source": {
+        "name": "gesso",
+        "confidence": "DEMONSTRATED",
+        "where": "rule `benefit-speak` (GATE)"
+      },
+      "detector": {
+        "kind": "text_lexicon",
+        "scope": "visible",
+        "terms": [
+          "elevate",
+          "elevating",
+          "supercharge",
+          "supercharged",
+          "streamline",
+          "streamlined",
+          "streamlining",
+          "empower",
+          "empowering",
+          "effortless",
+          "effortlessly",
+          "seamless",
+          "seamlessly",
+          "revolutionize",
+          "revolutionise",
+          "revolutionary",
+          "game-changer",
+          "game changer",
+          "game-changing",
+          "world-class",
+          "next-level",
+          "next level",
+          "unleash",
+          "unleashing",
+          "turbocharge",
+          "cutting-edge",
+          "best-in-class",
+          "transformative"
+        ],
+        "patterns": [
+          "\\bunlock (?:the|your|a|new)\\b"
+        ],
+        "spare_patterns": [
+          "unlock with (?:face|touch) id",
+          "unlock (?:your )?(?:phone|device|screen|door)"
+        ],
+        "min_count": 1
+      },
+      "threshold": "One or more lexicon terms in visible copy. Functional uses are spared — 'Unlock with Face ID' is an instruction, not a claim.",
+      "threshold_provenance": "from_source",
+      "severity": "fail",
+      "fix": "Replace each one with the thing it is standing in for. 'Streamline your accounts' probably means 'we file your quarterly return'. Say that.",
+      "teach": "These words all describe how the reader is supposed to feel rather than what actually happens. They are also the exact words that show up on every machine-written page, so they now read as filler even to people who could not explain why. Swap each one for the concrete thing it was hiding.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "A genuine pass, and a real credit to the copy generator. The copy is plain: 'Assistance with green cards, family immigration, federal appeals, and bail.' That sentence can be checked."
+      }
+    },
+    {
+      "id": "W-NOT-X-BUT-Y",
+      "tier": 3,
+      "category": "copy",
+      "title": "The 'not just X, it's Y' cadence",
+      "what_it_is": "A sentence built on a contrast that is not really a contrast: 'Not just a haircut — an experience.' 'More than a website. A partnership.'",
+      "why_it_matters": "Named in the corpus as the single most recognised generated-copy cadence: contrast as a tic. It promises that the second half is more valuable than the first, and the second half is always the vaguer of the two.",
+      "source": {
+        "name": "gesso",
+        "confidence": "DEMONSTRATED",
+        "where": "rule `not-x-but-y-cadence`",
+        "quote": "the single most recognized generated-copy cadence: contrast as a tic"
+      },
+      "detector": {
+        "kind": "text_regex",
+        "pattern": "\\b(?:not just|more than just|it'?s not (?:just )?(?:a|an|about)|isn'?t just)\\b[^.!?]{3,60}[—–\\-,.][^.!?]{3,60}",
+        "flags": "gi"
+      },
+      "threshold": "A sentence opening with 'not just', 'more than just', \"it's not (just) a/an/about\" or \"isn't just\", followed by a contrasting clause.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Delete the first half. Whatever the second half claims, say it directly — and then check it against the falsifiability test, because the second half is usually the unfalsifiable one.",
+      "teach": "This sentence shape sounds like it is making a point, but it works by dismissing something concrete in favour of something vague. Say the concrete thing and stop.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "W-EM-DASH",
+      "tier": 3,
+      "category": "copy",
+      "title": "An em dash in short interface copy",
+      "what_it_is": "A single long dash (—) inside a heading, button, card or label.",
+      "why_it_matters": "It is the most-cited written tell there is, and its detector is one of the cleanest in the corpus: a single U+2014 in visible copy, with unspaced ranges spared.",
+      "source": {
+        "name": "gesso",
+        "confidence": "DEMONSTRATED",
+        "where": "rule `em-dash-copy`. Auto-fix replaces it with a comma."
+      },
+      "detector": {
+        "kind": "text_regex",
+        "pattern": "—",
+        "flags": "g",
+        "scope": "short_ui_copy",
+        "spare_patterns": [
+          "\\w—\\w",
+          "\\d—\\d",
+          "(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)—"
+        ],
+        "max_block_chars": 140
+      },
+      "threshold": "A U+2014 EM DASH in a visible text block of 140 characters or fewer. Unspaced ranges (Mon—Fri, 9—5) are spared: that is a range, not a rhetorical pause.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "A comma, a full stop, or two sentences. In long-form prose the em dash is fine; in a button label or a card heading it is a tell.",
+      "teach": "The long dash has become the single most recognised sign of machine-written text, particularly in short phrases where a comma would do. Long prose can carry it. A four-word heading cannot.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "CORRECTED BY THE RUN. Written as firing 13/13 on the page title. It does not, and that is right: the three em dashes per page are in the `<title>` element and inside CSS comments, neither of which is visible UI copy. The detector scopes to rendered text blocks of 140 characters or fewer. A rule that fires on a document title would be noise."
+      }
+    },
+    {
+      "id": "W-FABRICATED-PRECISION",
+      "tier": 3,
+      "category": "copy",
+      "title": "Fabricated precision",
+      "what_it_is": "Numbers chosen because they sound authoritative: 99.9%, 99.99%, 10x, 100x, '#1', 'trusted by 10,000+'.",
+      "why_it_matters": "A precise number invites checking. A precise number that is invented fails the check. And on a page for a small business the reader is usually the owner, who knows exactly how many customers he has.",
+      "source": {
+        "name": "gesso",
+        "confidence": "DEMONSTRATED",
+        "where": "rules `fabricated-precision` and `oversized-number`"
+      },
+      "detector": {
+        "kind": "text_regex",
+        "pattern": "\\b99\\.9{1,2}%|\\b\\d{1,3}x\\b|#1\\b|\\btrusted by (?:over )?\\d{1,3},?\\d{3}\\+?|\\b\\d{1,3},000\\+\\b|\\b(?:thousands|millions) of (?:customers|clients|businesses|users)\\b",
+        "flags": "gi"
+      },
+      "threshold": "Any of: a 99.9-class uptime figure, an Nx multiplier, '#1', 'trusted by' followed by a round crowd number, an un-abbreviated figure of 10,000 or more, or a vague plural crowd claim.",
+      "threshold_provenance": "from_source",
+      "severity": "fail",
+      "fix": "Delete it, or replace it with the real number and say where it came from and when it was measured. If the real number is small, the small number is more persuasive than the round one, because it is checkable.",
+      "teach": "Numbers are the most persuasive thing you can put on a page and the easiest thing to be caught on. A round impressive figure that nobody can trace is worse than no figure — it teaches the reader that you do not check things, and once they have learned that they discount everything else.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "CORRECTED BY THE RUN. Written as firing on the datedness score; it does not, and should not. '51/100' is a real computed number, not a fabricated round one, so it correctly escapes this lexicon and is caught by H-UNSOURCED-METRIC instead. The distinction is the point: this rule is about numbers chosen to sound authoritative, not about numbers lacking a method."
+      }
+    },
+    {
+      "id": "W-BANNED-STAT-94",
+      "tier": 3,
+      "category": "copy",
+      "title": "The 94% first-impressions statistic",
+      "what_it_is": "The claim that 94% of first impressions are design-related, attributed to Stanford.",
+      "why_it_matters": "It is a documented misattribution and it is the one statistic you would reach for first. Stanford's Web Credibility Project found 46.1% of consumers assessed credibility partly on visual design. The 94% comes from a different study measuring what participants gave FEEDBACK about — a completely different claim. A prospect who Googles your statistic and finds it wrong has learned you do not check things, and in a trust sale that is fatal.",
+      "source": {
+        "name": "research_04",
+        "confidence": "DEMONSTRATED",
+        "where": "§2 STATISTIC INTEGRITY WARNING"
+      },
+      "also_in": [
+        {
+          "name": "research_11",
+          "where": "§8.3 item 13, where it is banned again"
+        }
+      ],
+      "detector": {
+        "kind": "text_regex",
+        "pattern": "9[47]%[^.]{0,80}(?:first impression|design)|(?:first impression|design)[^.]{0,80}9[47]%|97%[^.]{0,60}19,?000 participants",
+        "flags": "gi"
+      },
+      "threshold": "A 94% or 97% figure within 80 characters of 'first impression' or 'design'. The 2026 '97%, 19,000 participants, 16 countries' variant has no corroboration anywhere and appears only on content-aggregator pages; treat it as fabricated.",
+      "threshold_provenance": "from_source",
+      "severity": "fail",
+      "fix": "Cite Lindgaard et al. 2006 — 'Attention web designers: You have 50 milliseconds to make a good first impression!', Behaviour & Information Technology 25(2), 115-126, three experiments, around 1,068 citations. Or cite the real Stanford figure of 46.1%. Or cite nothing.",
+      "teach": "There is a famous statistic about design and first impressions that is quoted everywhere and is wrong — the real number from that study is about half as big, and the 94% comes from a different study asking a different question. Using it is a test you will fail in front of the one person most likely to check.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "W-RULE-OF-THREE",
+      "tier": 3,
+      "category": "copy",
+      "title": "Every list is exactly three items",
+      "what_it_is": "Multiple lists on the page, each with exactly three items.",
+      "why_it_matters": "Three is the length a generator produces because three looks balanced, not because the business has three of something. It is the copy equivalent of three identical cards, and the tell is the same: uniformity across the page, not the number itself.",
+      "source": {
+        "name": "research_08",
+        "confidence": "ASSERTED",
+        "where": "§4 Tier 3 structural tells, from HN `zahlman`"
+      },
+      "confidence_note": "A forum observation, not a study. It is `info` for that reason. A page with one three-item list is not suspicious; a page where every list has exactly three items was assembled.",
+      "detector": {
+        "kind": "text_measure",
+        "what": "list_item_counts",
+        "min_lists": 3,
+        "require_all_equal": 3
+      },
+      "threshold": "3 or more lists on the page, all of exactly 3 items.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "info",
+      "fix": "Let each list be as long as the truth. Four services is four items. One service is one item and a sentence.",
+      "teach": "Lists of three look tidy, so machines produce them constantly. Businesses rarely have exactly three of everything. Let the number of items be the real number — the raggedness is a sign a person wrote it.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "Service counts vary genuinely: 3, 4, 5, 6 and 7 across the corpus. The generator gets this right because the counts come from real scraped data."
+      }
+    },
+    {
+      "id": "W-CATEGORY-MISMATCH",
+      "tier": 3,
+      "category": "copy",
+      "title": "Items that do not belong in the same list",
+      "what_it_is": "A list whose entries are not the same kind of thing — a service, a feeling, and a guarantee sitting as three bullets under one heading.",
+      "why_it_matters": "The corpus describes this as a genuinely useful detector seen nowhere else. A person writing a list keeps the items parallel without thinking about it; a machine filling a list of three does not.",
+      "source": {
+        "name": "research_08",
+        "confidence": "ASSERTED",
+        "where": "§4 Tier 3, from HN `zahlman`",
+        "quote": "items that don't all seem to belong in the same natural category"
+      },
+      "confidence_note": "A single forum observation with no method behind it. No automated detector is honest here — the judgement is semantic. It is listed so a human reviewing the report is prompted to make it.",
+      "detector": {
+        "kind": "manual",
+        "what": "Whether every item in each list is the same kind of thing",
+        "needs": "A reading pass. The tool prints each list with its items numbered and asks the question."
+      },
+      "threshold": "Reported, not gated.",
+      "threshold_provenance": "arithmetic",
+      "severity": "info",
+      "fix": "Make the items parallel — all services, or all outcomes, or all steps — or split them into two lists with two headings.",
+      "teach": "When you write a list yourself, the items naturally end up being the same sort of thing. When a list is filled to reach a nice round number, one item is usually a different sort of thing from the others, and the reader senses the seam without spotting it.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": null,
+        "hits_total": null,
+        "note": "NOT RUN over this corpus: this detector needs a live render or a person."
+      }
+    },
+    {
+      "id": "W-STALE-COPYRIGHT",
+      "tier": 3,
+      "category": "copy",
+      "title": "An out-of-date copyright year",
+      "what_it_is": "A footer copyright line naming a year earlier than the current one.",
+      "why_it_matters": "Named in the corpus as the single cheapest, most legible signal that a site is abandoned. It costs nothing to check and nothing to fix, and it is the first thing a suspicious visitor looks at.",
+      "source": {
+        "name": "research_04",
+        "confidence": "DEMONSTRATED",
+        "where": "§4 What reads as DATED: 'Outdated copyright year in the footer — the single cheapest, most legible signal'"
+      },
+      "detector": {
+        "kind": "text_regex",
+        "pattern": "(?:©|&copy;|\\(c\\)|copyright)\\s*(?:19|20)(\\d{2})",
+        "flags": "gi",
+        "compare": "year_lt_current"
+      },
+      "threshold": "A copyright year earlier than the current year. A year RANGE ending in the current year passes.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Render the year from the build date rather than typing it. One line at build time and it can never go stale.",
+      "teach": "A copyright line with last year's date is the clearest possible sign that nobody has touched the site since. Generate the year rather than typing it, so it can never be wrong.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "No copyright line at all, which cannot be stale. Deliberate on these pages — they are unofficial concepts and claim no rights."
+      }
+    },
+    {
+      "id": "W-PLACEHOLDER-TEXT",
+      "tier": 3,
+      "category": "copy",
+      "title": "Placeholder text shipped",
+      "what_it_is": "Lorem ipsum, 'Your text here', 'TODO', 'FIXME', 'Insert description', or a bracketed template slot like [Business Name].",
+      "why_it_matters": "It means the page was never read end to end before it was shown to someone. On a page for a specific business, a visible template slot is the exact accusation being defended against.",
+      "source": {
+        "name": "chess_tee_forge",
+        "confidence": "DEMONSTRATED",
+        "where": "DESIGN-SYSTEM.md §1, where an intentional placeholder is a DESIGN — a dashed box labelled as unfilled — precisely so that an unintentional one is visible"
+      },
+      "detector": {
+        "kind": "text_regex",
+        "pattern": "lorem ipsum|dolor sit amet|your (?:text|title|headline|content) here|\\bTODO\\b|\\bFIXME\\b|\\bXXX\\b|insert (?:description|text|name)|\\[(?:business|company|client|name|city)[^\\]]*\\]|\\{\\{[^}]+\\}\\}",
+        "flags": "gi"
+      },
+      "threshold": "Any of those strings in visible copy.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "fail",
+      "fix": "Fill it, or delete the block. If the information genuinely is not available yet, make the gap deliberate and labelled — a visible 'your Google rating goes here' block is a conversation opener and proves you did not invent one.",
+      "teach": "There is a big difference between a gap you meant to leave and a gap you forgot. A deliberate gap, clearly labelled, is honest and gives the owner something to do. Filler text that nobody replaced says the page was never finished.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "W-WEASEL-TRUST",
+      "tier": 3,
+      "category": "copy",
+      "title": "Unearned trust language",
+      "what_it_is": "Phrases claiming trust, reputation or reliability with nothing behind them: 'trusted by', 'industry-leading', 'award-winning', 'proven track record', 'we pride ourselves on'.",
+      "why_it_matters": "These are claims, and a claim with no evidence attached is worse than no claim. The corpus is direct about the mechanism for this audience: the buyer's live fear is abandonment and fraud, not ugliness. Unsupported trust language reads as the shape of the thing they have been warned about.",
+      "source": {
+        "name": "hallmark",
+        "confidence": "ASSERTED",
+        "where": "gate 46: any metric the client did not supply",
+        "quote": "The number-shaped hole is honest; the fabricated number is slop."
+      },
+      "also_in": [
+        {
+          "name": "research_08",
+          "where": "§5.3: 'Never fabricate proof... For a concept site the honest hole is an advantage.'"
+        }
+      ],
+      "confidence_note": "The lexicon here is this rulebook's, assembled from the corpus's arguments about fabricated proof rather than published as a list by any source. The gate it is derived from (Hallmark 46, any metric the client did not supply) is narrower than the phrase list. The adjacent survey finding is real and relevant: 97% of 1,002 US adults read reviews and 47% will not use a business with fewer than 20 -- this audience checks proof, which is why unsupported claims cost.",
+      "detector": {
+        "kind": "text_lexicon",
+        "scope": "visible",
+        "terms": [
+          "trusted by",
+          "industry-leading",
+          "industry leader",
+          "award-winning",
+          "proven track record",
+          "we pride ourselves",
+          "second to none",
+          "unparalleled",
+          "premier",
+          "the gold standard"
+        ],
+        "min_count": 1
+      },
+      "threshold": "Any of those phrases in visible copy, unless an adjacent element supplies the specific award, the specific client, or the specific measurement.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "warn",
+      "fix": "Name the award and the year, or name the clients with their permission, or delete the sentence. A licence number, a years-in-business figure you can prove, or an opening time are all checkable and do the same job better.",
+      "teach": "Words like 'trusted' and 'award-winning' are claims about the world, and a reader who cannot check them treats them as noise at best and as a warning sign at worst. One specific verifiable fact — a licence number, the year the shop opened — outperforms a paragraph of them.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "W-PROSE-AS-BULLETS",
+      "tier": 3,
+      "category": "copy",
+      "title": "Prose broken into bullets",
+      "what_it_is": "A list whose items are full sentences that read as a paragraph chopped up, rather than as parallel items.",
+      "why_it_matters": "A named structural tell. Bulleting prose makes it look organised without making it clearer, and it is what a generator does when asked to summarise.",
+      "source": {
+        "name": "research_08",
+        "confidence": "ASSERTED",
+        "where": "§4 Tier 3 structural tells, from HN `zahlman`"
+      },
+      "confidence_note": "A forum observation. The detector below is a crude proxy — sentence length and terminal punctuation — and will have false positives on genuinely long list items.",
+      "detector": {
+        "kind": "text_measure",
+        "what": "list_item_prose",
+        "min_avg_chars": 120,
+        "min_items": 3,
+        "require_terminal_punctuation": true
+      },
+      "threshold": "A list of 3 or more items averaging over 120 characters each and ending in full stops.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "info",
+      "fix": "If it is a paragraph, set it as a paragraph. If it is a list, cut each item to a phrase.",
+      "teach": "Bullet points work when each one is short and the items are comparable. Full sentences with full stops are a paragraph wearing a costume, and they are harder to read as a list than they would have been as prose.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    }
+  ]
+}

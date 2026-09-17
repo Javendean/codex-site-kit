@@ -1,0 +1,313 @@
+{
+  "$comment": "MATERIAL — texture, images and the things that give a page physical quality in code. research/11 §4 has measured costs for all of it, and the headline finding is that the cheapest technique is also the most valuable: static grain costs 570 bytes, rasterises once, and measures ZERO cost during scroll.",
+  "tier": "craft",
+  "rules": [
+    {
+      "id": "MAT-GRAIN-LIVE-FILTER",
+      "tier": "craft",
+      "category": "material",
+      "title": "Grain applied as a live filter rather than a tile",
+      "what_it_is": "`feTurbulence` used as a running CSS `filter` across a large area, or an animated `baseFrequency`.",
+      "why_it_matters": "`feTurbulence` rasterisation is genuinely expensive. As a small tiled background image it rasterises once and then costs nothing; as a live full-viewport filter it is recomputed. The measured numbers: 128px tile 88.3ms to first paint, 200px 96.6ms, 400px 130.1ms against a 25.6ms no-grain control — and then ZERO cost during scroll, with frame times identical to the control.",
+      "source": {
+        "name": "research_11",
+        "confidence": "MEASURED_HERE",
+        "where": "§4.1, with the full cost table; technique from CSS-Tricks Grainy Gradients"
+      },
+      "also_in": [
+        {
+          "name": "css_tricks_grain",
+          "where": "the verified recipe, in which stitchTiles='stitch' is the part that makes it tile seamlessly"
+        }
+      ],
+      "detector": {
+        "kind": "css_regex",
+        "pattern": "filter\\s*:\\s*url\\([^)]*turbulence|animation[^;]*baseFrequency",
+        "flags": "i"
+      },
+      "threshold": "`feTurbulence` referenced from a `filter` property rather than from `background-image`, or a `baseFrequency` that is animated.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Serve it as a tiled data URI background instead, and put it over the hero only, never the whole page — the cost scales with rasterised area.",
+      "fix_code": ".grain::after {\n  content: \"\"; position: absolute; inset: 0;\n  pointer-events: none; opacity: .05;\n  background-image: url(\"data:image/svg+xml,...feTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='2' stitchTiles='stitch'...\");\n  background-repeat: repeat;  /* a 160px tile, NOT a full-viewport filter */\n}",
+      "teach": "A fine grain over a page is one of the cheapest ways to stop it looking flat and machine-clean, and it also breaks up the banding you get on cheap phone screens. The trick is to generate a small square of noise once and repeat it like wallpaper, rather than asking the browser to compute noise across the whole screen while you scroll.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "MAT-GRAIN-PNG",
+      "tier": "craft",
+      "category": "material",
+      "title": "A PNG noise tile instead of generated grain",
+      "what_it_is": "A raster image file used to supply the noise texture.",
+      "why_it_matters": "Measured: a 200px canvas-generated PNG noise tile is 85,098 bytes — 150 times larger than the SVG version — because random noise is incompressible, and it is not meaningfully faster to paint. The corpus's instruction is flat: never do this.",
+      "source": {
+        "name": "research_11",
+        "confidence": "MEASURED_HERE",
+        "where": "§4.1: '570 B as a data URI vs 85,098 B as a PNG — 150x larger, and not meaningfully faster to paint. Never do this.'"
+      },
+      "detector": {
+        "kind": "html_regex",
+        "pattern": "(?:noise|grain|texture)[\\w-]*\\.(?:png|jpe?g|webp)|data:image/png;base64,[A-Za-z0-9+/]{4000,}",
+        "flags": "i"
+      },
+      "threshold": "An image file named for noise or grain, or a base64 PNG data URI over about 3 KB used as a repeating background.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Use the SVG `feTurbulence` recipe. About 570 bytes, and the file size does not change with tile size.",
+      "teach": "Random noise cannot be compressed — that is what makes it random — so a picture of noise is enormous. The browser can generate the same noise from a short piece of instructions instead, at about a hundred and fiftieth of the size and the same speed.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "MAT-GRAIN-OPACITY",
+      "tier": "craft",
+      "category": "material",
+      "title": "Grain outside the usable opacity band",
+      "what_it_is": "A grain overlay at an opacity outside roughly 0.03 to 0.08.",
+      "why_it_matters": "Below the band it is not doing anything. Above about 0.10 it stops reading as texture and starts reading as dirt.",
+      "source": {
+        "name": "research_08",
+        "confidence": "ASSERTED",
+        "where": "§8.7: 'opacity .05; band .03 - .08. above .10 it becomes dirt'"
+      },
+      "confidence_note": "The band is a practitioner recommendation with no measurement behind it. research/11 §4.1 adds the one measured related finding: `numOctaves` has essentially no effect on cost, so choose the octave count purely on look.",
+      "detector": {
+        "kind": "css_decl",
+        "property": "^opacity$",
+        "selector_hint": "grain|noise|texture",
+        "value_numeric": {
+          "min": 0.081
+        }
+      },
+      "threshold": "Grain-layer opacity above 0.08 or below 0.02.",
+      "threshold_provenance": "from_source",
+      "severity": "info",
+      "fix": "0.05 is the recommended value. Add `pointer-events: none` and `aria-hidden` so the layer is invisible to both the mouse and the screen reader.",
+      "teach": "Grain works by being almost invisible. If you can see it clearly it has become a texture people notice, and then it looks like the screen is dirty. Around five percent opacity is the sweet spot.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "MAT-HERO-VIDEO",
+      "tier": "craft",
+      "category": "imagery",
+      "title": "An autoplaying hero video",
+      "what_it_is": "A `<video>` with `autoplay` behind or inside the hero.",
+      "why_it_matters": "Three independent kills, and the first is not technical. You do not have footage of THAT shop — so any hero video is stock footage of somebody else's barbershop, shown to a barber who knows exactly what his own shop looks like, and it fires in under a second in front of the one person best equipped to detect it. Second: the weight. A defensible loop is 135-250 KB after encoding, a ten-to-eighteen-fold increase on a 14 KB page. Third: iOS Low Power Mode blocks muted autoplay, so the video renders its poster or a grey box — and you will never see that failure yourself, because you test on a charged phone.",
+      "source": {
+        "name": "research_08",
+        "confidence": "ASSERTED",
+        "where": "§3.1, §3.2, §3.3"
+      },
+      "confidence_note": "The stock-footage-as-trust-signal argument is explicitly synthesis, not a study — the corpus searched for a source studying it and found none. The Low Power Mode behaviour is 5-for / 1-against across independent forum threads spanning about six years, and is NOT documented by Apple or WebKit: the WebKit video-policies post and MDN's Autoplay guide were both fetched and mention it nowhere. The byte figures ARE demonstrated, from vendor-published bitrate references.",
+      "detector": {
+        "kind": "html_attr",
+        "tag": "video",
+        "attr": "autoplay",
+        "mode": "forbidden"
+      },
+      "threshold": "A `<video autoplay>` anywhere on the page.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "If video belongs at all, use the click-to-play form: a poster image, a real play button, and `preload=\"none\"`. That form survives every one of the three objections. Note that `preload` is only a hint — the specification does not force the browser to honour it, and the `autoplay` attribute takes precedence over it, so `preload=\"none\"` plus `autoplay` resolves in favour of downloading anyway.",
+      "teach": "Background video on a business page is almost always footage of somebody else's business. The owner knows what his own shop looks like, so a near-match is worse than nothing — it invites the comparison and loses it. It is also heavy, and on an iPhone in low power mode it silently does not play at all, which you will never see because your phone is charged.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "MAT-KENBURNS-DIRECTION",
+      "tier": "craft",
+      "category": "imagery",
+      "title": "Ken Burns animating up to the larger scale",
+      "what_it_is": "A slow zoom on a still photograph that starts at `scale(1)` and grows.",
+      "why_it_matters": "This is the critical detail most implementations get wrong and it is a real rendering consequence, not a taste note. The compositor rasterises the layer ONCE at its initial size and then transforms that bitmap. Starting at 1.0 and growing to 1.08 means it is upscaling a raster that is 8% too small, and the hero goes soft. Animate DOWN from the larger scale instead.",
+      "source": {
+        "name": "research_08",
+        "confidence": "ASSERTED",
+        "where": "§3.4 Ken Burns entry",
+        "quote": "Critical detail most implementations get wrong: animate DOWN from the larger scale, not up to it."
+      },
+      "confidence_note": "The compositor-safety principle is DEMONSTRATED (Comeau). The specific Ken Burns values and the raster-softness consequence are ASSERTED — the corpus notes it could not open a live example this session because the relevant site was blocked for the whole sweep.",
+      "detector": {
+        "kind": "css_regex",
+        "pattern": "@keyframes[^{]*\\{[^}]*from\\s*\\{[^}]*scale\\(1(?:\\.0+)?\\)[^}]*\\}[^}]*to\\s*\\{[^}]*scale\\(1\\.\\d",
+        "flags": "is"
+      },
+      "threshold": "A keyframe animation whose starting scale is smaller than its ending scale, on an image.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Reverse it. Start at `scale(1.08) translate3d(-1.5%, -1%, 0)` and end at `scale(1) translate3d(0,0,0)`. Scale range 1.06 to 1.10. Cycle 24 to 30 seconds — under about 15 seconds it stops reading as ambient and becomes a screensaver. Gate the whole thing on `prefers-reduced-motion`.",
+      "teach": "A slow zoom on a photo is drawn once at whatever size it starts at, then stretched. If it starts small and grows, the browser is stretching a picture that is slightly too small and the photo goes soft. Start big and shrink instead, and it stays sharp the whole way.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "MAT-WEBGL",
+      "tier": "craft",
+      "category": "performance",
+      "title": "A WebGL or shader library shipped",
+      "what_it_is": "three.js, ogl, regl, twgl, or a shader package loaded on the page.",
+      "why_it_matters": "The reason is not bytes. Even the lightest option — measured at 21 KB gzipped — buys a continuously repainting full-viewport surface, and it is the loudest 'expensive design agency' signal available. A shader says studio. A photograph of the actual street says 'I am four blocks away', which is the differentiator.",
+      "source": {
+        "name": "research_11",
+        "confidence": "MEASURED_HERE",
+        "where": "§4.6, with real gzipped weights fetched and compressed in-browser: three 85 KB, ogl 37 KB, regl 28 KB, twgl.js 21 KB, gl-matrix 13 KB"
+      },
+      "detector": {
+        "kind": "html_regex",
+        "pattern": "\\b(?:three(?:\\.min)?\\.js|three@|/ogl|\\bregl\\b|twgl|@paper-design/shaders|WebGLRenderer|getContext\\(\\s*['\"]webgl)",
+        "flags": "i"
+      },
+      "threshold": "Any reference to a WebGL library or a `webgl` canvas context.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Remove it. If the hero needs something, a photograph is both cheaper and more persuasive.",
+      "teach": "Three-dimensional graphics in a web page mean the phone is redrawing the whole screen continuously, and they are the clearest possible signal that an expensive studio built the site. For a local business that signal works against you — it says 'I cannot afford this person'.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "MAT-IMAGE-TREATMENT",
+      "tier": "craft",
+      "category": "imagery",
+      "title": "A photograph with no treatment",
+      "what_it_is": "An `<img>` with no aspect ratio, no object-fit, no inset hairline, and no desaturation to harmonise it with the page.",
+      "why_it_matters": "An untreated photograph sits on top of the page rather than in it. The corpus's recipe is six declarations and it is what makes one phone snapshot look art-directed. There is also a build-time version of the same idea with a better payoff: run every client photograph through one luminance-to-colour lookup table and mismatched phone photos become a set — and the graded image measured 17-26% SMALLER than the ungraded one, at literally zero runtime cost.",
+      "source": {
+        "name": "research_08",
+        "confidence": "ASSERTED",
+        "where": "§8.6 image treatment block"
+      },
+      "also_in": [
+        {
+          "name": "research_11",
+          "where": "§4.2 duotone gradient map at build time, with measured file sizes; includes a correction — an earlier attempt using canvas blend modes produced a 4.7x apparent win by crushing the image to a 37-level tonal range, i.e. a mud rectangle. If your output is dramatically smaller than the source, you have destroyed the image, not compressed it."
+        }
+      ],
+      "confidence_note": "The six declarations are a recommendation, not a measurement. The build-time gradient-map figures ARE measured (17-26% smaller than ungraded, zero runtime cost), and that source carries its own correction worth reading: an earlier attempt using canvas blend modes appeared to win 4.7x and had in fact crushed the image to a 37-level tonal range.",
+      "detector": {
+        "kind": "css_absent",
+        "property": "^aspect-ratio$|^object-fit$",
+        "selector_hint": "img|figure img|\\.photo",
+        "when_html_contains": "<img"
+      },
+      "threshold": "An `<img>` in the document with no `aspect-ratio` and no `object-fit` declared for it.",
+      "threshold_provenance": "from_source",
+      "severity": "info",
+      "fix": "Six declarations. Crop tightly rather than full-bleed, bias the composition left or right rather than centring it, and serve at twice the displayed width and no more.",
+      "fix_code": "figure img {\n  display: block; width: 100%; height: auto;\n  aspect-ratio: 4 / 3; object-fit: cover;\n  border-radius: 12px;\n  outline: 1px solid var(--line); outline-offset: -1px;  /* inset hairline */\n  filter: saturate(.92);  /* ~8% desaturation to match the ground */\n}",
+      "teach": "A photograph dropped straight onto a page always looks slightly separate from it. Giving it a fixed shape so the layout never jumps, a thin line just inside its edge, and about eight percent less colour so it sits with the rest of the page — that is what makes one phone snapshot look deliberate.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "Gated on an `<img>` being present, so it correctly reports nothing on pages that have none. The absence itself is T1-NO-IMAGES's finding, not this one's."
+      }
+    },
+    {
+      "id": "MAT-CSS-SIGNATURE",
+      "tier": "craft",
+      "category": "material",
+      "title": "No hand-built element specific to this business",
+      "what_it_is": "A page with no piece of custom artwork built from CSS or hand-authored SVG — no barber pole, no wrench, no brake rotor, no espresso cup, no ledger.",
+      "why_it_matters": "It is the only element on the page that could not have come from a template, which is exactly what the viewer is unconsciously scanning for. It is also the thing the owner will point at. A worked example in the corpus is about twenty-five lines and zero bytes: one div, a lopsided border-radius, three radial-gradient ridges and a four-pixel rise over six seconds.",
+      "source": {
+        "name": "hallmark",
+        "confidence": "DEMONSTRATED",
+        "where": "the worked bakery-loaf example, quoted in research/08 §4's constructive inverse with full copy-pasteable code"
+      },
+      "also_in": [
+        {
+          "name": "research_08a",
+          "where": "A8 and §5.2, which adds the constraint set"
+        }
+      ],
+      "confidence_note": "The CODE is demonstrated. The claim that it moves a buyer is asserted. This is `info` and should stay there — it is an opportunity, not a defect.",
+      "detector": {
+        "kind": "manual",
+        "what": "Whether the page contains one hand-built element specific to this trade",
+        "needs": "A look. Automatable only as an absence of inline SVG and of non-trivial CSS shapes, which is a weak proxy."
+      },
+      "threshold": "Reported as an opportunity, never as a failure.",
+      "threshold_provenance": "arithmetic",
+      "severity": "info",
+      "fix": "One per page, and exactly one — doing it twice makes it decoration, once makes it a signature. Constraints: 1-3 elements maximum, three gradient stops maximum per layer, transform-only animation, reduced-motion fallback mandatory, and emit hex rather than newer colour formats. Avoid the adjacent tells: smooth 3D blobs and corporate-doodle SVG humans read as machine-made instantly.",
+      "teach": "One small drawing made specifically for this business — built out of CSS shapes rather than downloaded — is the only thing on the page that could not have come from a template. It is also usually the thing the owner points at. Do exactly one; two makes it decoration.",
+      "chess": "One prepared novelty in a game is memorable. Ten is a different game entirely.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": null,
+        "hits_total": null,
+        "note": "No hand-built element on any of the 13. The closest thing is the gradient initials square, which is the opposite — a cliché rather than a signature (T2-AVATAR-GRADIENT)."
+      }
+    },
+    {
+      "id": "MAT-SLIDER-UNGATED",
+      "tier": "craft",
+      "category": "imagery",
+      "title": "A before/after slider without its gates",
+      "what_it_is": "A comparison slider shipped without a matched image pair, without a byte budget check, or on a trade whose work product is not visual.",
+      "why_it_matters": "A misaligned slider looks worse than nothing. And the byte cost is the real constraint: two photographs at 1200x800 come to roughly 185-350 KB as embedded data, which is 13 to 26 times the weight of the whole page. Screenshots compress far better than photographs, which is why the pitch use (their current site versus the new one) is viable where the work-product use often is not.",
+      "source": {
+        "name": "research_08",
+        "confidence": "ASSERTED",
+        "where": "§3.4 and research/08a §5.1, with the gate table"
+      },
+      "confidence_note": "The corpus marks this FULLY ASSERTED: no practitioner source, no conversion data, the sweep found none. The implementation detail that IS solid is small and worth keeping: the handle transition must be 0ms because it tracks the finger, and `<input type=range>` is the right control precisely because it has native touch handling.",
+      "detector": {
+        "kind": "composite",
+        "all": [
+          {
+            "kind": "css_regex",
+            "pattern": "clip-path\\s*:\\s*inset\\([^)]*var\\("
+          },
+          {
+            "kind": "html_tag",
+            "tag": "input",
+            "attr_match": {
+              "type": "^range$"
+            }
+          }
+        ]
+      },
+      "threshold": "A comparison slider present. Reported for its gates rather than auto-failed: matched pair, byte budget, appropriate trade.",
+      "threshold_provenance": "from_source",
+      "severity": "info",
+      "fix": "Check three gates before shipping it. Is there a genuinely matched pair, same position and same framing? Has the byte cost been measured rather than assumed? Is this trade one where the work product is visual at all — it is the wrong shape for a barber, an accountant or a restaurant. And set the handle transition to zero.",
+      "teach": "A slider that wipes between a before and an after photo is powerful when the two photos line up and useless when they do not — a mismatch looks like a mistake. It is also heavy: two photographs can outweigh your entire page many times over. Measure before you commit to it.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    }
+  ]
+}

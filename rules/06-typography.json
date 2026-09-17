@@ -1,0 +1,478 @@
+{
+  "$comment": "TYPOGRAPHY — the hero of the reachable ceiling. research/11 §5 is explicit that every input here is a decision rather than a purchase: no commissioned asset appears anywhere in the reference tier, and the entire quality is carried by typographic hierarchy, one committed colour decision, and information that proves work was done. The weight rule alone (T2-DISPLAY-WEIGHT, in 02-felt.json) is described as the largest single perceptual move available, and it is free.",
+  "tier": "craft",
+  "rules": [
+    {
+      "id": "TY-BODY-SIZE",
+      "tier": "craft",
+      "category": "type",
+      "title": "Body text below the tested floor",
+      "what_it_is": "Body copy set below 19px.",
+      "why_it_matters": "GOV.UK serves the most demographically diverse, least technical audience of any digital product in the English-speaking world, and has tested its type harder than any agency will. Their body text is 19px, not 16px. The corpus's judgement: that single value does more for perceived competence with this audience than any hero image, and it is the highest ratio of trust gained to effort spent in the whole reference file.",
+      "source": {
+        "name": "govuk",
+        "confidence": "DEMONSTRATED",
+        "where": "type scale: desktop 48/50, 36/40, 24/30, 19/25; mobile 32/35, 27/30, 21/25, 19/25"
+      },
+      "also_in": [
+        {
+          "name": "research_11",
+          "where": "§5.2 and §8.2 item 8; §8.3 item 14 marks Legora's 13-15px body as a deliberate divergence to reject"
+        }
+      ],
+      "detector": {
+        "kind": "css_decl",
+        "property": "^font-size$",
+        "selector": "^(body|html)$|\\bbody\\b",
+        "value_numeric": {
+          "unit": "px",
+          "max": 18.99
+        }
+      },
+      "threshold": "Resolved body `font-size` below 19px is a warning; below 16px is a failure, because that is the iOS-zoom floor as well.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Set body to 19-20px. Use a clamp with explicit minimum and maximum so a viewport-width term cannot reflow the page when the phone's address bar collapses.",
+      "fix_code": "--step-0: clamp(1.1875rem, 0.4vw + 1.09rem, 1.25rem); /* 19 to 20px */\nbody { font-size: var(--step-0); line-height: 1.6; }",
+      "teach": "Most sites set body text at 16 pixels because that is the browser default. The UK government, which has tested reading on more kinds of people than anyone, sets theirs at 19. If your reader is fifty-five and standing outside in daylight, 19 is the right answer and it costs one number.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 13,
+        "note": "`clamp(16px, 1.05vw + 13px, 18px)` — above the iOS floor, below the GOV.UK floor, at every viewport width."
+      }
+    },
+    {
+      "id": "TY-H1-CAP",
+      "tier": "craft",
+      "category": "type",
+      "title": "The headline is bigger than confidence",
+      "what_it_is": "An H1 whose maximum size exceeds about 56px (3.5rem).",
+      "why_it_matters": "Above roughly 64px on a page for a non-technical local buyer, scale stops reading as confidence and starts reading as fashion — and fashion is distance. The corpus calls this the single most important restraint in its typography section.",
+      "source": {
+        "name": "research_11",
+        "confidence": "ASSERTED",
+        "where": "§5.2: 'Cap the H1 at 3.5rem / 56px, not 5rem.'"
+      },
+      "confidence_note": "A register judgement. research/11 §9.2 is explicit that nothing in the sweep measured how a human read any page. What IS measured: Legora's H1 is 56.26px at desktop dropping to 41.1px at a 393px viewport, and the two cheap-tier competitor sites both shout at weight 900 instead.",
+      "detector": {
+        "kind": "css_decl",
+        "property": "^font-size$",
+        "selector_hint": "h1|\\.hero h[12]|\\.display",
+        "value_numeric": {
+          "unit": "rem",
+          "min": 3.6,
+          "clamp_bound": "max"
+        }
+      },
+      "threshold": "H1 maximum size above 3.6rem / 58px, taking the upper bound of any `clamp()`.",
+      "threshold_provenance": "from_source",
+      "severity": "info",
+      "fix": "Cap at 3.5rem. Recover presence from measure and leading rather than size: 18 characters wide, line-height 1.04, `text-wrap: balance`.",
+      "fix_code": "h1 { font-size: clamp(2rem, 6.4vw + 0.4rem, 3.5rem);\n     line-height: 1.04; letter-spacing: -.02em;\n     max-width: 18ch; text-wrap: balance; }",
+      "teach": "There is a size past which a headline stops saying 'this is important' and starts saying 'this is a design'. For a local business page that is around 56 pixels. Bigger than that reads as a magazine cover, and a magazine cover reads as expensive.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 13,
+        "note": "`clamp(2.4rem, 7.2vw, 5.2rem)` — a maximum of 83px, about 1.5 times the recommended cap."
+      }
+    },
+    {
+      "id": "TY-H1-MEASURE",
+      "tier": "craft",
+      "category": "type",
+      "title": "The headline runs too wide",
+      "what_it_is": "An H1 with no `max-width` in character units, or one wider than about 22 characters.",
+      "why_it_matters": "The corpus's line is exact: a 5rem headline running 40 characters is not a hero, it is a paragraph that got bigger. Capping it at 16-22 characters and adding `text-wrap: balance` is two declarations.",
+      "source": {
+        "name": "research_11",
+        "confidence": "MEASURED_HERE",
+        "where": "§7 composition table: 'H1 measure 16-22ch, hard-capped'"
+      },
+      "detector": {
+        "kind": "css_absent",
+        "property": "^max-width$",
+        "value": "\\d+ch",
+        "selector_hint": "h1|\\.hero h[12]"
+      },
+      "threshold": "No `max-width` in `ch` on the H1, or a value above 22ch.",
+      "threshold_provenance": "from_source",
+      "severity": "info",
+      "fix": "`max-width: 18ch; text-wrap: balance;`. Balance makes the lines come out even instead of leaving one orphaned word.",
+      "teach": "A headline should break into two or three short lines, not run edge to edge. Measuring the limit in characters rather than pixels means it stays right at every screen size. Adding `text-wrap: balance` stops the last line ending up as a single stranded word.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "`max-width: 16ch` plus `text-wrap: balance` on the hero heading. Correct, and one of the better details in the generator."
+      }
+    },
+    {
+      "id": "TY-BODY-MEASURE",
+      "tier": "craft",
+      "category": "type",
+      "title": "Body text lines too long or too short",
+      "what_it_is": "Paragraph text with no measure cap, or a measure outside roughly 60-75 characters.",
+      "why_it_matters": "Long lines make the eye lose its place returning to the left margin. It is one of the oldest settled results in typesetting and it is one declaration.",
+      "source": {
+        "name": "impeccable",
+        "confidence": "ASSERTED",
+        "where": "craft-floor.md, Verify / Type: 'body measure 65-75ch'"
+      },
+      "also_in": [
+        {
+          "name": "research_11",
+          "where": "§7: 'Body measure 60-70ch. Lede 34ch.'"
+        }
+      ],
+      "confidence_note": "Two sources give slightly different bands (60-70ch and 65-75ch) and neither cites a study. The union is used here and the report says which bound was crossed. The underlying result -- that very long lines slow reading -- is old and well established in typesetting, but nothing in this corpus measured it.",
+      "detector": {
+        "kind": "css_absent",
+        "property": "^max-width$",
+        "value": "\\d+ch",
+        "selector_hint": "^p$|\\.prose|\\.body|main p"
+      },
+      "threshold": "No `max-width` in `ch` on body paragraphs, or a value outside 55-78ch. The two sources give slightly different bands (60-70 and 65-75); the union is used and the rule reports which bound was crossed.",
+      "threshold_provenance": "from_source",
+      "severity": "info",
+      "fix": "`max-width: 66ch` on prose. The opening lede runs shorter — around 34ch — because it is read as a unit rather than scanned.",
+      "teach": "There is a comfortable line length for reading, around 65 characters. Past that, your eye struggles to find the start of the next line and you re-read the same one. Setting the limit in characters rather than pixels keeps it right on every screen.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 13,
+        "note": "13 of 13: no `max-width` in `ch` on body paragraphs anywhere. In practice the grid constrains most of the text, so the real-world measure is probably acceptable — which is why this is `info`. The hero lede IS capped, at 52ch."
+      }
+    },
+    {
+      "id": "TY-TRACKING-LADDER",
+      "tier": "craft",
+      "category": "type",
+      "title": "Tracking applied as a style rather than a correction",
+      "what_it_is": "Letter-spacing set in the wrong direction for the size: negative on small text, or nothing at all on a large heading.",
+      "why_it_matters": "Tracking is a correction, not a style. It is a function of how a particular typeface fits at a particular size, and the measurements prove it: one face needed -0.04em at 64px, another needed -0.022em, a third needed effectively nothing. The general shape from a full measured production ladder is: negative above about 30px, normal between 16 and 25px, positive below about 14px.",
+      "source": {
+        "name": "research_11",
+        "confidence": "MEASURED_HERE",
+        "where": "§5.3, with the per-size table and Oxide's full measured ladder"
+      },
+      "detector": {
+        "kind": "css_cooccur",
+        "mode": "tracking_ladder",
+        "bands": [
+          {
+            "max_px": 14,
+            "min_em": 0.0
+          },
+          {
+            "min_px": 16,
+            "max_px": 25,
+            "min_em": -0.005,
+            "max_em": 0.01
+          },
+          {
+            "min_px": 30,
+            "max_em": -0.01
+          }
+        ]
+      },
+      "threshold": "Negative letter-spacing on text below 16px; any negative tracking on body copy; or a display heading above 36px with no negative tracking at all. Small uppercase labels are the exception and take +0.06em.",
+      "threshold_provenance": "from_source",
+      "severity": "info",
+      "fix": "Use the ladder: roughly -0.005 to -0.01em at 18px and below (grotesque) or 0 (serif); -0.015em at 24-32px; -0.02em at 36-48px; -0.025 to -0.03em at 56px and up. Hard stop at -0.02em on a large hero. Never tighten body copy. Small uppercase labels take +0.06em, twice per page at most.",
+      "teach": "Big letters look too loose and small letters look too tight, so you close up the big ones slightly and open up the tiny ones. That is all letter-spacing is for. It is not a way to make something look designed, and using it that way is one of the noticeable tells.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 13,
+        "note": "One finding per page: `-0.01em` on the 16px nav h1, i.e. negative tracking on small text. The hero's `-0.035em` is caught separately by T2-TIGHT-TRACKING, and the `+0.13em` section labels are the right direction at roughly twice the recommended amount."
+      }
+    },
+    {
+      "id": "TY-GOOGLE-FONTS-LINK",
+      "tier": "craft",
+      "category": "type",
+      "title": "Fonts linked from Google rather than self-hosted",
+      "what_it_is": "A `<link>` to `fonts.googleapis.com`, or an `@import` of it.",
+      "why_it_matters": "Google Fonts has the best file sizes and the worst latency, and latency is what kills a mid-range Android on a mobile connection. Linking it costs two extra origins in a strictly sequential chain: your HTML, then the Google CSS, then the font file from a third host. At about 100ms round trip that is 300-500ms of pure handshake before the first byte of the font. The 'everyone has it cached already' defence died when browsers partitioned their cache by top-level site.",
+      "source": {
+        "name": "research_11",
+        "confidence": "MEASURED_HERE",
+        "where": "§5.4, with the route comparison table: self-hosted and subsetted is 12-18 KB over 1 round trip, versus 29-47 KB over 3"
+      },
+      "applies_to": [
+        "hosted"
+      ],
+      "detector": {
+        "kind": "html_regex",
+        "pattern": "fonts\\.googleapis\\.com|fonts\\.gstatic\\.com|@import[^;]*fonts\\.googleapis",
+        "flags": "i"
+      },
+      "threshold": "Any reference to `fonts.googleapis.com` or `fonts.gstatic.com`.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Download the latin file, subset it, and serve it from your own origin. One file, one request, about 15 KB. A company with unlimited money ships a 57 KB font file, which is permission to stop at one small one.",
+      "fix_code": "pyftsubset \"FACE[wght].ttf\" --output-file=face.woff2 --flavor=woff2 \\\n  --layout-features='kern,liga,calt,tnum' \\\n  --unicodes=\"U+0000-00FF,U+2010-2019,U+2032-2033,U+20AC,U+2122\" \\\n  --variations='wght=400:600' --desubroutinize",
+      "teach": "Loading a font from Google means the phone has to talk to two extra servers before it can even start downloading the letters, and each conversation costs time. Copying the file onto your own site removes both trips. You also get to cut out the characters you never use, which halves the size again.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "Zero external requests of any kind — these are single-file pages by constraint. Note that the chess-tee-forge storefront DOES link Google Fonts, which is the one place its design system conflicts with this corpus. Take its honesty rules; do not take its font route."
+      }
+    },
+    {
+      "id": "TY-PRELOAD-CROSSORIGIN",
+      "tier": "craft",
+      "category": "type",
+      "title": "Font preloaded without crossorigin",
+      "what_it_is": "`<link rel=\"preload\" as=\"font\">` with no `crossorigin` attribute.",
+      "why_it_matters": "Fonts are always fetched in CORS mode, even from your own origin. Omitting `crossorigin` on the preload means the preloaded copy does not match the real request, so the browser silently downloads the font twice. The corpus calls it one of the most common real-world font mistakes, and it is silent — nothing in the interface tells you.",
+      "source": {
+        "name": "research_11",
+        "confidence": "DEMONSTRATED",
+        "where": "§5.4: 'crossorigin is mandatory even same-origin'"
+      },
+      "applies_to": [
+        "hosted"
+      ],
+      "detector": {
+        "kind": "html_attr",
+        "tag": "link",
+        "attr": "crossorigin",
+        "mode": "required",
+        "only_when_attr": {
+          "rel": "preload",
+          "as": "font"
+        }
+      },
+      "threshold": "A `rel=\"preload\" as=\"font\"` link with no `crossorigin` attribute.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Add the attribute. It takes no value.",
+      "fix_code": "<link rel=\"preload\" href=\"/f/face.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>",
+      "teach": "Preloading tells the browser to start fetching a font early. Fonts have a special rule: they are always requested in a particular mode, and if your preload does not say so, the browser decides the early copy does not match and downloads the whole file again. One word fixes it and nothing warns you.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "TY-FONT-DISPLAY",
+      "tier": "craft",
+      "category": "type",
+      "title": "font-display missing or set to optional",
+      "what_it_is": "An `@font-face` with no `font-display`, or with `font-display: optional`.",
+      "why_it_matters": "`optional` has a genuine layout-stability benefit, and it silently drops the webfont entirely on exactly the slow connections your buyers are on — so your own site falls back to a system font for the people you most need to impress. `swap` is measured in use on Legora, Linear and Fontshare alike.",
+      "source": {
+        "name": "research_11",
+        "confidence": "MEASURED_HERE",
+        "where": "§5.4: 'Use font-display: swap. Not optional.'"
+      },
+      "applies_to": [
+        "hosted"
+      ],
+      "detector": {
+        "kind": "css_decl",
+        "property": "^font-display$",
+        "value": "^(optional|auto)$",
+        "when_css_contains": "@font-face"
+      },
+      "threshold": "`font-display: optional`, or no `font-display` inside an `@font-face` block.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "`font-display: swap`, paired with a metric-matched fallback so the swap does not shift the layout. See TY-FONT-FALLBACK.",
+      "teach": "When a custom font is still downloading, the browser has to decide what to do. `swap` shows a system font immediately and replaces it when yours arrives. `optional` gives up entirely on a slow connection — which means the visitors on the worst phones never see your typography at all.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "TY-FONT-FALLBACK",
+      "tier": "craft",
+      "category": "type",
+      "title": "No metric-matched fallback font",
+      "what_it_is": "A webfont with no companion `@font-face` aliasing a local system font and tuned with `size-adjust`, `ascent-override` and `descent-override` so it occupies identical space.",
+      "why_it_matters": "The corpus calls this the highest-value free performance steal in the file, and gives the reason a designer cares about rather than the reason a developer does: nothing looks more broken to a non-technical visitor than a page that jumps while loading, and on a mobile connection that jump is very visible. It is craft the buyer genuinely perceives, unlike tracking.",
+      "source": {
+        "name": "research_11",
+        "confidence": "MEASURED_HERE",
+        "where": "§5.5, quoting Ramp's shipped values as the demonstrated pattern"
+      },
+      "also_in": [
+        {
+          "name": "research_08",
+          "where": "§6.3, which computes the overrides for two specific faces against Roboto and mandates it as a BUILD-STEP FUNCTION rather than a hardcoded block"
+        }
+      ],
+      "applies_to": [
+        "hosted"
+      ],
+      "detector": {
+        "kind": "css_absent",
+        "at_rule": "@font-face",
+        "property": "^(size-adjust|ascent-override)$",
+        "when_css_contains": "@font-face"
+      },
+      "threshold": "An `@font-face` loading a webfont with no companion fallback face carrying `size-adjust` or `ascent-override`.",
+      "threshold_provenance": "from_source",
+      "severity": "info",
+      "fix": "Generate the numbers for YOUR face against YOUR fallback — `fontpie` or `capsize` will do it. Do not copy someone else's: the corpus quotes Ramp's values and warns twice that they are specific to that face against Arial. The override values belong in a build step, not hardcoded, because they change whenever the font does.",
+      "fix_code": "@font-face {\n  font-family: \"Face Fallback\"; src: local(\"Arial\");\n  ascent-override: 89.26%; descent-override: 19.61%;\n  line-gap-override: 0%; size-adjust: 102.08%;\n}\n/* THESE NUMBERS ARE AN EXAMPLE. Compute your own. */",
+      "teach": "While your font downloads, the browser shows a substitute — and when yours arrives, the text changes size slightly and the whole page jumps. You can measure the substitute and stretch it so it takes up exactly the same space, and then nothing moves. Visitors genuinely notice this one, unlike most typographic detail.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "CORRECTED BY THE RUN. Written as firing 13/13; it now correctly reports nothing, because these pages load no webfont at all and a fallback for a font that does not exist is not a defect. The detector is gated on an `@font-face` being present."
+      }
+    },
+    {
+      "id": "TY-FONT-UNSUBSET",
+      "tier": "craft",
+      "category": "type",
+      "title": "A self-hosted font that was never subset",
+      "what_it_is": "A `woff2` over about 60 KB, which almost always means the full character set shipped.",
+      "why_it_matters": "The corpus measured a reference-tier site self-hosting a 352,240-byte unsubsetted variable font and says outright not to copy that. A subsetted latin face is 12-18 KB. The saving is 20 to 1 and the page loses nothing a visitor will see.",
+      "source": {
+        "name": "research_11",
+        "confidence": "MEASURED_HERE",
+        "where": "§5.4 route table; §1.2 Linear's 352,240 B InterVariable.woff2"
+      },
+      "applies_to": [
+        "hosted"
+      ],
+      "detector": {
+        "kind": "manual",
+        "what": "The byte size of each self-hosted font file",
+        "needs": "Filesystem access to the built output. Reported by the build check rather than by parsing the page."
+      },
+      "threshold": "A self-hosted `woff2` over 60 KB, or total font weight over 25 KB for the page.",
+      "threshold_provenance": "from_source",
+      "severity": "info",
+      "fix": "Subset it. And if the budget is tight, inline or load ONE display face for headings only and let body text use the system stack — about 43 KB, and it buys most of the visual difference.",
+      "teach": "A font file contains every character the designer drew, including alphabets your page will never use. Cutting it down to the characters you actually need typically takes it from about 60 kilobytes to about 15, and nobody can tell.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": null,
+        "hits_total": null,
+        "note": "NOT RUN over this corpus: this detector needs a live render or a person."
+      }
+    },
+    {
+      "id": "TY-BODY-TRACKING",
+      "tier": "craft",
+      "category": "type",
+      "title": "Letter-spacing applied to body copy",
+      "what_it_is": "Any non-zero `letter-spacing` on paragraph text.",
+      "why_it_matters": "Body faces are spaced by their designer for reading at body size. Changing it makes the text measurably slower to read, and the reader experiences that as the page being hard work rather than as a style.",
+      "source": {
+        "name": "research_11",
+        "confidence": "ASSERTED",
+        "where": "§5.3: 'Never tighten body copy.'"
+      },
+      "confidence_note": "Asserted. The measured half is only that reference-tier sites use very small or zero tracking at body sizes — one production example sets body at 15px with -0.011em, which is within a rounding error of nothing.",
+      "detector": {
+        "kind": "css_decl",
+        "property": "^letter-spacing$",
+        "selector_hint": "^body$|^p$|\\.prose|\\.lede",
+        "value": "^(?!normal|0)"
+      },
+      "threshold": "Any `letter-spacing` other than `normal` or `0` on a body-text selector, beyond -0.011em.",
+      "threshold_provenance": "from_source",
+      "severity": "info",
+      "fix": "Remove it. Leave body copy at the spacing the typeface was designed with.",
+      "teach": "Paragraph text is already spaced correctly by whoever drew the typeface. Squeezing or stretching it makes reading slower, and the reader blames the page without knowing why.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "TY-TABULAR-NUMS",
+      "tier": "craft",
+      "category": "type",
+      "title": "Numbers in a column that do not line up",
+      "what_it_is": "Prices, times or measurements displayed in a table or list without `font-variant-numeric: tabular-nums`.",
+      "why_it_matters": "Most typefaces give digits different widths, so a column of prices comes out ragged. It is one of the browser surfaces that ships with a default belonging to no design system, and it is a one-line fix that a reader feels as tidiness rather than noticing as typography.",
+      "source": {
+        "name": "impeccable",
+        "confidence": "ASSERTED",
+        "where": "craft-floor.md, Verify / Browser surfaces: 'the numerals in tabular data all ship with browser defaults that belong to no design system'"
+      },
+      "also_in": [
+        {
+          "name": "research_11a",
+          "where": "§1, listed among the things the audited site already gets right: 'font-variant-numeric: tabular-nums on every figure'"
+        }
+      ],
+      "confidence_note": "A craft assertion with no sample. It is `info`. The mechanical fact is plain: most typefaces give digits different widths and most also ship a same-width set, and switching is one declaration.",
+      "detector": {
+        "kind": "css_absent",
+        "property": "^font-variant-numeric$",
+        "value": "tabular-nums",
+        "when_html_contains": "<(?:table|dl)\\b|class=\"[^\"]*(?:price|hours|spec|readout|stat)"
+      },
+      "threshold": "A table, definition list or price/hours/stat component with no `tabular-nums` anywhere in the stylesheet.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "info",
+      "fix": "One declaration on the elements that hold figures.",
+      "fix_code": "dd, td, .price, .hours dd { font-variant-numeric: tabular-nums; }",
+      "teach": "In most typefaces a 1 is narrower than a 0, so a column of prices comes out slightly crooked. Most fonts also contain a second set of digits that are all the same width, and one line of CSS switches to them. Nobody will mention it; everyone will find the table easier to scan.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "`dl.hours dd { font-variant-numeric: tabular-nums }` on all 13. Correct."
+      }
+    },
+    {
+      "id": "TY-BROWSER-SURFACES",
+      "tier": "craft",
+      "category": "type",
+      "title": "Unthemed browser surfaces",
+      "what_it_is": "Text selection colour, the text caret, scrollbars, focus rings and underline offset left at browser defaults.",
+      "why_it_matters": "The parts you did not draw still carry the design. impeccable calls this the cheapest signal that a page was built rather than assembled, and the one models skip most reliably.",
+      "source": {
+        "name": "impeccable",
+        "confidence": "ASSERTED",
+        "where": "craft-floor.md, Verify / Browser surfaces"
+      },
+      "confidence_note": "A craft assertion with no counted sample. `info`, and genuinely optional — but the cost is about six lines.",
+      "detector": {
+        "kind": "css_absent",
+        "selector": "::selection|caret-color|::-webkit-scrollbar|text-underline-offset|accent-color"
+      },
+      "threshold": "None of `::selection`, `caret-color`, `text-underline-offset` or `accent-color` defined anywhere.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "info",
+      "fix": "Theme them from the palette.",
+      "fix_code": "::selection { background: var(--accent); color: var(--paper); }\n:root { accent-color: var(--accent); }\na { text-underline-offset: 3px; }",
+      "teach": "When someone drags to highlight text on your page, the highlight is a colour you did not choose. Same with the blinking cursor in a form field and the little tick in a checkbox. Setting those from your own palette takes a few lines and makes the page feel like one object rather than your content sitting inside the browser's.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 13,
+        "note": "Only `text-underline-offset: 3px` on one link rule. No selection colour, no caret colour, no accent-color."
+      }
+    }
+  ]
+}

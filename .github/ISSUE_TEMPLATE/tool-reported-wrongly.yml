@@ -1,0 +1,55 @@
+name: A check reported something wrongly
+description: A tool flagged correct content, or missed something it should have caught.
+title: "[check] "
+labels: ["accuracy"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        These reports are the most valuable kind. A check that cries wolf gets
+        ignored, and a check that stays quiet when it shouldn't is worse than
+        not having it.
+
+  - type: dropdown
+    id: tool
+    attributes:
+      label: Which tool
+      options:
+        - check_honesty
+        - check_responsive
+        - check_assets
+        - check_single_source
+        - palette_from_image
+        - init_site
+    validations:
+      required: true
+
+  - type: dropdown
+    id: direction
+    attributes:
+      label: Which way did it get it wrong
+      options:
+        - It flagged something that was actually fine (false positive)
+        - It missed something it should have flagged (false negative)
+        - The report was correct but I couldn't tell what to do about it
+    validations:
+      required: true
+
+  - type: textarea
+    id: input
+    attributes:
+      label: The smallest piece of content that reproduces it
+      description: |
+        A few lines of HTML is ideal. The smaller the example, the faster this
+        gets fixed.
+      render: html
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What it reported, and what it should have reported
+      render: text
+    validations:
+      required: true

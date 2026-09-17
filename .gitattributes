@@ -1,0 +1,7 @@
+# Keep line endings LF in the repository on every platform. The bin entry has a
+# shebang, and a CRLF shebang makes the shim fail on macOS with an unhelpful
+# error — which is exactly the class of failure this package must not have,
+# since its whole audience is somebody who will not debug an install.
+* text=auto eol=lf
+*.png binary
+*.jpg binary

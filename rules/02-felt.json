@@ -1,0 +1,1641 @@
+{
+  "$comment": "TIER 2 — felt rather than named, but decisive. A visitor cannot tell you what is wrong; they can tell you the page feels like every other page. This is the tier where the highest signal-to-effort tell in the whole corpus lives (the coloured side stripe) and where most of the executable thresholds are.",
+  "tier": 2,
+  "rules": [
+    {
+      "id": "T2-EDGE-STRIPE",
+      "tier": 2,
+      "category": "layout",
+      "title": "The coloured left-border stripe",
+      "what_it_is": "A card, callout, alert or list item with a thick coloured border on one edge only — typically 3 to 6 pixels, purple or green, on the left.",
+      "why_it_matters": "This is described in the corpus as the highest signal-to-effort tell in the whole list, and four sources found it independently. One practitioner's line: coloured left borders are almost as reliable a sign of AI-generated design as em dashes are for text. Krebs built his entire 1,590-page study around it.",
+      "source": {
+        "name": "gesso",
+        "confidence": "DEMONSTRATED",
+        "where": "rule `edge-stripe`",
+        "quote": "colored left borders are almost as reliable a sign of AI-generated design as em-dashes for text"
+      },
+      "also_in": [
+        {
+          "name": "krebs",
+          "where": "the study was built around this tell"
+        },
+        {
+          "name": "impeccable",
+          "where": "craft-floor.md, Refuse: 'A colored border-left or border-right above 1px on cards, list items, callouts, or alerts.'",
+          "note": "impeccable sets the bar lower — anything above 1px — where Gesso's detector targets the 3-6px band"
+        }
+      ],
+      "detector": {
+        "kind": "css_decl",
+        "property": "^border-(left|right)(-width)?$",
+        "value": "([2-9]|[1-9][0-9])(px|\\.5px)",
+        "require_colored": true,
+        "excludeSelector": "blockquote|hr|table|td|th"
+      },
+      "threshold": "`border-left` or `border-right` at 2px or more, carrying a colour that is not the page's hairline neutral, on a non-blockquote element. Gesso's published band is 3-6px; impeccable refuses anything above 1px. This detector uses 2px as the floor and reports which of the two bars was crossed.",
+      "threshold_provenance": "from_source",
+      "severity": "fail",
+      "fix": "Delete the stripe. If a heading needs an accent near it, use a small solid accent square beside the heading, or change the heading's own colour. If the card needs separating, a 1px hairline on all four sides is the confident version.",
+      "fix_code": "border: 1px solid var(--line);",
+      "teach": "A thick coloured line down the left side of a box is the single most recognisable machine-made design decision on the web right now. It is also doing no work — it is not separating anything, it is decorating. A thin line all the way round, or nothing, reads as deliberate.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "A genuine pass. The generator uses 1px hairlines on all four sides, which is the correct answer."
+      }
+    },
+    {
+      "id": "T2-KICKER-H1",
+      "tier": 2,
+      "category": "type",
+      "title": "The eyebrow badge above the main headline",
+      "what_it_is": "A short label sitting immediately above the page's main heading — small, uppercase or widely letter-spaced, often coloured with the accent. 'INTRODUCING'. 'OUR SERVICES'. 'WHY CHOOSE US'.",
+      "why_it_matters": "It is a named gate in two detectors, with an auto-fix that simply deletes the element. The headline is already the top of the page; the label above it is a second, smaller headline that repeats what the first one is about to say.",
+      "source": {
+        "name": "gesso",
+        "confidence": "DEMONSTRATED",
+        "where": "rule `hero-kicker-eyebrow`; Hallmark gate 54",
+        "quote": "Fires on the element immediately preceding the primary H1 when <= 60 chars / <= 9 words, uppercase or letter-spacing >= 0.08em, not a heading, no links/lists/nav/buttons. Auto-fix removes it."
+      },
+      "detector": {
+        "kind": "dom_precedes_heading",
+        "heading": "h1",
+        "max_chars": 60,
+        "max_words": 9,
+        "require_any": [
+          "uppercase",
+          "letter_spacing_ge_0.08em"
+        ],
+        "exclude_tags": [
+          "h1",
+          "h2",
+          "h3",
+          "h4",
+          "h5",
+          "h6",
+          "nav",
+          "ul",
+          "ol",
+          "button"
+        ],
+        "exclude_if_contains": [
+          "a",
+          "button",
+          "li"
+        ]
+      },
+      "threshold": "The element immediately preceding the primary `<h1>` in document order, when its text is <= 60 characters AND <= 9 words, AND it is either fully uppercase or carries `letter-spacing >= 0.08em`, AND it is not itself a heading, and contains no links, list items, nav or buttons.",
+      "threshold_provenance": "from_source",
+      "severity": "fail",
+      "fix": "Delete it. The auto-fix in both source detectors is deletion, not rewriting. If the label carried real information, fold that information into the headline.",
+      "teach": "A small label above a big headline is a habit from slide decks. It makes the reader read the same idea twice, at two sizes, before reaching anything new. Deleting it always works — that is why both detectors that flag it simply remove it rather than suggesting a rewrite.",
+      "chess": "It is announcing the opening before you play it. The board will show what you are doing.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "Narrowly passes, for the wrong reason: the `<h1>` is the business name inside the nav, so nothing precedes it. The kickers on these pages sit above `<h3>` section headings instead — caught by T2-KICKER-ANY. See also A-HEADING-ORDER, which flags the underlying misuse of h1."
+      }
+    },
+    {
+      "id": "T2-KICKER-ANY",
+      "tier": 2,
+      "category": "type",
+      "title": "An eyebrow label above any heading",
+      "what_it_is": "The same small uppercase label, above any heading on the page — not just the main one. Usually one per section.",
+      "why_it_matters": "impeccable escalates this above the Gesso version and is unusually blunt about it: this one is a ban, not a default, and no brief earns it back. The corpus also records a real site shipping six of them on two pages and auto-failing its own author's detector.",
+      "source": {
+        "name": "impeccable",
+        "confidence": "ASSERTED",
+        "where": "craft-floor.md, Refuse / Page scaffolds",
+        "quote": "A kicker or eyebrow above a heading. This one is a ban, not a default: no brief earns it back. The heading carries its own weight; delete the label and let the heading speak."
+      },
+      "also_in": [
+        {
+          "name": "research_11a",
+          "where": "§1.2: six kickers across two pages, auto-failing the site author's own detector"
+        }
+      ],
+      "confidence_note": "impeccable states this as a flat ban with no number and no counted sample. The narrow H1-only version (T2-KICKER-H1) is the one with a published detector and threshold. This broader version is a strong opinion held by an enforced tool, which is why it is `warn` here rather than `fail`.",
+      "detector": {
+        "kind": "dom_precedes_heading",
+        "heading": "any",
+        "max_chars": 60,
+        "max_words": 9,
+        "require_any": [
+          "uppercase",
+          "letter_spacing_ge_0.08em"
+        ],
+        "exclude_tags": [
+          "h1",
+          "h2",
+          "h3",
+          "h4",
+          "h5",
+          "h6",
+          "nav",
+          "ul",
+          "ol",
+          "button"
+        ]
+      },
+      "threshold": "Same conditions as T2-KICKER-H1, applied to every heading rather than only the primary `<h1>`. Counted per occurrence.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Delete every one of them. Then check whether the headings underneath still say enough on their own; usually they do, and where they do not, the fix is a better heading.",
+      "teach": "Once you have one of these labels, you tend to add one to every section for consistency, and then the page has five tiny shouting captions. The heading below each one is already doing that job. Take them all out and read the page again.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 13,
+        "note": "`p.sec-label` — 12.5px, uppercase, letter-spacing 0.13em, accent-coloured — immediately precedes `h3.sec` on every page."
+      }
+    },
+    {
+      "id": "T2-PUFFY-SHADOW",
+      "tier": 2,
+      "category": "material",
+      "title": "Puffy stacked shadows",
+      "what_it_is": "A box-shadow built from several blurred layers, or one heavy blurred layer, so that cards appear to float on a soft pillow.",
+      "why_it_matters": "Depth on a page should be barely perceptible. The reference tier is subtractive here: Legora ships zero box-shadows on its entire homepage, and so does Teenage Engineering. Puffy stacks are the cheap-tier signature. Layer count is NOT a performance question — a 5-layer ladder and a 2-layer shadow measured the same speed — so the objection is purely that it looks generated, and that is decisive by itself.",
+      "source": {
+        "name": "gesso",
+        "confidence": "DEMONSTRATED",
+        "where": "rule `heavy-box-shadow`",
+        "quote": "FAIL if >= 3 blurred non-inset layers OR >= 2 layers where any alpha > 0.12 OR 1 blurred layer with alpha > 0.30"
+      },
+      "also_in": [
+        {
+          "name": "research_11",
+          "where": "§4.4: measured 5-layer 18.55ms vs 2-layer 17.86ms — the same speed, so the objection is aesthetic and stands on its own"
+        },
+        {
+          "name": "impeccable",
+          "where": "craft-floor.md, Verify / Depth: 'shadows carry an offset and a soft blur. A zero-offset colored halo is decoration.'"
+        }
+      ],
+      "detector": {
+        "kind": "box_shadow",
+        "mode": "puffy",
+        "max_blurred_layers": 2,
+        "multi_layer_alpha_max": 0.12,
+        "single_layer_alpha_max": 0.3
+      },
+      "threshold": ">= 3 blurred non-inset layers, OR >= 2 blurred layers where any alpha > 0.12, OR a single blurred layer with alpha > 0.30. Inset shadows and zero-blur rings are not counted as layers here.",
+      "threshold_provenance": "from_source",
+      "severity": "fail",
+      "fix": "Flatten to one barely-there layer, or remove shadows entirely and separate surfaces with a 1px hairline instead. On a dark background, never use shadow for depth — raise the lightness of the raised surface by about 3% per level.",
+      "fix_code": "box-shadow: 0 1px 2px rgba(0, 0, 0, .06);",
+      "teach": "A shadow's job is to say 'this is slightly in front of that', and it takes almost nothing to say it. Big soft shadows are what a machine reaches for when it wants a card to look important. The safest version is a single one-pixel shadow at about six percent opacity, and the best version on many pages is no shadow at all.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 26,
+        "note": "Two findings per page. `--shadow: 0 1px 2px rgba(0,0,0,.05), 0 12px 34px -18px rgba(0,0,0,.28)` is two blurred layers with a peak alpha of 0.28, above the 0.12 multi-layer bar; research/08a C7 called it 'borderline' and by the published threshold it fires. The dark-mode variant at alpha 0.85 fires harder. NOTE: this rule initially reported nothing because of a real bug in this engine's shadow parser — a bare unitless `0` offset was not being read as a length, so `0 1px 2px` parsed as an offset shadow with no blur. That bug also produced a false positive on T2-HARD-OFFSET-SHADOW. Both are fixed; the episode is recorded because it is exactly the kind of error a rulebook that never runs its own detectors would ship."
+      }
+    },
+    {
+      "id": "T2-COLOR-GLOW",
+      "tier": 2,
+      "category": "material",
+      "title": "A coloured glow on a light background",
+      "what_it_is": "A box-shadow tinted with the accent colour — most often under a button — creating a halo rather than a shadow. The worst form has zero offset, so the light is coming from nowhere.",
+      "why_it_matters": "Light has a direction. A zero-offset coloured halo is physically impossible and reads as a sticker rather than an object. The corpus's competitor audit found a 44px zero-offset blue glow on the site it was measuring AGAINST, as a marker of the cheap tier.",
+      "source": {
+        "name": "research_08",
+        "confidence": "ASSERTED",
+        "where": "§8.1: 'never a coloured glow on a light ground'"
+      },
+      "also_in": [
+        {
+          "name": "impeccable",
+          "where": "craft-floor.md, Verify / Depth: 'A zero-offset colored halo is decoration.'"
+        },
+        {
+          "name": "research_11",
+          "where": "§1.2 Oak Harbor Web Designs: 'Glowing blue shadow rgba(67,183,255,0.2) 0 0 44px — zero offset, i.e. physically impossible light'"
+        }
+      ],
+      "confidence_note": "Nobody measured how a buyer reads a glow. What IS counted is that the two cheap-tier competitor sites in the reference set both carry one and none of the twenty reference-tier sites do.",
+      "detector": {
+        "kind": "box_shadow",
+        "mode": "colored_glow",
+        "require_saturated": true,
+        "chroma_min": 0.05
+      },
+      "threshold": "A non-inset box-shadow whose colour has OKLCH chroma >= 0.05 (i.e. is not a grey or a near-black) applied on a light surface. Reported at higher severity when both offsets are 0.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "warn",
+      "fix": "Drop the glow. Keep any lift you had on hover as a small upward movement instead. If you want the button to feel raised, give it a hairline and let the fill do the work.",
+      "teach": "A shadow is where light does not reach. A coloured glow is light coming OUT of the button, which nothing in the physical world does, and the eye notices even when the mind does not. Remove it; the button will look more solid, not less.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 26,
+        "note": "`.btn { box-shadow: 0 8px 22px -10px var(--accent) }` and again at 0 14px 30px -12px on hover. Both are accent-coloured on a light ground. They do carry an offset, so they are the milder form."
+      }
+    },
+    {
+      "id": "T2-HARD-OFFSET-SHADOW",
+      "tier": 2,
+      "category": "material",
+      "title": "The zero-blur block shadow",
+      "what_it_is": "A shadow with an offset but no blur at all — `box-shadow: 4px 4px 0` — giving a hard duplicate edge behind the element.",
+      "why_it_matters": "It belongs to one specific visual world (neobrutalism). Outside that world it is a costume: the page is wearing a style it did not choose, to look like it has a point of view.",
+      "source": {
+        "name": "impeccable",
+        "confidence": "ASSERTED",
+        "where": "craft-floor.md, Refuse / Surface habits",
+        "quote": "Hard offset shadows (box-shadow: 4px 4px 0) outside a world that is actually neobrutalist. The zero-blur block shadow is a costume, not a depth system; a world that did not choose it never earns it as a default."
+      },
+      "confidence_note": "A taste judgement from an enforced tool, with no counted sample. Fires as `info` unless the project has declared a visual world in which it is out of place.",
+      "detector": {
+        "kind": "box_shadow",
+        "mode": "zero_blur",
+        "min_offset": 2
+      },
+      "threshold": "A non-inset box-shadow with blur radius 0 and an offset of 2px or more.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "info",
+      "fix": "If the whole page is deliberately neobrutalist — heavy borders, flat colour, no soft edges anywhere — keep it and silence this rule. Otherwise use a soft 1px shadow or a hairline.",
+      "teach": "A shadow with no softness at all is a specific style, not a neutral one. If the rest of the page is soft and quiet, one hard-edged shadow looks like it wandered in from a different site.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "Zero, after the shadow-parser fix described under T2-PUFFY-SHADOW. It initially reported 26 false positives."
+      }
+    },
+    {
+      "id": "T2-RADIUS-40",
+      "tier": 2,
+      "category": "material",
+      "title": "Corners rounded past the point of confidence",
+      "what_it_is": "A filled surface — a card, a panel, a section — with `border-radius` of 40px or more.",
+      "why_it_matters": "Past about 24px, corners stop reading as 'soft' and start reading as 'blobby': the friendly dial turned past its stop. The corpus measured a competitor site with 152 elements at radius >= 40px and used it as a marker of the cheap tier.",
+      "source": {
+        "name": "gesso",
+        "confidence": "DEMONSTRATED",
+        "where": "rule `over-rounded-card`",
+        "quote": "40px+ corners turn content cards into blobs: the 'friendly' dial turned past its stop. Confident systems hold 8-24px."
+      },
+      "detector": {
+        "kind": "css_decl",
+        "property": "^border-radius$",
+        "value_numeric": {
+          "unit": "px",
+          "min": 40,
+          "max": 400
+        },
+        "exclude_values": [
+          "9999px",
+          "999px",
+          "50%"
+        ]
+      },
+      "threshold": "`border-radius` between 40px and 400px on a filled surface. Pills (`9999px`, `999px`) and circles (`50%`) pass this rule — they are a different shape, not an over-rounded rectangle. See T2-PILL-CTA for the pill.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Clamp to 24px. Confident systems hold 8-24px and use ONE radius throughout rather than three.",
+      "teach": "Rounded corners have a working range. Below about 8px they are barely visible; above about 24px the box stops looking like a box. Pick one value between those and use it for everything on the page.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "Cards sit at 18px, inside the band. The pills at 999px pass this rule by design and are caught by T2-PILL-CTA."
+      }
+    },
+    {
+      "id": "T2-PILL-CTA",
+      "tier": 2,
+      "category": "material",
+      "title": "The fully-rounded pill button",
+      "what_it_is": "A primary button with `border-radius: 999px` or `9999px`, making it a capsule.",
+      "why_it_matters": "It passes the over-rounded detector by construction, and the corpus still names it separately: the pill CTA is the most-cloned single element of 2026. It is not wrong. It is just not a decision.",
+      "source": {
+        "name": "research_08",
+        "confidence": "ASSERTED",
+        "where": "§8.2: 'the pill CTA is separately the most-cloned single element of 2026'"
+      },
+      "also_in": [
+        {
+          "name": "research_08a",
+          "where": "R3: move the radius to a per-project language of soft 18px / crisp 4px / flat 0"
+        }
+      ],
+      "confidence_note": "An assertion with no counted sample. It is `info`, and it should stay `info`: a pill button is a completely reasonable thing to ship. The value of the rule is that it makes the choice visible rather than automatic.",
+      "detector": {
+        "kind": "css_decl",
+        "property": "^border-radius$",
+        "value": "^(999+|9999+)px$|^50rem$|^100vmax$",
+        "selector_hint": "btn|button|cta"
+      },
+      "threshold": "`border-radius` of 999px or more on an element whose selector matches /btn|button|cta/.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "info",
+      "fix": "Decide it rather than inherit it. Pick one corner language for the whole project and hold it: soft (18px), crisp (4px), or flat (0). Radius, shadow and border weight as a TRIPLE are what make two pages read as different studios; any one of them alone carries almost nothing.",
+      "teach": "A capsule-shaped button is everywhere right now, which is neither good nor bad — but you should be able to say why yours is that shape. Choosing one corner style and applying it to every box on the site is what makes a page look like it came from one hand.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 13,
+        "note": "`border-radius: 999px` on `.btn`, `.ghost` and the proof-list chips. Reported once per page after deduplication."
+      }
+    },
+    {
+      "id": "T2-BACKDROP-BLUR",
+      "tier": 2,
+      "category": "material",
+      "title": "backdrop-filter: blur()",
+      "what_it_is": "The frosted-glass effect: a sticky bar or card that blurs whatever is scrolling behind it.",
+      "why_it_matters": "Three separate costs. It is named by practitioners as the single marker of a machine-generated page. It repaints continuously while the page scrolls, which is exactly the wrong thing on a mid-range Android. And it disables subpixel text rendering for the whole element, so the text inside it gets measurably blurrier.",
+      "source": {
+        "name": "research_08",
+        "confidence": "DEMONSTRATED",
+        "where": "§4 Tier 2; §7.1 forbidden list",
+        "quote": "It's not a Claude generated website without at least one backdrop-filter: blur(1000px) element that slows older machines to a crawl."
+      },
+      "also_in": [
+        {
+          "name": "impeccable",
+          "where": "craft-floor.md, Refuse: 'Glass and blur as decoration rather than as a specific effect.'"
+        },
+        {
+          "name": "research_11",
+          "where": "§4.6: measured second-best of eight treatments under CPU throttle — and explicitly says NOT to quote that number as proof it is safe, because the effect is GPU-bound and CPU throttling does not model an Android GPU"
+        }
+      ],
+      "detector": {
+        "kind": "css_regex",
+        "pattern": "backdrop-filter\\s*:\\s*[^;]*blur|-webkit-backdrop-filter\\s*:\\s*[^;]*blur",
+        "flags": "i"
+      },
+      "threshold": "Any `backdrop-filter` or `-webkit-backdrop-filter` containing `blur()`.",
+      "threshold_provenance": "from_source",
+      "severity": "fail",
+      "fix": "Replace with a solid background in the page's own ground colour plus a 1px hairline border underneath. It is more confident, it has no failure modes, and the text inside it gets sharper.",
+      "fix_code": "background: var(--bg); border-bottom: 1px solid var(--line);",
+      "teach": "Frosted glass looks expensive and costs the phone real work — it has to re-blur the background on every frame while you scroll. It also makes the text sitting on it slightly fuzzier. A solid bar with a thin line under it looks more certain and never stutters.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 13,
+        "note": "`header.nav { backdrop-filter: blur(14px) }` on all 13."
+      }
+    },
+    {
+      "id": "T2-HERO-GLOW",
+      "tier": 2,
+      "category": "material",
+      "title": "The blurred glow behind the hero",
+      "what_it_is": "A decorative pseudo-element behind the headline holding a radial gradient, usually with `filter: blur()` on top of it, producing a soft coloured haze.",
+      "why_it_matters": "The corpus names this the single most recognisable AI-artifact element in its own generator's output, and removes it first. `filter: blur()` is not composite-only: it forces a paint, and a full-viewport blurred layer is pure GPU cost on a cheap phone, spent entirely on identifying the page as generated.",
+      "source": {
+        "name": "research_08a",
+        "confidence": "MEASURED_HERE",
+        "where": "R1: 'the single most recognisable AI-artifact element in the file'"
+      },
+      "detector": {
+        "kind": "css_cooccur",
+        "within_rule": true,
+        "requires": [
+          {
+            "property": "background",
+            "value": "radial-gradient"
+          },
+          {
+            "property": "filter",
+            "value": "blur"
+          }
+        ]
+      },
+      "threshold": "One CSS rule containing both a `radial-gradient` background and a `filter: blur()`. Also fires on a `::before`/`::after` with a radial-gradient sized above 50vh.",
+      "threshold_provenance": "from_source",
+      "severity": "fail",
+      "fix": "Delete the pseudo-element entirely. If the hero needs texture, use the static grain tile (MAT-GRAIN) — about 570 bytes, rasterised once, and zero cost while scrolling.",
+      "teach": "A soft coloured haze behind a headline is decoration that the phone has to redraw. It is also one of the most repeated looks in machine-made pages. Deleting it makes the page faster and less familiar at the same time.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 13,
+        "note": "`.hero::before` — a 70vh radial-gradient at 22% accent with `filter: blur(20px)`, on all 13 pages."
+      }
+    },
+    {
+      "id": "T2-AVATAR-GRADIENT",
+      "tier": 2,
+      "category": "material",
+      "title": "The gradient initials mark",
+      "what_it_is": "A small rounded square holding the business's initials, filled with a diagonal two-colour gradient.",
+      "why_it_matters": "It is a specific, recognisable cliché — the default avatar shape of several developer tools, reproduced as though it were a logo. It also has an honesty dimension: a generated mark presented in a logo position implies a brand identity that does not exist.",
+      "source": {
+        "name": "research_08a",
+        "confidence": "MEASURED_HERE",
+        "where": "C11 / R4: 'the shadcn/Vercel avatar cliche'"
+      },
+      "also_in": [
+        {
+          "name": "chess_tee_forge",
+          "where": "DESIGN-SYSTEM.md §1: 'A premature logo is worse than none, so the dashed field is the design: an unfilled box on a drawing.'"
+        }
+      ],
+      "detector": {
+        "kind": "css_cooccur",
+        "within_rule": true,
+        "requires": [
+          {
+            "property": "background",
+            "value": "linear-gradient"
+          },
+          {
+            "property": "border-radius",
+            "value": ".+"
+          }
+        ],
+        "and_selector": "mark|logo|avatar|initials|brand|wordmark"
+      },
+      "threshold": "A rule whose selector matches /mark|logo|avatar|initials|brand|wordmark/ carrying both a `linear-gradient` background and a `border-radius`.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "warn",
+      "fix": "Keep the shape, drop the gradient: a flat accent-tinted square with the initials in the accent colour, or a hairline-bordered square. If no logo exists yet, draw the placeholder AS a placeholder — a dashed box that says so — rather than inventing a mark.",
+      "teach": "A gradient-filled square with two letters in it is the default profile picture of several developer tools, and putting it where a logo goes suggests a brand that has not been designed. If the business has no logo, say so on the page. An honest empty box is a conversation; an invented mark is a small lie.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 13,
+        "note": "`.mark { border-radius: 12px; background: linear-gradient(140deg, var(--accent), var(--accent-soft)) }` on all 13."
+      }
+    },
+    {
+      "id": "T2-PURE-BW",
+      "tier": 2,
+      "category": "color",
+      "title": "Pure black on pure white",
+      "what_it_is": "`#000` used as a text colour or `#fff` used as a page background — the two colours at the absolute ends of the range.",
+      "why_it_matters": "This is the most counted rule in the corpus and one of the least visible to a non-designer, which is exactly why it is safe to apply: it raises perceived quality without ever registering as expense. Twelve of thirteen measured reference sites avoid both. Legora runs #0D1016 on #ECECE7; Anthropic #141413 on #F0EEE6; a single bakery in San Francisco on a hosted theme with no design budget runs #4A494A on #F7F1EE.",
+      "source": {
+        "name": "research_11",
+        "confidence": "MEASURED_HERE",
+        "where": "§7 composition table: 'Never #000 on #FFF — 12 of 13 measured sites comply'"
+      },
+      "also_in": [
+        {
+          "name": "hallmark",
+          "where": "color.md: pure #000/#fff banned"
+        }
+      ],
+      "detector": {
+        "kind": "hex_set",
+        "hexes": [
+          "#000",
+          "#000000",
+          "#fff",
+          "#ffffff"
+        ],
+        "roles": [
+          "text",
+          "background"
+        ]
+      },
+      "threshold": "`#000`/`#000000` as a colour, or `#fff`/`#ffffff` as a background or page ground. Pure white as the label colour ON a saturated button is a separate, milder case and is reported at lower severity.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Move both ends a step inward and give each a trace of the page's hue. Off-black around OKLCH lightness 0.16-0.22, off-white around 0.96-0.98, both carrying 0.005-0.015 chroma of the anchor hue.",
+      "fix_code": "--ink: #171615;  /* not #000 */\n--paper: #F6F5E8; /* not #fff */",
+      "teach": "Pure black text on pure white is harsher than anything you see on paper, and almost every well-made site quietly avoids it. Nudging both ends slightly — a very dark brown-grey, a very slightly warm white — is invisible to the reader and makes the whole page feel considered. It costs two values.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 26,
+        "note": "`--bg-2: #ffffff` as a card ground, plus `color: #fff` on the mark and the button label. Two distinct findings per page after deduplication."
+      }
+    },
+    {
+      "id": "T2-ZERO-CHROMA-GREY",
+      "tier": 2,
+      "category": "color",
+      "title": "Greys with no colour in them at all",
+      "what_it_is": "Neutral colours — greys used for body text, borders, panels — mixed from equal red, green and blue, so they carry no hue.",
+      "why_it_matters": "A page with a warm accent and cool grey body copy looks wrong and most people cannot name why. Every neutral should carry a trace of the page's anchor hue. This is confirmed by a production number rather than asserted: Oxide's page ground is `oklch(0.162 0.01 260)` — chroma 0.01, deliberately not 0.",
+      "source": {
+        "name": "hallmark",
+        "confidence": "ASSERTED",
+        "where": "color.md: 'Every neutral should carry 0.005-0.015 chroma of the anchor hue. Minimum 0.005, never 0.'"
+      },
+      "also_in": [
+        {
+          "name": "research_11",
+          "where": "§7: Oxide's ground at chroma 0.01 independently confirms the never-zero rule with a production value"
+        }
+      ],
+      "confidence_note": "Hallmark asserts the 0.005-0.015 band; nobody tested it. What is DEMONSTRATED is that reference-tier sites do carry chroma in their neutrals. The upper bound of the band is the softer half of the claim — this rulebook found the preview corpus running neutrals at chroma 0.027, above the band, and treats that as a weaker finding than chroma 0.",
+      "detector": {
+        "kind": "hex_oklch_band",
+        "mode": "neutrals",
+        "chroma_min": 0.005,
+        "chroma_max": 0.015,
+        "lightness": [
+          0.0,
+          1.0
+        ],
+        "report": "outside_band"
+      },
+      "threshold": "A colour used as a neutral (chroma < 0.04) whose chroma is below 0.005. Chroma between 0.015 and 0.04 is reported as `info` — over-tinted rather than untinted.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Rebuild the neutral ramp in OKLCH from the accent's hue, at chroma 0.005-0.015, then emit hex. Do not ship `oklch()` literals to an unknown phone — see C-OKLCH-LITERAL.",
+      "teach": "Grey does not have to be colourless. Adding a tiny amount of your main colour into every grey — so little that nobody could name it — makes the greys belong to the page instead of sitting on top of it. Pure grey next to a warm colour is the mismatch people feel and cannot explain.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 39,
+        "note": "3 findings per page in the light palette. `--bg: #fbfaf8` is chroma 0.0029, BELOW the 0.005 floor; `--bg-2: #ffffff` is chroma 0; `--fg-2: #5a6070` is chroma 0.0267, ABOVE the 0.015 ceiling. Dark-theme tokens are excluded — a dark palette is a different palette, not an untinted grey."
+      }
+    },
+    {
+      "id": "T2-SINGLE-FONT",
+      "tier": 2,
+      "category": "type",
+      "title": "One typeface doing every job",
+      "what_it_is": "The same font family used for the headline, the body text and the interface labels.",
+      "why_it_matters": "Gesso's line is flat: a one-font page is a template page. Every reference-tier site in the corpus uses at least two families — typically a display face and a text face. This is also the cheapest way out of the named-typeface trap, because the second face does not have to be famous.",
+      "source": {
+        "name": "gesso",
+        "confidence": "DEMONSTRATED",
+        "where": "rule `single-font-page`",
+        "quote": "A one-font page is a template page."
+      },
+      "also_in": [
+        {
+          "name": "research_11",
+          "where": "§5.6: 'Two families, not one — a display face and a text face — which satisfies single-font-page and is what every reference site actually does'"
+        }
+      ],
+      "detector": {
+        "kind": "font_stack",
+        "mode": "single_family",
+        "min_families": 2
+      },
+      "threshold": "Fewer than 2 distinct primary font families across the declared `font-family` stacks, where a family is the first non-generic entry in each stack.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Add a second family for headings only. On a page that must make no external requests, the free version is a serif system stack on headings (`ui-serif, Georgia, 'Times New Roman', serif`) with the system sans for body — but verify on Android, which has no Georgia and will give you Noto Serif.",
+      "teach": "Books use one typeface for chapter titles and another for the paragraphs, and the difference is half of why a book looks like a book. A page where every word is the same typeface reads as a document nobody typeset. Two is enough; three is usually too many.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 13,
+        "note": "One stack — `ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif` — for the entire page on all 13."
+      }
+    },
+    {
+      "id": "T2-BANNED-FONT",
+      "tier": 2,
+      "category": "type",
+      "title": "A typeface on the named-tell list",
+      "what_it_is": "A font family that appears on the corpus's banned lists: Inter, Space Grotesk, Geist, Instrument Serif, Roboto, Montserrat, Poppins, Open Sans, Lato, Raleway, Work Sans, DM Sans, Arial, Helvetica.",
+      "why_it_matters": "These are the faces a generator reaches for. There is a real and important refutation to record alongside it, though: the corpus measured Linear's shipped type at H1 38px / weight 510 / -0.022em and concluded Inter is not the tell — UNTUNED Inter is. Nobody generating slop types 510.",
+      "source": {
+        "name": "gesso",
+        "confidence": "DEMONSTRATED",
+        "where": "rules `overused-font-stack`, `single-font-page`; Hallmark's banned list"
+      },
+      "also_in": [
+        {
+          "name": "research_11",
+          "where": "§1.2 Linear: 'The most useful thing here is the refutation: Inter is not the AI tell — untuned Inter is.'"
+        }
+      ],
+      "confidence_note": "There is a trap inside this rule that the corpus names explicitly. On a page that may make no external requests, the honest answer is a system stack — and on Android `system-ui` resolves to Roboto, which is on the banned list. The constraint-satisfying answer lands you on a named tell for exactly the device your audience uses. So this rule is `warn` on a single-file page and `fail` on a hosted one, where self-hosting a subsetted face dissolves the conflict.",
+      "detector": {
+        "kind": "font_stack",
+        "mode": "banned",
+        "banned_faces": [
+          "inter",
+          "space grotesk",
+          "geist",
+          "instrument serif",
+          "instrument sans",
+          "roboto",
+          "montserrat",
+          "poppins",
+          "open sans",
+          "lato",
+          "raleway",
+          "work sans",
+          "dm sans",
+          "arial",
+          "helvetica",
+          "helvetica neue"
+        ],
+        "ignore_position": "fallback_only"
+      },
+      "threshold": "A banned face named as the FIRST family in any `font-family` stack. A banned face appearing later in the stack as a fallback is not counted — that is what a fallback is for.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "applies_to": [
+        "any"
+      ],
+      "fix": "On a hosted site: self-host one subsetted variable `woff2` from outside the list. Candidates that are free, self-hostable, and on neither banned list: Newsreader, Fraunces, Bricolage Grotesque, Martian Mono. Reject Playfair Display and Instrument Serif — both read 'wedding invitation'. On a single-file page where a webfont is impossible, tune what you have: the weight and tracking matter more than the name.",
+      "teach": "A handful of typefaces show up on almost every machine-made page, so they carry a faint smell of the machine. The useful finding underneath is that the typeface is rarely the real problem — the settings are. A common font set carefully looks better than a rare font set carelessly.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "Passes on the letter of the rule: the stack leads with `ui-sans-serif, system-ui`, and Inter, Roboto, Arial and Helvetica appear only as fallbacks. On Android that stack RESOLVES to Roboto, so the page ships a banned face to most of its audience while passing a static check. This is a genuine limit of static analysis and is recorded rather than hidden — TY-ANDROID-WEIGHT catches the consequence that IS statically detectable."
+      }
+    },
+    {
+      "id": "T2-DISPLAY-WEIGHT",
+      "tier": 2,
+      "category": "type",
+      "title": "The headline is shouting",
+      "what_it_is": "A display heading set at font-weight 700 or above.",
+      "why_it_matters": "This is the loudest single signal in the corpus and it is free to fix. Measured across two tiers: the reference tier runs Legora 450, Linear 510, Ramp 400, Oxide every style 400, Teenage Engineering 100 and 300. The cheap tier runs Oak Harbor 900 uppercase and Valley Construction 900. Everything cheap shouts at 900; everything expensive whispers at 400-510. And a non-designer cannot see 450 versus 900 — he sees loud versus quiet, which is exactly why the move is safe.",
+      "source": {
+        "name": "research_11",
+        "confidence": "MEASURED_HERE",
+        "where": "§5.1: 'Dropping 900 to 450 and adding -0.02em costs zero dollars, zero kilobytes and zero new files, and it is the largest single perceptual move available.'"
+      },
+      "detector": {
+        "kind": "weight_census",
+        "mode": "display",
+        "max_weight": 620,
+        "selector_hint": "h1|h2|\\.hero|\\.display|\\.title"
+      },
+      "threshold": "Any `font-weight` >= 620 on an element whose selector matches a display heading. 620 is the midpoint between the reference tier's ceiling (510) and the cheap tier's floor (700), chosen so that 550-600 does not fire.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "warn",
+      "fix": "Set the display weight to 450 and add `letter-spacing: -0.02em`. Recover the lost presence with size and line-height, not weight. If the type looks weak at 450, the problem is usually that the headline is too long — cap it at 16-22 characters wide.",
+      "fix_code": "h1 { font-weight: 450; letter-spacing: -0.02em; line-height: 1.04; max-width: 18ch; text-wrap: balance; }",
+      "teach": "Heavy headlines look like they are trying hard. The sites that read as expensive almost all set their headlines at a normal or barely-bolder weight and win the attention back with size and space. Nobody can see the difference between weight 450 and weight 900 as a number — they only register loud or quiet, and quiet reads as certain.",
+      "chess": "Playing every move with an exclamation mark. The strongest players annotate mostly in silence.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 26,
+        "note": "`font-weight: 760` on the hero h2 and 650-700 on nav and buttons, on all 13."
+      }
+    },
+    {
+      "id": "TY-ANDROID-WEIGHT",
+      "tier": 2,
+      "category": "type",
+      "title": "A weight ladder that does not exist on Android",
+      "what_it_is": "Three or more distinct non-standard font weights (like 560, 650, 760) declared on a page whose font stack resolves to a system font.",
+      "why_it_matters": "This is a genuinely hidden defect and it is the sharpest finding in the corpus's own site audit. On Android, `system-ui` resolves to Roboto, and Roboto as shipped by the system is static, not variable: it exposes 400 and 700 plus 300/500 on some builds. Every weight from 550 to 949 snaps to 700. So a page that believes it has a six-step ladder has two steps on the demo device — and the one it lands on is 700, which is the cheap-tier signature.",
+      "source": {
+        "name": "research_11a",
+        "confidence": "MEASURED_HERE",
+        "where": "§1.1: 'The type system believes it has six weights. On Android it has two.'"
+      },
+      "detector": {
+        "kind": "weight_census",
+        "mode": "synthetic_ladder",
+        "min_distinct_nonstandard": 3,
+        "requires_system_stack": true
+      },
+      "threshold": ">= 3 distinct `font-weight` values outside {100,200,300,400,500,600,700,800,900} declared on a page whose primary font family is a system keyword (`system-ui`, `ui-sans-serif`, `-apple-system`) with no `@font-face` variable font loaded.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Two fixes and both are needed. Ship a real variable webfont if the delivery allows it. And regardless, cut the ladder to weights that exist: 400 and 500 for text, 450 for display. A ladder of decimals nobody's phone can render is precision that is not on the screen.",
+      "teach": "Font weight is not a dial on most phones — it is a set of steps, and a system font usually has only two or three of them. Asking for weight 760 on an Android phone gets you 700, and so does asking for 650, and so does 720. Your careful hierarchy collapses into one weight. Use the weights that actually exist.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 13,
+        "note": "Each page declares 760, 650, 550, 450, 700, 500 on a `ui-sans-serif, system-ui` stack with no @font-face. On Android that is two weights, not six."
+      }
+    },
+    {
+      "id": "T2-TIGHT-TRACKING",
+      "tier": 2,
+      "category": "type",
+      "title": "Letters pulled too tight on a large heading",
+      "what_it_is": "`letter-spacing` of -0.03em or tighter on a display-size heading.",
+      "why_it_matters": "Named in the corpus as a detected AI-slop signature, measured on this project's own generator output at -0.035em on a 5.2rem hero. There is a real principle underneath: tracking is a correction, not a style. It is a function of how the particular typeface fits at that particular size — measured need across three faces ranged from -0.04em to effectively nothing.",
+      "source": {
+        "name": "research_08",
+        "confidence": "MEASURED_HERE",
+        "where": "§4 Tier 2 and §4's measured list; research/11 §5.3: 'Hard stop at -0.02em on a large hero.'"
+      },
+      "detector": {
+        "kind": "css_cooccur",
+        "within_rule": true,
+        "requires": [
+          {
+            "property": "letter-spacing",
+            "value_numeric": {
+              "unit": "em",
+              "max": -0.03
+            }
+          }
+        ],
+        "and_property_present": "font-size"
+      },
+      "threshold": "`letter-spacing` <= -0.03em in a rule that also sets a display-size `font-size` (>= 2rem, or a `clamp()` whose maximum is >= 2rem).",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Hard stop at -0.02em. Use the tracking ladder instead of one value: roughly -0.005 to -0.01em at 18px and below, -0.015em at 24-32px, -0.02em at 36-48px, -0.025em at 56px and up. Never tighten body copy at all. Small uppercase labels take +0.06em, and no more than twice on a page.",
+      "teach": "Letter-spacing is the gap between letters. Large type genuinely needs a little less gap than small type, so a small negative value on a headline is correct. Past about -0.02 the letters start touching and it reads as a style choice rather than a correction — and it is the exact value machine-made pages keep landing on.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 13,
+        "note": "`letter-spacing: -.035em` on a `clamp(2.4rem, 7.2vw, 5.2rem)` hero, on all 13."
+      }
+    },
+    {
+      "id": "T2-UNIVERSAL-FADEUP",
+      "tier": 2,
+      "category": "motion",
+      "title": "Every section fading up on scroll",
+      "what_it_is": "A reveal-on-scroll class applied to most or all of the page's content, so nothing is visible until it has been scrolled to.",
+      "why_it_matters": "The page never settles. This has been the default output of one scroll-animation library since 2015, so the uniformity IS the signature. The corpus frames it as a budget problem: roughly 100% of the motion budget spent on one identical reveal applied to twelve elements, when two or three moments that respond to the USER would read as more considered while doing strictly less.",
+      "source": {
+        "name": "hallmark",
+        "confidence": "ASSERTED",
+        "where": "anti-patterns.md; febbhav tell #35",
+        "quote": "Every section fades in when it enters the viewport. Every list staggers. The page never settles."
+      },
+      "also_in": [
+        {
+          "name": "freiberg",
+          "where": "the 90/10 novelty rule, applied to a motion budget in research/08 §2.2"
+        }
+      ],
+      "confidence_note": "The 90/10 rule is a design essay offering a framework, not evidence. What is demonstrated is only that the uniform fade-up is the default of a widely-used library and is therefore extremely common.",
+      "detector": {
+        "kind": "dom_repeated_siblings",
+        "mode": "reveal_saturation",
+        "max_ratio": 0.5
+      },
+      "threshold": "More than half of the page's top-level content blocks carry the same reveal/animate-on-scroll class.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "warn",
+      "fix": "Spend the budget on the press instead. Two rules: a `:active` scale on real buttons, and at most one entrance sequence below the fold. Above the fold nothing animates, because there is no scroll yet.",
+      "teach": "When everything on a page animates in, the animation stops meaning anything — it just delays the reading. The version that feels considered is the opposite: almost nothing moves on its own, and the things the visitor touches respond instantly. One is cheaper to build and reads as more expensive.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 6,
+        "hits_total": 6,
+        "note": "6 of 13 cross the half-the-page threshold outright (58-70% of content blocks carry the reveal class); the rest trip the uniformity clause instead — 5 or more elements sharing one identical treatment. Both are the same finding measured two ways."
+      }
+    },
+    {
+      "id": "T2-HERO-REVEAL",
+      "tier": 2,
+      "category": "performance",
+      "title": "The biggest thing on the page is hidden until JavaScript runs",
+      "what_it_is": "The main headline — almost always the Largest Contentful Paint element — starts at `opacity: 0` and is revealed by a script.",
+      "why_it_matters": "It is a bug, not a taste call. An element at `opacity: 0` does not count as painted, so the page's own largest paint waits for a script to parse and an observer to fire. Above-the-fold content should never be revealed on scroll for the simple reason that there is no scroll yet.",
+      "source": {
+        "name": "research_08a",
+        "confidence": "MEASURED_HERE",
+        "where": "C1, and its own correction in the implementation log"
+      },
+      "confidence_note": "The MECHANISM is real and the fix is right regardless. The MAGNITUDE was overstated in the corpus's first pass and corrected after a controlled A/B: hero inside the reveal 744ms median LCP, hero outside 700ms, n=7 per arm, ranges 572-1256 and 308-976 — the difference is inside the noise. Chrome treats an element as painted once its opacity is non-zero, i.e. at the START of the fade. Do not repeat the original '450ms penalty' figure; it was content differences between pages, not the reveal.",
+      "detector": {
+        "kind": "dom_nested",
+        "mode": "lcp_in_reveal",
+        "lcp_candidates": [
+          "h1",
+          "h2:first-of-type",
+          ".hero h1",
+          ".hero h2"
+        ]
+      },
+      "threshold": "The first heading inside the hero region carries a class that the stylesheet sets to `opacity: 0`.",
+      "threshold_provenance": "from_source",
+      "severity": "fail",
+      "fix": "Strip the reveal class from the hero heading, its subhead, its buttons and any proof list. Reveal starts at the first section below the fold, or not at all.",
+      "teach": "Browsers measure how quickly your biggest piece of content appears. If that piece starts invisible and waits for JavaScript, you have put your own score behind a script for no benefit — nobody has scrolled yet, so there is nothing to reveal. Let the top of the page simply be there.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 12,
+        "hits_total": 12,
+        "note": "CORRECTED BY THE RUN. This was written as a clean pass, from reading ONE preview. It is a pass in one file and a failure in twelve. research/08a's implementation log records C1 (hero out of the reveal) as done on 2026-08-31 — and only `quan-law-office-500c3fec72`, regenerated at 12:38 that day, carries it. The other twelve date from 01:27-02:11 and still ship `<h2 class=\"reveal\">`. The fix landed in the generator; the artifacts were never regenerated."
+      }
+    },
+    {
+      "id": "T2-NESTED-REVEAL",
+      "tier": 2,
+      "category": "motion",
+      "title": "A reveal inside a reveal",
+      "what_it_is": "An element with the reveal class containing children that also carry it, each with its own delay.",
+      "why_it_matters": "An `opacity: 0` subtree inside an `opacity: 0` parent with independent delays. The inner elements can finish their animation while the parent is still invisible, so the timings are meaningless and the content can appear in the wrong order.",
+      "source": {
+        "name": "research_08a",
+        "confidence": "MEASURED_HERE",
+        "where": "C2"
+      },
+      "detector": {
+        "kind": "dom_nested",
+        "mode": "same_class",
+        "class_pattern": "reveal|animate|fade-in|aos"
+      },
+      "threshold": "An element carrying a reveal class that contains a descendant carrying the same class.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Pull the whole group out of the reveal system rather than tuning the delays. Animate the container or the children, never both.",
+      "teach": "If a box fades in and the things inside it also fade in separately, the two fades fight each other and the timing stops being controllable. Pick one level to animate.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 6,
+        "hits_total": 6,
+        "note": "6 of 13 still ship `ul.proof.reveal` containing `li.reveal` — an opacity:0 subtree inside an opacity:0 parent, each with its own delay. C2 is recorded as done and is present in one file. Same cause as T2-HERO-REVEAL: the generator was fixed, the previews were not rebuilt."
+      }
+    },
+    {
+      "id": "T2-AOS-TRAVEL",
+      "tier": 2,
+      "category": "motion",
+      "title": "Elements travelling too far on entry",
+      "what_it_is": "A reveal animation that moves an element more than about 14 pixels into place.",
+      "why_it_matters": "40px and above is the default of a widely-used scroll-animation library and is the most recognisable template signature there is. The corpus supplies both ends of the dial from production: Legora's hero word reveal travels TWO pixels. Two pixels is felt, not seen — and a large travel distance reads as a website doing a trick, which invites the thought that someone paid for it.",
+      "source": {
+        "name": "kowalski",
+        "confidence": "ASSERTED",
+        "where": "research/08 §2.1 — the inverse of his never-animate-from-scale(0) rule"
+      },
+      "also_in": [
+        {
+          "name": "research_11",
+          "where": "§6.2: Legora translateY(2px), Linear translateY(20%), AOS default 40px+"
+        }
+      ],
+      "confidence_note": "The 8-14px band is asserted, not measured. The 40px AOS default is a matter of public record. The 2px production value is measured from live CSS.",
+      "detector": {
+        "kind": "css_decl",
+        "property": "^transform$|^translate$",
+        "value_numeric": {
+          "function": "translateY",
+          "unit": "px",
+          "min": 15
+        },
+        "selector_hint": "reveal|animate|fade|aos"
+      },
+      "threshold": "`translateY` of 15px or more in the hidden state of a reveal rule. The corpus locks 14px as the ceiling for a client site and recommends going quieter, not louder, on your own.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Set the travel to 14px and stop. On your own site, consider 2px, or no travel at all — a pure fade.",
+      "teach": "When something slides into place, the distance it travels is what decides whether the motion reads as considered or as a stunt. A long slide is the default setting of a popular animation library, so it is on an enormous number of pages. A very short one — a few pixels — is felt rather than seen, which is the effect you actually want.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "`translateY(14px)`, exactly on the ceiling. The source carries a comment marking it a locked parameter. Correct."
+      }
+    },
+    {
+      "id": "T2-PLAIN-EASE-ENTRANCE",
+      "tier": 2,
+      "category": "motion",
+      "title": "The sluggish entrance curve",
+      "what_it_is": "An entrance animation using the CSS keyword `ease`, or its literal equivalent `cubic-bezier(0.25, 0.1, 0.25, 1)`.",
+      "why_it_matters": "`ease` has an ease-IN component, so the element starts from zero velocity. That slow start is the sluggish signature. The alternative gives the effect that something came hustling in from far away and settles in front of the user. Easing is the most important part of any animation, and this is a one-token fix.",
+      "source": {
+        "name": "comeau",
+        "confidence": "DEMONSTRATED",
+        "where": "CSS Transitions, with live controls; Kowalski tip #4"
+      },
+      "also_in": [
+        {
+          "name": "research_11",
+          "where": "§1.2 Attio ships cubic-bezier(0.33,1,0.68,1) verbatim in production, confirming out-cubic was not just prior knowledge"
+        }
+      ],
+      "detector": {
+        "kind": "css_decl",
+        "property": "^(transition|transition-timing-function|animation|animation-timing-function)$",
+        "value": "(?:^|[\\s,])ease(?:[\\s,;]|$)|cubic-bezier\\(\\s*\\.?0?\\.25\\s*,\\s*\\.?0?\\.1\\s*,",
+        "selector_hint": "reveal|animate|fade|enter|in$"
+      },
+      "threshold": "The `ease` keyword or `cubic-bezier(0.25, 0.1, 0.25, 1)` on a transition or animation in a reveal/entrance rule.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Use `ease-out`, or out-cubic. Do NOT use out-expo at short durations — at 180-260ms it is so front-loaded it reads as a glitch.",
+      "fix_code": "--ease-out: cubic-bezier(0.33, 1, 0.68, 1);\ntransition: opacity 180ms var(--ease-out), transform 260ms var(--ease-out);",
+      "teach": "Easing is the rhythm of a movement — whether it starts fast and settles, or starts slow and speeds up. Things arriving on screen should start fast and settle, like something sliding to a stop. The default setting does the opposite, which is why so many animated pages feel heavy.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 12,
+        "hits_total": 12,
+        "note": "12 of 13 still ship `transition: opacity .45s ease, transform .45s ease`. C4 (ease to ease-out) is recorded as done and is present only in the one regenerated file. The `ease` keyword has an ease-IN component, which is the sluggish signature the rule is about."
+      }
+    },
+    {
+      "id": "T2-DURATION-CEILING",
+      "tier": 2,
+      "category": "motion",
+      "title": "Animations longer than 300 milliseconds",
+      "what_it_is": "Any transition or animation triggered by a user action or a UI state change that takes longer than 300ms.",
+      "why_it_matters": "Kowalski states this twice across two articles with a side-by-side comparator: a 400ms dropdown noticeably underperforms a 180ms one, and the same values recur in his shipped library CSS. The practical bands are 100-200ms for hover and press, 200-300ms for entrances, and 400-500ms ONLY for large surfaces that physically travel across the screen.",
+      "source": {
+        "name": "kowalski",
+        "confidence": "DEMONSTRATED",
+        "where": "7 Practical Animation Tips; values confirmed in Sonner and Vaul production CSS"
+      },
+      "detector": {
+        "kind": "css_decl",
+        "property": "^(transition|transition-duration|animation|animation-duration)$",
+        "value_numeric": {
+          "unit": "ms",
+          "min": 301
+        },
+        "exclude_selector": "marquee|ken-burns|ambient|grain|failsafe"
+      },
+      "threshold": "A duration above 300ms on an interaction or entrance. Ambient loops (Ken Burns) and failsafe keyframes are excluded — those are deliberately long and have their own rules.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Split the durations per property rather than using one number: opacity shorter than transform. The shipped production ratio is 2.5x — `transition: transform 500ms, opacity 200ms`. For an entrance on this kind of page: opacity 180ms, transform 260ms, and never invert them.",
+      "teach": "Under a third of a second is the window where movement reads as responsiveness. Past it, the same movement reads as the page being slow. And a useful trick from a shipped library: fade the thing in faster than you move it, so it has arrived visually before it has finished travelling.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 12,
+        "hits_total": 12,
+        "note": "Same twelve files, same declaration: 450ms against a 300ms ceiling. Worth restating as velocity rather than duration, which is how the corpus frames it: 14px over 450ms is about 31px per second, below the speed at which the eye reads motion as motion. It reads as drift rather than as arrival."
+      }
+    },
+    {
+      "id": "T2-BOUNCE-EASING",
+      "tier": 2,
+      "category": "motion",
+      "title": "Bounce or overshoot on interface motion",
+      "what_it_is": "A timing curve that goes past its target and comes back — a `cubic-bezier` with a control point above 1 or below 0.",
+      "why_it_matters": "A bounce on an accountant's or a plumber's page reads as toy-like. It is the wrong register for a business where the purchase is a phone call. The corpus also notes it costs 100-400 bytes per curve in a file whose small weight is part of the pitch.",
+      "source": {
+        "name": "research_08",
+        "confidence": "ASSERTED",
+        "where": "§8.5 banned list: 'bounce/overshoot on UI (cubic-bezier(0.34, 1.56, 0.64, 1))'"
+      },
+      "confidence_note": "A register judgement with no counted sample. The one place the corpus found overshoot in production was an award-winning luxury builder's site, where 'expensive-looking' was on-brief — and it notes that barbers are not.",
+      "detector": {
+        "kind": "css_regex",
+        "pattern": "cubic-bezier\\(\\s*[^)]*?(?:1\\.[1-9]|[2-9]\\.|-0?\\.[1-9])",
+        "flags": "i"
+      },
+      "threshold": "A `cubic-bezier` whose second or fourth control value exceeds 1.05 or falls below -0.05.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "info",
+      "fix": "Use out-cubic for entrances and a symmetrical in-out curve for toggles. Keep one authored curve for the whole page.",
+      "teach": "A bounce makes an element overshoot and spring back, like a ball. It is playful, which is a decision — and on a page for a law office or a plumber it is usually the wrong one. Movement that simply slows to a stop reads as composed.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "T2-MANY-EASINGS",
+      "tier": 2,
+      "category": "motion",
+      "title": "Too many different timing curves",
+      "what_it_is": "More than three distinct `cubic-bezier` values across the stylesheet.",
+      "why_it_matters": "This is a counted signature rather than an opinion. One agency site in the corpus ships 39 `cubic-bezier` occurrences, all identical — and the corpus's reading is that a high count of DISTINCT authored curves is the numerical signature of a design agency, which is the exact thing that makes a small business assume it cannot afford you. One curve, declared once, reads as considered.",
+      "source": {
+        "name": "research_11",
+        "confidence": "MEASURED_HERE",
+        "where": "§8.2 item 9; §1.2 basement.studio measured at 39 cubic-bezier occurrences"
+      },
+      "confidence_note": "The counts are measured. The inference that a buyer reads many curves as expense is INFERRED — research/11 §9.2 is explicit that no datum in the sweep concerns how any human read any page.",
+      "detector": {
+        "kind": "easing_census",
+        "max_distinct": 3
+      },
+      "threshold": "More than 3 distinct `cubic-bezier(...)` argument tuples in the stylesheet. Keyword easings (`ease-out`, `linear`) are counted as one each.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "info",
+      "fix": "Declare one entering curve, one leaving curve and one toggle curve as custom properties, and use only those.",
+      "fix_code": "--ease-out: cubic-bezier(0.33, 1, 0.68, 1);\n--ease-in: cubic-bezier(0.7, 0, 0.84, 0);\n--ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);",
+      "teach": "Every animation on a page has a rhythm, and pages read as coherent when all their movements share one. Three named rhythms — arriving, leaving, toggling — cover everything a brochure page does. A dozen different ones is a sign nobody was choosing.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "Zero authored cubic-beziers; keyword easings only. Passes."
+      }
+    },
+    {
+      "id": "T2-TRANSITION-ALL",
+      "tier": 2,
+      "category": "motion",
+      "title": "transition: all",
+      "what_it_is": "A transition declared against every animatable property rather than named ones.",
+      "why_it_matters": "It animates properties you did not intend, including layout properties that force the browser to recalculate the page on every frame. It also makes the intent unreadable: nobody can tell from the code what is supposed to move.",
+      "source": {
+        "name": "research_08",
+        "confidence": "ASSERTED",
+        "where": "§8.5 banned list"
+      },
+      "also_in": [
+        {
+          "name": "comeau",
+          "where": "compositor-safe properties: transform, opacity and filter run on the compositor; margin-left invalidates layout every frame"
+        }
+      ],
+      "confidence_note": "The ban is asserted by the corpus's own banned list with no counted sample. What is DEMONSTRATED underneath it is Comeau's compositor argument: transform, opacity and filter run on the compositor thread, and a layout property invalidates layout on every frame. `transition: all` is flagged because it silently includes the second kind.",
+      "detector": {
+        "kind": "css_decl",
+        "property": "^transition(-property)?$",
+        "value": "(?:^|[\\s,])all(?:[\\s,]|$)"
+      },
+      "threshold": "`transition: all` or `transition-property: all`.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Name the properties. Almost always `transform` and `opacity`, which are the two the browser can animate without redoing layout.",
+      "fix_code": "transition: transform 120ms var(--ease-out), opacity 180ms var(--ease-out);",
+      "teach": "Telling the browser to animate 'all' properties means it watches every one of them, including the ones that change the layout of the page and force everything to be measured again. Name the two or three you actually want to move.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "T2-LAYOUT-ANIMATION",
+      "tier": 2,
+      "category": "performance",
+      "title": "Animating a property that changes the layout",
+      "what_it_is": "A transition or animation on `width`, `height`, `top`, `left`, `right`, `bottom`, `margin` or `padding`.",
+      "why_it_matters": "These invalidate layout on every frame, so the browser re-measures the page sixty times a second. `transform` and `opacity` run on the compositor thread and stay smooth even while the main thread is busy parsing. On a mid-range Android this is the difference between motion and stutter — and nothing else about the animation matters if it will not run at sixty frames a second.",
+      "source": {
+        "name": "comeau",
+        "confidence": "DEMONSTRATED",
+        "where": "CSS Transitions",
+        "quote": "If I used, say, margin-left instead of a transform, this would invalidate the layout every time it changes, on every frame."
+      },
+      "detector": {
+        "kind": "css_decl",
+        "property": "^(transition|transition-property|animation)$",
+        "value": "(?:^|[\\s,])(width|height|top|left|right|bottom|margin|padding|max-height)(?:[\\s,]|$)"
+      },
+      "threshold": "Any of those properties named in a `transition` or `animation` shorthand or in `transition-property`.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Rewrite as `transform`. For an expanding panel, use `display: grid` with `grid-template-rows: 0fr` to `1fr` — it works everywhere. Do NOT use `max-height` (you have to guess a ceiling, so the visible part finishes early and the rest of the duration animates empty space) and do NOT use `interpolate-size` (zero support in any Safari or Firefox version, so it would animate on Android and snap on iPhone).",
+      "teach": "Some things a browser can move almost for free, because it just slides a picture it already drew. Others force it to work out the whole layout of the page again, on every single frame. Moving and fading are free; changing width, height or position is not.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "T2-WILL-CHANGE-STATIC",
+      "tier": 2,
+      "category": "performance",
+      "title": "will-change left permanently applied",
+      "what_it_is": "`will-change` declared in a static rule rather than added just before an animation and removed after it.",
+      "why_it_matters": "It promotes the element to its own compositor layer and keeps it there forever — a standing memory tax the browser pays for the lifetime of the page. The corpus measured one reference site carrying it on 55 elements.",
+      "source": {
+        "name": "research_11",
+        "confidence": "MEASURED_HERE",
+        "where": "§6.5: 'Never leave will-change permanently applied — Legora has it on 55 elements, a standing memory tax the compositor pays forever.'"
+      },
+      "detector": {
+        "kind": "css_decl",
+        "property": "^will-change$",
+        "value": "^(?!auto).+"
+      },
+      "threshold": "Any `will-change` other than `auto` in a static rule (not inside a `:hover`, `:active`, or a class that scripts add and remove).",
+      "threshold_provenance": "from_source",
+      "severity": "info",
+      "fix": "Remove it. Add it from script immediately before the animation starts and set it back to `auto` on `transitionend`, or simply do without — modern browsers promote transformed layers on their own.",
+      "teach": "`will-change` is a note to the browser saying 'get ready, this is about to move'. Leaving the note up permanently means the browser keeps resources reserved for a movement that is not coming. On a cheap phone with little memory, that adds up.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "T2-CANVAS-PARTICLES",
+      "tier": 2,
+      "category": "performance",
+      "title": "A full-viewport particle or constellation canvas",
+      "what_it_is": "A `<canvas>` sized to the viewport driven by a `requestAnimationFrame` loop, drawing floating dots and connecting lines.",
+      "why_it_matters": "The corpus lists it as an ANTI-recommendation specifically because it is the thing most likely to be reached for as a lightweight alternative to video. It permanently occupies the main thread, repaints the whole viewport continuously, drains battery measurably, and is the single most over-represented visual in AI-generated landing pages. Its small line count is not its cost.",
+      "source": {
+        "name": "research_08",
+        "confidence": "ASSERTED",
+        "where": "§3.4, listed as an anti-recommendation; §7.1 forbidden list"
+      },
+      "confidence_note": "Listed as an anti-recommendation in the corpus rather than measured. The performance claims (permanently occupied main thread, continuous full-viewport paint) follow from how rAF and canvas work and are not in dispute; the claim that it is 'the single most over-represented visual in AI-generated landing pages' is a catalogue observation, not a count.",
+      "detector": {
+        "kind": "composite",
+        "all": [
+          {
+            "kind": "html_tag",
+            "tag": "canvas",
+            "mode": "present"
+          },
+          {
+            "kind": "text_regex",
+            "scope": "script",
+            "pattern": "requestAnimationFrame"
+          }
+        ]
+      },
+      "threshold": "A `<canvas>` element plus a `requestAnimationFrame` call in page script.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Delete it. If the page needs texture, use the static grain tile: about 570 bytes, rasterised once, and measured at zero cost during scroll.",
+      "teach": "Floating dots joined by lines are drawn fresh sixty times a second, forever, whether anyone is looking or not. It is one of the heaviest things you can put on a page and one of the most copied. A still texture gets you most of the feeling for none of the work.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "T2-SMOOTH-SCROLL",
+      "tier": 2,
+      "category": "motion",
+      "title": "Smooth scrolling",
+      "what_it_is": "`scroll-behavior: smooth`, or a JavaScript smooth-scroll library that takes over the page's scrolling entirely.",
+      "why_it_matters": "The library form is the single most recognisable 'an agency built this' tell on the web, it fights the operating system on a mid-range Android, it breaks scroll anchoring, and it costs 10-30 KB. The deeper problem: a visitor who does not consciously notice the hijacking experiences it as 'my phone is slow'. The native CSS form is much milder but on a phone it still delays an anchor jump for no benefit.",
+      "source": {
+        "name": "research_11",
+        "confidence": "ASSERTED",
+        "where": "§6.3, which separates the two forms explicitly"
+      },
+      "confidence_note": "The library ban is strongly argued and includes an on-the-record user calling it 'janky, cheap feeling'. The native `scroll-behavior: smooth` verdict is softer — research/11 says it is 'not the thing being banned' but should still come off. Two severities, recorded separately.",
+      "detector": {
+        "kind": "composite",
+        "any": [
+          {
+            "kind": "css_decl",
+            "property": "^scroll-behavior$",
+            "value": "smooth",
+            "severity_override": "info"
+          },
+          {
+            "kind": "html_regex",
+            "pattern": "locomotive-scroll|lenis|smooth-scrollbar|@studio-freight",
+            "flags": "i",
+            "severity_override": "fail"
+          }
+        ]
+      },
+      "threshold": "`scroll-behavior: smooth` reports as `info`. A smooth-scroll library reports as `fail`.",
+      "threshold_provenance": "from_source",
+      "severity": "info",
+      "fix": "Delete the library outright; there is no trade-off, you also save the bytes and the main-thread cost. For the CSS property: if the page has no in-page anchor links, it is a declaration that has never fired, so delete it as dead code.",
+      "teach": "Browsers and phones already have a scrolling feel, tuned by the people who made them, and visitors are used to it. Replacing it with your own almost always feels slightly wrong, and people blame their phone rather than your page.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 13,
+        "note": "`html { scroll-behavior: smooth }` on all 13, correctly guarded under reduced-motion. It affects exactly one anchor link. Reported as `info`."
+      }
+    },
+    {
+      "id": "T2-FOCUS-FADE",
+      "tier": 2,
+      "category": "a11y",
+      "title": "A focus ring that fades in",
+      "what_it_is": "A transition applied to `outline`, `outline-offset` or `box-shadow` on the `:focus` or `:focus-visible` state.",
+      "why_it_matters": "A focus ring is a state indicator, not an animation. Someone navigating by keyboard is moving quickly through a page and needs to know instantly where they are; a fade makes the indicator lag behind the key press.",
+      "source": {
+        "name": "research_08",
+        "confidence": "ASSERTED",
+        "where": "§8.4: 'Focus rings must not fade in. (Hallmark, banned list.)'"
+      },
+      "confidence_note": "Cited to a banned list with no sample behind it. The underlying reasoning -- a focus ring is a state indicator, and a keyboard user moving quickly needs it immediately -- is straightforward but was not tested by anyone in the corpus.",
+      "detector": {
+        "kind": "css_decl",
+        "property": "^transition",
+        "value": "outline|box-shadow",
+        "selector": ":focus"
+      },
+      "threshold": "A transition affecting `outline`, `outline-offset` or `box-shadow` inside a `:focus` or `:focus-visible` rule.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Remove the transition from the focus state. Keep it on hover if you want it there.",
+      "teach": "The outline that shows which button is selected when someone navigates with the keyboard has to appear the instant they press Tab. Animating it means they are always a moment behind, which is disorienting for the people who rely on it most.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "Zero hits because there is no focus styling at all — see A-NO-FOCUS-VISIBLE. Another pass that is really an absence."
+      }
+    },
+    {
+      "id": "T2-AI-NAV",
+      "tier": 2,
+      "category": "structure",
+      "title": "The generated navigation bar",
+      "what_it_is": "Wordmark on the left, four or five links in the middle, a button on the right, the whole thing sticky, blurred and separated by a hairline.",
+      "why_it_matters": "It is a specific recognisable assembly rather than a set of independent decisions. A five-page brochure site for one shop rarely has four destinations worth naming, so the links are usually invented to fill the shape.",
+      "source": {
+        "name": "hallmark",
+        "confidence": "ASSERTED",
+        "where": "gates 42-43"
+      },
+      "confidence_note": "Hallmark's gates 42-43 are stated as pass/fail but the corpus records no counted sample behind them. `warn`, not `fail`.",
+      "detector": {
+        "kind": "composite",
+        "all": [
+          {
+            "kind": "html_tag",
+            "tag": "nav",
+            "mode": "present"
+          },
+          {
+            "kind": "css_regex",
+            "pattern": "position\\s*:\\s*sticky"
+          },
+          {
+            "kind": "css_regex",
+            "pattern": "backdrop-filter"
+          }
+        ],
+        "and_link_count": [
+          4,
+          5
+        ]
+      },
+      "threshold": "A `<nav>` containing 4-5 links, in a sticky container, with a `backdrop-filter`.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "warn",
+      "fix": "For a local business, the nav is a wordmark on the left and the phone number on the right. That is the whole nav. Drop the blur (see T2-BACKDROP-BLUR) and use a solid ground with a hairline.",
+      "teach": "The bar across the top of most modern sites has a standard shape, and it fits a software company with several products. A single shop usually has two things to say up there: who you are, and the number to call. Anything else is filling the shape.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "The nav has zero links and a phone button — the correct shape. The blur fires separately on T2-BACKDROP-BLUR."
+      }
+    },
+    {
+      "id": "T2-AI-FOOTER",
+      "tier": 2,
+      "category": "structure",
+      "title": "The four-column Product / Company / Resources / Legal footer",
+      "what_it_is": "A footer split into four columns of links under those headings, or close variants.",
+      "why_it_matters": "The corpus's line is the whole argument: a bakery does not have a Resources column. The structure belongs to a software company with documentation, a careers page and an investor deck, and filling it for a shop means inventing pages.",
+      "source": {
+        "name": "hallmark",
+        "confidence": "ASSERTED",
+        "where": "gates 42-43",
+        "quote": "A bakery doesn't have a Resources column."
+      },
+      "confidence_note": "A Hallmark gate with no counted sample. The 'bakery has no Resources column' argument is an observation about fit, not evidence about what readers notice, which is why this is `warn` rather than `fail`.",
+      "detector": {
+        "kind": "text_lexicon",
+        "scope": "footer_headings",
+        "terms": [
+          "product",
+          "company",
+          "resources",
+          "legal",
+          "solutions",
+          "developers"
+        ],
+        "min_count": 3
+      },
+      "threshold": "3 or more of those words used as column headings inside `<footer>`.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "warn",
+      "fix": "A local business footer is the address, the phone number, the hours, and whatever the law requires. Typeset it as part of the design rather than bolting it on.",
+      "teach": "A footer full of link columns is borrowed from software companies with dozens of pages. A shop has an address, a number, and opening times. Putting those in properly is more useful to a visitor than four columns of links to pages that do not exist.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "The footer is two paragraphs of disclaimer. It passes this rule — but see V-BOILERPLATE, because it is byte-identical across all 13 pages, which is its own problem."
+      }
+    },
+    {
+      "id": "T2-HERO-100VH",
+      "tier": 2,
+      "category": "layout",
+      "title": "The full-screen centred hero",
+      "what_it_is": "A first screen set to exactly the height of the viewport with everything in it centred on one axis.",
+      "why_it_matters": "Two separate problems. Aesthetically it is a named auto-fail: a 100vh hero with everything centred, or any hero where the label, headline, lede and button share one centred axis. Structurally, `100vh` on a phone is its own bug — browser chrome makes 100vh taller than the visible area, so content gets cut off. And a full-screen statement wastes the entire first screen on a page whose job is to show a business name, a trade, a neighbourhood and a tappable number.",
+      "source": {
+        "name": "hallmark",
+        "confidence": "ASSERTED",
+        "where": "gates 6 and 44; Krebs scored the centred hero independently"
+      },
+      "also_in": [
+        {
+          "name": "research_08",
+          "where": "§7.2: '100vh on mobile is its own bug independent of aesthetics'"
+        }
+      ],
+      "confidence_note": "The aesthetic half (a centred 100vh hero auto-fails) is a Hallmark gate with no sample. The TECHNICAL half is not contested and is the stronger reason: browser chrome makes 100vh taller than the visible viewport on a phone, so content is cut off. `dvh` helps and is not universally reliable.",
+      "detector": {
+        "kind": "css_decl",
+        "property": "^(height|min-height)$",
+        "value": "100vh",
+        "selector_hint": "hero|banner|masthead|header"
+      },
+      "threshold": "`height: 100vh` or `min-height: 100vh` on a hero-like selector. `dvh` and `svh` are reported at lower severity — they help but are not universally reliable.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Let the hero be the height of its content. If it needs breathing room, use asymmetric padding — bottom at least 1.3 times the top.",
+      "teach": "Making the first screen exactly as tall as the window sounds tidy, but phones lie about how tall the window is — the address bar moves — so content gets clipped. Letting the section be as tall as what is in it always works, and gets the useful information higher up the page.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "The hero uses `padding: clamp(56px,9vw,120px) 0 clamp(40px,6vw,80px)`. Note the bottom padding is SMALLER than the top, which fires L-HERO-PADDING instead."
+      }
+    },
+    {
+      "id": "L-HERO-PADDING",
+      "tier": 2,
+      "category": "layout",
+      "title": "Symmetric hero padding",
+      "what_it_is": "A hero whose bottom padding is not noticeably larger than its top padding.",
+      "why_it_matters": "Asymmetry reads as intentional; symmetry reads as generated. This is the cheapest available expression of that principle, and it is a published auto-fail threshold rather than a feeling.",
+      "source": {
+        "name": "hallmark",
+        "confidence": "ASSERTED",
+        "where": "hero gates: 'hero padding-block-end should be >= 1.3x padding-block-start'"
+      },
+      "also_in": [
+        {
+          "name": "research_11",
+          "where": "§7 composition table, repeated as a measured value"
+        }
+      ],
+      "confidence_note": "The 1.3 ratio is published by Hallmark but the corpus records no sample behind it. The underlying claim — asymmetry reads as intentional — is asserted by Hallmark and is not tested anywhere.",
+      "detector": {
+        "kind": "css_cooccur",
+        "mode": "hero_padding_ratio",
+        "min_ratio": 1.3
+      },
+      "threshold": "Hero `padding-block-end` divided by `padding-block-start` is below 1.3. Compared at the maximum of each `clamp()` where clamps are used.",
+      "threshold_provenance": "from_source",
+      "severity": "info",
+      "fix": "Increase the bottom padding until it is at least 1.3 times the top.",
+      "teach": "Space above and below a section does not have to be equal, and making it unequal is one of the quietest ways a page shows a person made it. More room underneath the opening block than above it is the usual direction.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 13,
+        "note": "Top `clamp(56px,9vw,120px)`, bottom `clamp(40px,6vw,80px)` — a ratio of 0.67, the wrong way round."
+      }
+    },
+    {
+      "id": "T2-NESTED-CARDS",
+      "tier": 2,
+      "category": "layout",
+      "title": "A card inside a card",
+      "what_it_is": "A bordered or shadowed container holding another bordered or shadowed container.",
+      "why_it_matters": "impeccable's position is unusually absolute: cards are the lazy container, and nested cards are always wrong. Two frames around the same content means neither frame is saying anything.",
+      "source": {
+        "name": "impeccable",
+        "confidence": "ASSERTED",
+        "where": "craft-floor.md, Refuse / Page scaffolds",
+        "quote": "Cards are the lazy container; nested cards are always wrong."
+      },
+      "confidence_note": "An absolute statement ('always wrong') from an enforced design tool, with no counted sample. It is `warn` for that reason. The defensible core is narrower and uncontroversial: two frames around the same content means neither frame is distinguishing anything.",
+      "detector": {
+        "kind": "dom_nested",
+        "mode": "card_in_card",
+        "class_pattern": "card|panel|tile|box|surface"
+      },
+      "threshold": "An element whose class matches the card vocabulary containing a descendant whose class also matches it.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Remove the inner frame. If the inner content needs separating, use space or a hairline rule, not a second box.",
+      "teach": "A box around content says 'these things belong together'. A box inside a box says it twice, which weakens both. Space is usually enough to group things.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "T2-HERO-METRIC",
+      "tier": 2,
+      "category": "layout",
+      "title": "The big-number hero template",
+      "what_it_is": "A hero built from one enormous number, a small label under it, a row of supporting statistics, and an accent colour.",
+      "why_it_matters": "It is one of the small number of layouts a generator reaches for, and it usually arrives WITH invented numbers, so it drags a second, worse problem in behind it. See H-UNSOURCED-METRIC.",
+      "source": {
+        "name": "impeccable",
+        "confidence": "ASSERTED",
+        "where": "craft-floor.md, Refuse / Page scaffolds: 'The hero-metric template: big number, small label, supporting stats, accent.'"
+      },
+      "confidence_note": "A named page scaffold from an enforced tool, with no count behind it. Its severity is `info` because a big-number hero is completely legitimate when the number is real -- the reason it appears in this rulebook at all is that it usually arrives WITH an invented number, which H-UNSOURCED-METRIC is the rule for.",
+      "detector": {
+        "kind": "dom_repeated_siblings",
+        "mode": "hero_metric",
+        "min_rem": 3
+      },
+      "threshold": "A number set at 3rem or larger inside the hero region, with a smaller label adjacent.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "info",
+      "fix": "Only ship it if the number is real, you can say where it came from, and it can be checked. Otherwise the number-shaped hole is honest and the fabricated number is slop: leave the space, label it, and say what will go there.",
+      "teach": "A huge number at the top of a page is powerful exactly when it is true and checkable, and embarrassing when it is not. If you do not have the number yet, leave a labelled gap saying so. A visible gap is a conversation starter; an invented number is a thing you will be caught on.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "Zero, after a calibration fix. It initially fired 42 times on the digits of the phone number in the hero. The detector now requires a text block whose ENTIRE content is a figure, set at display size, and excludes anything with seven or more digits. The phone number in the hero is the one number on a local business page that belongs there."
+      }
+    },
+    {
+      "id": "T2-MONO-COSTUME",
+      "tier": 2,
+      "category": "type",
+      "title": "Monospace as a costume",
+      "what_it_is": "A monospaced typeface used for labels, headings or marketing copy — not for code, data, or a measurement.",
+      "why_it_matters": "Monospace signals 'technical' without being technical. It is also half of a specific trap-tier package (see TRAP-CREAM-PACKAGE): cream ground plus italic serif plus mono uppercase labels.",
+      "source": {
+        "name": "impeccable",
+        "confidence": "ASSERTED",
+        "where": "craft-floor.md, Refuse: 'Monospace as a costume for technical rather than for code, data, or measurement.'"
+      },
+      "confidence_note": "A taste judgement with no sample. The legitimate use is clear and the corpus contains a good example of it -- a counted results table where every row must align -- so this rule is about scope, not about the typeface.",
+      "detector": {
+        "kind": "font_stack",
+        "mode": "mono_scope",
+        "allowed_selectors": "code|pre|kbd|samp|\\.spec|\\.data|\\.readout|tabular|\\.mono-data"
+      },
+      "threshold": "A monospace family applied to a selector outside code, data and measurement contexts.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "info",
+      "fix": "Use it where the characters need to line up in columns — prices, times, measurements — and nowhere else. The corpus has a good example of the legitimate use: a table of counted results where every row must align.",
+      "teach": "Monospace is the typewriter-style font where every letter takes the same width. That property is genuinely useful when numbers need to line up in a column. Used for headings it is a costume, and increasingly a recognisable one.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "T2-GEOMETRIC-MASK",
+      "tier": 2,
+      "category": "imagery",
+      "title": "A geometric shape standing in for a real cut-out",
+      "what_it_is": "A circle, polygon or radial-gradient mask used to approximate the outline of a photographed subject.",
+      "why_it_matters": "It is the cheap version of the effect and reads worse than not doing it at all — the shape never quite matches the subject, so the eye reads a mistake rather than a treatment.",
+      "source": {
+        "name": "impeccable",
+        "confidence": "ASSERTED",
+        "where": "craft-floor.md, Refuse: 'Derive an alpha matte from the actual image, or produce a cut-out asset.'"
+      },
+      "confidence_note": "Asserted by one source with no sample. The failure it describes (the shape never quite matches the subject, and the almost is what people notice) is a reasoning claim, not a measurement.",
+      "detector": {
+        "kind": "css_decl",
+        "property": "^(clip-path|mask-image|-webkit-mask-image)$",
+        "value": "circle\\(|ellipse\\(|polygon\\(|radial-gradient\\(",
+        "selector_hint": "img|photo|portrait|figure|hero"
+      },
+      "threshold": "A `clip-path` or mask using a geometric primitive applied to a selector that targets an image.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "info",
+      "fix": "Cut the subject out properly in an image editor and ship a transparent PNG or WebP, or leave the photograph rectangular. A rectangle with a hairline is a finished decision.",
+      "teach": "Cutting a person or an object out of a photo with a circle almost works and never quite does — the edges do not line up, and the almost is what people notice. Either cut it out properly once, or leave the picture as a rectangle.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "T2-DASHED-RULE",
+      "tier": 2,
+      "category": "material",
+      "title": "Dashed borders as separators",
+      "what_it_is": "`border-bottom: 1px dashed` or similar on list items, table rows or definition lists.",
+      "why_it_matters": "A dated-template signal, named as such in the corpus's audit of a real shipped site. A dashed line has a legitimate use — marking something as a placeholder or an unfilled field — and using it decoratively spends that meaning.",
+      "source": {
+        "name": "research_11a",
+        "confidence": "MEASURED_HERE",
+        "where": "§1.6: 'border-bottom:1px dashed on list items — a dated-template signal'"
+      },
+      "also_in": [
+        {
+          "name": "chess_tee_forge",
+          "where": "DESIGN-SYSTEM.md §1: the dashed box is reserved to mean 'this field is deliberately unfilled'"
+        }
+      ],
+      "detector": {
+        "kind": "css_decl",
+        "property": "^border(-bottom|-top|-left|-right)?$",
+        "value": "\\bdashed\\b",
+        "excludeSelector": "placeholder|slug|empty|unfilled|todo"
+      },
+      "threshold": "A `dashed` border style outside a selector that names a placeholder.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "info",
+      "fix": "Use a solid 1px hairline, or space. Keep dashed for one job: marking a field that is deliberately empty and waiting to be filled.",
+      "teach": "A dashed line usually means 'cut here' or 'fill this in'. Using it as ordinary decoration spends a meaning you will want later — when you genuinely need to show the visitor that a piece of information is missing rather than forgotten.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 13,
+        "note": "`dl.hours > div { border-bottom: 1px dashed var(--line) }` on all 13."
+      }
+    },
+    {
+      "id": "T2-EMPTY-SPACER",
+      "tier": 2,
+      "category": "layout",
+      "title": "An empty element reserving space",
+      "what_it_is": "An element whose only content is a non-breaking space or nothing at all, present to keep two columns the same height.",
+      "why_it_matters": "It reads as a template with the fields not filled in, which is precisely the accusation you are trying to avoid. The corpus caught this on a real pricing page: three of four cards carried an empty badge element.",
+      "source": {
+        "name": "research_11a",
+        "confidence": "MEASURED_HERE",
+        "where": "§1.6: an empty badge element reserving vertical space on three of four pricing cards"
+      },
+      "detector": {
+        "kind": "dom_repeated_siblings",
+        "mode": "empty_element"
+      },
+      "threshold": "Any non-void element whose content is only whitespace or non-breaking spaces. Elements with an explicit `aria-hidden` and a background image are spared.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "warn",
+      "fix": "Align the cards with CSS (`align-items: start` and a grid row, or `min-height` on the element that varies) rather than with an invisible placeholder. Or accept unequal heights, which is usually fine.",
+      "teach": "An empty box holding space open is a sign that a layout is fighting itself. Modern layout tools can line things up without invisible filler. And an empty slot in one card out of four tells the reader that the information exists elsewhere and is missing here.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 13,
+        "hits_total": 15,
+        "note": "A flex spacer `<div class=\"spacer\">` in the nav, on all 13, plus one further empty element. This is the milder form of the tell — the rule was written about a reserved badge slot on a pricing card — and the detector now excludes genuine layout spacers with `margin: auto` or `flex`. These are reported because the spacer carries neither, only `margin-left: auto` via a class the detector does read; see the finding text for which."
+      }
+    },
+    {
+      "id": "T2-BLINK-MARQUEE",
+      "tier": 2,
+      "category": "structure",
+      "title": "Deprecated presentational elements",
+      "what_it_is": "`<blink>`, `<marquee>`, `<center>`, `<font>`, or `<table>` used to lay out a page rather than to present data.",
+      "why_it_matters": "These are the technical-age markers from the dated-site detector, and they are cheap and objective: no browser needed, just parse the HTML. The HTML specification now expressly forbids layout tables.",
+      "source": {
+        "name": "research_04",
+        "confidence": "DEMONSTRATED",
+        "where": "§5 Tier 1 technical age; PowerMapper's layout-table heuristic"
+      },
+      "detector": {
+        "kind": "html_tag",
+        "tag": "blink|marquee|center|font",
+        "mode": "forbidden"
+      },
+      "threshold": "Any of those elements present. A `<table>` with no `<th>`, `<thead>`, `<tfoot>`, `<colgroup>`, `scope`, `headers` or `abbr` is reported separately as a layout table.",
+      "threshold_provenance": "from_source",
+      "severity": "fail",
+      "fix": "Delete them. `<center>` becomes `text-align` or a flex container; `<font>` becomes CSS; a layout table becomes a grid.",
+      "teach": "A handful of very old HTML tags are the clearest possible sign that a page has not been touched in fifteen years — which is exactly why they are worth checking for on somebody else's site, and unforgivable on your own.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "Zero. Worth noting that these pages QUOTE the finding — one preview reports that the business's current site 'still contains <blink> tags' — as escaped text, which correctly does not fire."
+      }
+    }
+  ]
+}

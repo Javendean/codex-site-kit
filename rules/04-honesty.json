@@ -1,0 +1,513 @@
+{
+  "$comment": "HONESTY — is what the page says actually true, and can it be checked? Most of these rules come from chess-tee-forge/store, and they are scar tissue rather than theory: that project advertised one price and charged another, and it set a name under a quotation whose attribution traced to no primary source. Both bugs shipped. The rules exist because the bugs happened.",
+  "tier": "honesty",
+  "rules": [
+    {
+      "id": "H-INVENTED-BRAND",
+      "tier": "honesty",
+      "category": "honesty",
+      "title": "A brand name or logo that does not exist",
+      "what_it_is": "A wordmark, logo, monogram or tagline invented for the page because the slot needed filling.",
+      "why_it_matters": "A premature logo is worse than none. It presents a decision as already made, and it presents it to the one person who would know it was not. The right answer is to make the placeholder LOOK like a placeholder: an unfilled box on a drawing.",
+      "source": {
+        "name": "chess_tee_forge",
+        "confidence": "DEMONSTRATED",
+        "where": "DESIGN-SYSTEM.md §1",
+        "quote": "A premature logo is worse than none, so the dashed field is the design: an unfilled box on a drawing. When a name exists, replace the slug's text and delete the meta. Do not restyle the box into a mark."
+      },
+      "detector": {
+        "kind": "manual",
+        "what": "Whether the wordmark, logo or tagline came from the business or from the page",
+        "needs": "One question to whoever commissioned the page: did you give me this name and this mark?",
+        "heuristic": "A gradient-filled initials square (T2-AVATAR-GRADIENT) is surfaced here as evidence."
+      },
+      "threshold": "Reported, not gated. Every brand-position element is listed and the question is attached.",
+      "threshold_provenance": "arithmetic",
+      "severity": "warn",
+      "fix": "If no name or mark exists, ship the placeholder as a placeholder — a dashed box reading WORDMARK, with a line beside it saying no name has been chosen — and repeat the point in words in the footer. Do not restyle the placeholder into something that looks like a decision.",
+      "teach": "If the business has no logo yet, drawing one for them is not a favour: it quietly claims a decision they have not made. A box that visibly says 'no name chosen' is honest, looks deliberate, and starts the right conversation.",
+      "chess": "You do not write a move into the scoresheet before it is played.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": null,
+        "hits_total": null,
+        "note": "NOT RUN over this corpus: this detector needs a live render or a person."
+      }
+    },
+    {
+      "id": "H-QUOTE-ATTRIBUTION",
+      "tier": "honesty",
+      "category": "honesty",
+      "title": "A name set under a quotation",
+      "what_it_is": "A block of quoted text with a name, a job title or a company placed beneath it.",
+      "why_it_matters": "This is the rule that exists because the bug shipped. A name set under a quotation IS an attribution, whether or not it is inside a `<cite>` tag, and whether or not anyone intended it as one. If the attribution has not been traced to a primary source, that layout is asserting something untrue.",
+      "source": {
+        "name": "chess_tee_forge",
+        "confidence": "DEMONSTRATED",
+        "where": "DESIGN-SYSTEM.md §8 Honesty rules",
+        "quote": "The words appear with no name under them, and a note explaining that the attribution is repeated everywhere and traced to no primary source. If a citation is ever found, it can be added that day. The component has no cite and no author slot; do not add one."
+      },
+      "detector": {
+        "kind": "dom_precedes_heading",
+        "mode": "attribution_under_quote",
+        "quote_tags": [
+          "blockquote",
+          "q",
+          "figure"
+        ],
+        "attribution_max_words": 12
+      },
+      "threshold": "A text block of 12 words or fewer immediately following a `blockquote`, `q`, or an element whose class matches /quote|testimonial|words|pull/, when that block contains a capitalised name pattern, a dash-prefixed name, or a job-title word.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "fail",
+      "fix": "Either trace the attribution to a primary source and cite it properly with a link, or remove the name and add a note saying the attribution could not be verified. Removing the name is not a loss — the note is more interesting than the name was.",
+      "teach": "Putting a name under a quote tells the reader that person said it. If you have not actually traced the quote to where it was first written down, you are making a claim you cannot support — and quotes get misattributed constantly. Keep the words, drop the name, and say why.",
+      "chess": "The game score matters more than the anecdote about it. If you cannot find the game, say the anecdote is unsourced.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "No quotations at all on these pages — correct for a page that has no verified testimonials."
+      }
+    },
+    {
+      "id": "H-INVENTED-TESTIMONIAL",
+      "tier": "honesty",
+      "category": "honesty",
+      "title": "A testimonial that did not come from a customer",
+      "what_it_is": "A review, a star rating, a customer count or a quote from a named person, where the source is not a real customer who said it.",
+      "why_it_matters": "The corpus is unusually blunt: a fake testimonial from 'Sarah M.' with a generated headshot, shown to a man who knows every regular in his shop, is unrecoverable. And it inverts into an advantage — a visible 'your Google rating goes here' block is not a weakness. It is a conversation opener, it proves you did not fabricate, and it gives the owner something to do. The holes are the pitch.",
+      "source": {
+        "name": "research_08",
+        "confidence": "ASSERTED",
+        "where": "§5.3 Trust signals",
+        "quote": "Never fabricate proof... For a concept site the honest hole is an advantage."
+      },
+      "also_in": [
+        {
+          "name": "chess_tee_forge",
+          "where": "DESIGN-SYSTEM.md §8: 'No invented social proof. No reviews, no testimonials, no customer count, no press logos. The page says outright that none exist.'"
+        }
+      ],
+      "confidence_note": "The 'unrecoverable' judgement is asserted — nobody ran the experiment, for obvious reasons. What the corpus DOES establish empirically is adjacent and relevant: a survey of 1,002 US adults found 97% read reviews and 47% will not use a business with fewer than 20 of them. Reviews matter enormously to this audience, which is exactly why inventing them is expensive.",
+      "detector": {
+        "kind": "composite",
+        "any": [
+          {
+            "kind": "html_regex",
+            "pattern": "class=\"[^\"]*(?:testimonial|review|quote-card|rating|stars)",
+            "flags": "i"
+          },
+          {
+            "kind": "text_regex",
+            "pattern": "[★☆⭐]{3,}|\\b[0-5](?:\\.\\d)? ?(?:out of ?5|stars?)\\b",
+            "flags": "gi"
+          }
+        ]
+      },
+      "threshold": "Any testimonial, review or star-rating component present. Reported for confirmation rather than auto-failed — the check is whether the content came from a real customer, which the tool cannot know.",
+      "threshold_provenance": "arithmetic",
+      "severity": "warn",
+      "fix": "Show the real reviews, with a link to where they live. If there are none yet, ship the labelled hole: a block that says a Google rating goes here, styled as part of the design rather than as an apology.",
+      "teach": "Made-up reviews are the single most expensive mistake on a small business page, because the person you are showing it to knows every one of their actual customers. An empty, clearly-labelled space for reviews is not embarrassing — it is proof you did not invent any, and it gives the owner an obvious next step.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "Zero testimonials, zero ratings, zero customer counts across all 13. This is the corpus's own rule being followed, and it is the clearest thing these pages get right."
+      }
+    },
+    {
+      "id": "H-PRESS-LOGOS",
+      "tier": "honesty",
+      "category": "honesty",
+      "title": "A logo wall or 'as seen in' strip",
+      "what_it_is": "A row of client, partner or press logos, or a line reading 'As featured in' / 'Trusted by'.",
+      "why_it_matters": "Borrowed credibility. Reproducing someone else's mark also carries a trademark problem the page usually has not thought about, and on a spec or concept build it is doubly wrong: the corpus records a documented case of an unsolicited same-name site outranking the real business in search results.",
+      "source": {
+        "name": "research_11",
+        "confidence": "ASSERTED",
+        "where": "§8.3 item 12: 'No logo wall, no Trusted by, no invented testimonials, no empty testimonials section, and no spec builds in a portfolio'"
+      },
+      "confidence_note": "Asserted, with one documented case behind the adjacent spec-build concern (an unsolicited same-name site outranking the real business in map results). No source measured how a reader treats a logo wall.",
+      "detector": {
+        "kind": "composite",
+        "any": [
+          {
+            "kind": "text_regex",
+            "pattern": "\\bas (?:seen|featured) in\\b|\\btrusted by\\b|\\bour (?:clients|partners)\\b",
+            "flags": "gi"
+          },
+          {
+            "kind": "html_regex",
+            "pattern": "class=\"[^\"]*(?:logo-?wall|logos|client-?logos|press-?strip)",
+            "flags": "i"
+          }
+        ]
+      },
+      "threshold": "An 'as seen in' / 'trusted by' phrase, or a container whose class names a logo wall.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "warn",
+      "fix": "Remove it. If there are real clients who have agreed to be named, name them in words with a link — that is checkable, where a logo is decorative.",
+      "teach": "A row of famous logos borrows other people's reputations and usually without asking. Naming a real client in a sentence, with their permission, does more and cannot be misread.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "H-EMPTY-PROOF-SECTION",
+      "tier": "honesty",
+      "category": "honesty",
+      "title": "A proof section with nothing in it",
+      "what_it_is": "A testimonials, reviews, case-studies or clients section that is present but empty, or filled with placeholder cards.",
+      "why_it_matters": "Worse than omitting the section. It shows the shape of proof with no proof in it, which reads as either an oversight or a template. The corpus's preferred fix is structural: a stat-led macrostructure with no real stats is the wrong macrostructure — rebuild the section rather than filling it.",
+      "source": {
+        "name": "research_11",
+        "confidence": "ASSERTED",
+        "where": "§8.3 item 12: 'no empty testimonials section'"
+      },
+      "also_in": [
+        {
+          "name": "hallmark",
+          "where": "gate 46 fixes, in preference order"
+        }
+      ],
+      "confidence_note": "Asserted. The fix order (labelled hole, ask and pause, or rebuild the section) comes from Hallmark's gate 46 fix list and is a recommendation, not a tested sequence.",
+      "detector": {
+        "kind": "dom_repeated_siblings",
+        "mode": "empty_proof_section",
+        "section_pattern": "testimonial|review|clients|case-stud|logos|stats"
+      },
+      "threshold": "A section whose heading or class names proof, containing no text content beyond its own heading, or containing only elements matching W-PLACEHOLDER-TEXT.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "warn",
+      "fix": "Three options, in order: replace the number with a labelled hole and a grey 'metric to confirm' block; ask the client and pause; or rebuild the section without a proof slot at all.",
+      "teach": "An empty reviews section is the shape of a promise with nothing inside. Either put something real in it, or label the gap deliberately, or take the whole section out and build the page without that slot.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "H-UNSOURCED-METRIC",
+      "tier": "honesty",
+      "category": "honesty",
+      "title": "A number with no method and no date",
+      "what_it_is": "Any figure presented as measured — a score, a count, a percentage, a rating — with no statement of how it was produced or when.",
+      "why_it_matters": "The persuasive value of a number is its checkability. A rounded gloss that a curious owner or a competitor can break on the first question inverts it. The corpus caught itself doing this on the one page whose entire thesis was checkability: a headline claiming 1,184 sites 'no longer load' was false for at least 523 of them, because 290 were parked pages that load fine and 233 returned 404s from a server that answers.",
+      "source": {
+        "name": "research_11",
+        "confidence": "MEASURED_HERE",
+        "where": "§8.5, with the exact row-by-row refutation",
+        "quote": "The persuasive value of a number is its checkability."
+      },
+      "also_in": [
+        {
+          "name": "hallmark",
+          "where": "gate 46: any metric the client did not supply"
+        },
+        {
+          "name": "chess_tee_forge",
+          "where": "DESIGN-SYSTEM.md §8: 'Out-of-band numbers are flagged, not hidden' and 'Assumptions are labelled' — the halftone angle and dot gain are stamped 'Assumed — untested' in the constants table"
+        }
+      ],
+      "detector": {
+        "kind": "text_regex",
+        "pattern": "\\b\\d+\\s*/\\s*\\d+\\b|\\b\\d+(?:\\.\\d+)?%|\\b\\d{2,}\\+?\\s+(?:customers|clients|projects|years|sites|businesses)",
+        "flags": "gi",
+        "require_nearby": [
+          "method",
+          "measured",
+          "checked on",
+          "as of",
+          "source:",
+          "how this",
+          "sample"
+        ],
+        "nearby_chars": 400
+      },
+      "threshold": "A numeric claim with no method, date, sample size or source statement within 400 characters.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "warn",
+      "fix": "State the method, the date and the population, as a caption. The itemised version is MORE persuasive than the round one, not less, and it is the only version that survives the phone call it is designed to provoke. If a figure is an assumption, stamp it as one.",
+      "teach": "A number with no explanation is an opinion in a suit. Say where it came from, when you measured it, and what exactly you counted — the detail is what makes it convincing, and it is also what stops you being caught out when someone adds up the columns.",
+      "chess": "A published evaluation without the line behind it is just an assertion. Show the moves.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 4,
+        "hits_total": 4,
+        "note": "4 of 13, not all 13: only four pages carry the datedness score. Each shows 'Automated datedness score of the current site: 51/100' with no method, no date and no definition of the scale. Out of 100 of what? Measured when? The fix is one caption, and the corpus's own reasoning applies — the itemised version is MORE persuasive than the round one, and it is the only version that survives the phone call it is designed to provoke."
+      }
+    },
+    {
+      "id": "H-SINGLE-SOURCE",
+      "tier": "honesty",
+      "category": "honesty",
+      "title": "The same value written in two places",
+      "what_it_is": "A price, a phone number, an address, an opening time or a SKU appearing as a literal in more than one file — markup, script, stylesheet or comment.",
+      "why_it_matters": "This is not a style preference. Four agents built the chess-tee-forge storefront in parallel against two pricing documents, and the product grid, the basket and the payment worker each ended up with their own copy of the numbers. A customer walking from a product card to the basket watched the price fall and a shipping line appear. A second copy of a price is a second price, and it will drift.",
+      "source": {
+        "name": "chess_tee_forge",
+        "confidence": "DEMONSTRATED",
+        "where": "DESIGN-SYSTEM.md §8, 'On the price — there is exactly one source, and it is not this document'",
+        "quote": "No price, size surcharge, shipping figure or SKU may be written as a literal anywhere under store — markup, script, stylesheet or comment."
+      },
+      "detector": {
+        "kind": "text_regex",
+        "mode": "cross_file_duplicate",
+        "patterns": [
+          "\\$\\s?\\d[\\d,]*(?:\\.\\d{2})?",
+          "\\+?\\d{1,2}[\\s.-]?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}",
+          "\\b\\d{1,5}[\\w-]*\\s+(?:[A-Z][a-z]+\\s+){1,3}(?:St|Street|Ave|Avenue|Rd|Road|Blvd|Way|Lane|Ln|Dr|Drive)\\b",
+          "\\b(?:mon|tue|wed|thu|fri|sat|sun)[a-z]*\\s*[-–]\\s*(?:mon|tue|wed|thu|fri|sat|sun)[a-z]*\\s+\\d"
+        ],
+        "min_files": 2
+      },
+      "threshold": "The same price, phone number, street address or hours string appearing as a literal in 2 or more files of the project.",
+      "threshold_provenance": "from_source",
+      "severity": "fail",
+      "fix": "Put the value in exactly one data file and read it everywhere else. Give that file no fallback copy — if it fails to load, the page should fail loudly rather than quietly showing a stale number. That is the correct failure.",
+      "teach": "If a price is typed in two files, you now have two prices, and one day they will disagree. Keep every fact in one place and read it from there. This sounds like housekeeping and it is actually the difference between a page that is true and a page that used to be true.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": null,
+        "hits_total": null,
+        "note": "Each page is a single self-contained file, so there is no cross-file drift — but WITHIN each file the phone number appears three times as a literal (nav button, hero button, find-us card) alongside the tel: hrefs. A single-file page is the one context where this is defensible; the rule reports it as `info` there and `fail` across files."
+      }
+    },
+    {
+      "id": "H-HIDDEN-PRICE",
+      "tier": "honesty",
+      "category": "honesty",
+      "title": "A price that is not a price",
+      "what_it_is": "'Contact us for pricing', 'Custom', 'Let's talk', or a figure followed by 'and up' presented in a price position.",
+      "why_it_matters": "It is the enterprise convention, and it is precisely what manufactures the thought 'I cannot afford this'. The corpus caught a real pricing page contradicting its own headline: the headline read 'Four prices. Everyone pays the same one' and the fourth tier read '$5,000 and up, quoted after one conversation'. That is not a price.",
+      "source": {
+        "name": "research_11a",
+        "confidence": "MEASURED_HERE",
+        "where": "§1.6"
+      },
+      "also_in": [
+        {
+          "name": "research_11",
+          "where": "§8.3 item 2: hidden pricing is an enterprise convention and a disqualification signal for a small-business buyer"
+        }
+      ],
+      "confidence_note": "The claim that hidden pricing reads as unaffordable to this specific buyer is INFERRED. research/11 §9.2 is explicit that nothing in the sweep measured how any human read any page. What is demonstrated is only that the reference-tier enterprise sites hide price and the small-business operators publish it.",
+      "detector": {
+        "kind": "text_regex",
+        "pattern": "contact (?:us )?for (?:a )?(?:pricing|price|quote)|let'?s talk|custom pricing|\\band up\\b|starting (?:at|from)\\s*\\$?\\d|request a quote",
+        "flags": "gi",
+        "scope": "pricing_region"
+      },
+      "threshold": "Any of those phrases inside a region whose heading or class names pricing.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "warn",
+      "fix": "Publish the real prices. Move the genuinely custom work out of the price grid and into one sentence underneath: work of that shape is a conversation, not a card. Same information, no empty price, no decoy.",
+      "teach": "A price card that does not contain a price makes the reader assume the worst, and they are usually right to. If some work genuinely has to be quoted, say so in a sentence below the real prices rather than putting an empty card where a price should be.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "No pricing region on these pages."
+      }
+    },
+    {
+      "id": "H-DECOY-PRICING",
+      "tier": "honesty",
+      "category": "honesty",
+      "title": "The four-column pricing grid with a highlighted middle tier",
+      "what_it_is": "Three or four price columns with one visually promoted and labelled 'Most popular' or similar.",
+      "why_it_matters": "The most recognisable pricing layout on the internet, and specifically the decoy pattern — a tier placed there to make the tier beside it look reasonable. It is also where empty reserved elements tend to appear (see T2-EMPTY-SPACER).",
+      "source": {
+        "name": "research_11a",
+        "confidence": "MEASURED_HERE",
+        "where": "§1.6"
+      },
+      "detector": {
+        "kind": "composite",
+        "all": [
+          {
+            "kind": "dom_repeated_siblings",
+            "mode": "pricing_columns",
+            "min_count": 3
+          },
+          {
+            "kind": "text_regex",
+            "pattern": "most popular|best value|recommended|most (?:shops|people|teams) pick",
+            "flags": "gi"
+          }
+        ]
+      },
+      "threshold": "3 or more sibling pricing columns, one of which carries a promotional badge.",
+      "threshold_provenance": "calibrated_here",
+      "severity": "info",
+      "fix": "Cut to three tiers with no badge and let the prices speak. If one tier genuinely suits most buyers, say so in a sentence rather than with a ribbon.",
+      "teach": "The pricing table with a highlighted middle column is designed to steer, and most readers now recognise it as steering. Three honest prices in a row, with a plain sentence about which one usually fits, is more persuasive and less irritating.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0
+      }
+    },
+    {
+      "id": "H-WRONG-LOCAL-DETAIL",
+      "tier": "honesty",
+      "category": "honesty",
+      "title": "A local detail the pipeline did not actually retrieve",
+      "what_it_is": "A neighbourhood, cross street, landmark, opening time or service area written into the page from inference rather than from data.",
+      "why_it_matters": "Getting a local detail WRONG is far worse than omitting it. Naming the wrong cross street in front of the owner ends the meeting. Only emit facts the pipeline actually scraped — and if a field is uncertain, leave the hole.",
+      "source": {
+        "name": "research_08",
+        "confidence": "ASSERTED",
+        "where": "§5.3",
+        "quote": "Getting a local detail wrong is far worse than omitting it."
+      },
+      "confidence_note": "Asserted, and forcefully: 'naming the wrong cross street in front of the owner ends the meeting' is a vivid claim nobody tested. What makes the rule worth keeping anyway is that the cost is asymmetric -- omitting a detail is cheap and being wrong about it is not, so the conservative action dominates regardless of the evidence.",
+      "detector": {
+        "kind": "manual",
+        "what": "Whether every place name, time and service-area claim came from retrieved data",
+        "needs": "The data record the page was built from. The tool lists every place-shaped and time-shaped string on the page for reconciliation against it."
+      },
+      "threshold": "Reported, not gated. Place names, opening times and service-area claims are extracted and listed for confirmation against the source record.",
+      "threshold_provenance": "arithmetic",
+      "severity": "warn",
+      "fix": "Emit only what was retrieved. Where a field is uncertain, leave a labelled hole rather than a plausible guess.",
+      "teach": "Being slightly wrong about a local detail is worse than saying nothing, because the person reading it lives there. If you are not certain of the cross street, do not name a cross street.",
+      "chess": "A wrong move number in an annotation destroys the reader's trust in the whole line, even when the analysis is sound.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": null,
+        "hits_total": null,
+        "note": "NOT RUN over this corpus: this detector needs a live render or a person."
+      }
+    },
+    {
+      "id": "H-OUT-OF-BAND-HIDDEN",
+      "tier": "honesty",
+      "category": "honesty",
+      "title": "A value outside its own stated range, presented as if inside it",
+      "what_it_is": "The page states a standard, a band or a specification, and also shows a value that falls outside it, without saying so.",
+      "why_it_matters": "The chess-tee-forge storefront handles this the right way and it is worth copying exactly: its hero design measures 34.92% ink density against a stated house band of 12-32%, and the sheet stamps it ABOVE BAND with a numbered note explaining why. Flagging the exception is what makes the rest of the numbers believable.",
+      "source": {
+        "name": "chess_tee_forge",
+        "confidence": "DEMONSTRATED",
+        "where": "DESIGN-SYSTEM.md §8: 'Out-of-band numbers are flagged, not hidden'"
+      },
+      "detector": {
+        "kind": "manual",
+        "what": "Whether any displayed value falls outside a range the same page declares",
+        "needs": "The page's own stated bands. Automatable only where the band and the value are both machine-readable, which is rare."
+      },
+      "threshold": "Reported, not gated.",
+      "threshold_provenance": "arithmetic",
+      "severity": "info",
+      "fix": "Show the exception and label it. A page that flags its own out-of-range value is more trustworthy than one where every number happens to fall neatly inside.",
+      "teach": "If your page states a standard and one of your own numbers misses it, say so on the page. Readers trust a set of numbers far more when one of them is visibly imperfect — it proves nobody was tidying.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": null,
+        "hits_total": null,
+        "note": "NOT RUN over this corpus: this detector needs a live render or a person."
+      }
+    },
+    {
+      "id": "H-ASSUMPTION-UNLABELLED",
+      "tier": "honesty",
+      "category": "honesty",
+      "title": "An assumption presented as a measurement",
+      "what_it_is": "A value that was assumed, estimated or inherited from a default, displayed with the same authority as one that was measured.",
+      "why_it_matters": "The same discipline as the confidence tags in this rulebook. chess-tee-forge stamps its press constants 'Assumed — untested' in the constants table; the research corpus flags its own 45ms stagger interval as having no practitioner source and tells you not to attribute it to anyone.",
+      "source": {
+        "name": "chess_tee_forge",
+        "confidence": "DEMONSTRATED",
+        "where": "DESIGN-SYSTEM.md §8: 'Assumptions are labelled. Halftone angle 22.5 degrees, usable dot 10-80% and ~30% dot gain are stamped Assumed — untested in the press-constants table.'"
+      },
+      "also_in": [
+        {
+          "name": "research_08a",
+          "where": "the locked-parameters table, where --stagger:45ms is marked as having NO PRACTITIONER SOURCE despite being shipped"
+        }
+      ],
+      "detector": {
+        "kind": "manual",
+        "what": "Whether each displayed constant was measured or assumed",
+        "needs": "The build data. The tool lists every numeric constant in a data or spec table for tagging."
+      },
+      "threshold": "Reported, not gated.",
+      "threshold_provenance": "arithmetic",
+      "severity": "info",
+      "fix": "Tag each value with how it was obtained. Three tags cover almost everything: measured, supplied by the client, assumed.",
+      "teach": "Some numbers on a page were measured and some were guessed, and the reader cannot tell which unless you say. Marking the guesses does not weaken the page — it makes the measured ones believable.",
+      "chess": "The difference between 'this is winning' and 'this looks winning, I have not calculated it out'. Say which one you mean.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": null,
+        "hits_total": null,
+        "note": "NOT RUN over this corpus: this detector needs a live render or a person."
+      }
+    },
+    {
+      "id": "H-SPEC-BUILD-PORTFOLIO",
+      "tier": "honesty",
+      "category": "honesty",
+      "title": "An unsolicited build presented as client work",
+      "what_it_is": "A speculative page made for a business that did not commission it, shown in a portfolio, indexed by search engines, or presented without a clear statement of what it is.",
+      "why_it_matters": "There is a documented case in the corpus of an unsolicited same-name site outranking the real business on Google Maps. The mitigations are structural, not cosmetic: `noindex` plus a robots deny, a persistent visible banner saying what the page is, no reproduction of the business's logo, no working booking or payment path, and an unguessable URL.",
+      "source": {
+        "name": "research_11",
+        "confidence": "ASSERTED",
+        "where": "§8.3 item 12; the mitigation set is from research/08a §1's non-removable list"
+      },
+      "confidence_note": "The legal position is a live decision in the source project with a mandatory mitigation attached, not a settled rule. This rulebook encodes the MITIGATIONS as checkable, and does not attempt to encode the legal question.",
+      "detector": {
+        "kind": "composite",
+        "all": [
+          {
+            "kind": "html_tag",
+            "tag": "meta",
+            "attr_match": {
+              "name": "^robots$",
+              "content": "noindex"
+            },
+            "mode": "required"
+          },
+          {
+            "kind": "text_regex",
+            "pattern": "concept|unofficial|not affiliated|speculative",
+            "flags": "i",
+            "scope": "visible",
+            "mode": "required"
+          }
+        ]
+      },
+      "threshold": "When a project is flagged as speculative, all of: a `noindex` robots meta, a visible non-dismissible banner stating what the page is, no logo reproduction, no working booking or payment path, and a robots.txt written alongside.",
+      "threshold_provenance": "from_source",
+      "severity": "warn",
+      "fix": "Ship every mitigation and give none of them an off switch. Then typeset them as part of the design rather than as a bolted-on disclaimer bar — they cannot be removed, but they can look deliberate.",
+      "teach": "Building a page for a business that did not ask for it is a real thing people do, and it has a real risk: a search engine can decide your page is the business. The protections are simple and must all be present — tell search engines to ignore it, say plainly on the page what it is, do not reproduce their logo, and make sure nothing on it can take a booking or a payment.",
+      "measured": {
+        "corpus": "local-site-forge/previews",
+        "pages_total": 13,
+        "pages_firing": 0,
+        "hits_total": 0,
+        "note": "All 13 ship the full mitigation set: `noindex, nofollow, noarchive, nosnippet`, a sticky non-dismissible concept banner, a footer disclaimer with a same-day takedown promise, a robots.txt written alongside, and an unguessable slug. This is the corpus at its most disciplined. The one remaining problem is that the banner and footer are byte-identical across all 13 — see S-BOILERPLATE-IDENTICAL."
+      }
+    }
+  ]
+}

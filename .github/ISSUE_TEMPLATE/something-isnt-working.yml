@@ -1,0 +1,59 @@
+name: Something isn't working
+description: For anyone using the kit. You do not need to know what went wrong.
+title: "[help] "
+labels: ["needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        You don't need to diagnose anything. There is one command that collects
+        almost everything needed to help you.
+
+        Open Terminal and run:
+
+        ```
+        codex-site-kit doctor
+        ```
+
+        Copy everything it prints and paste it below. If that command itself
+        doesn't work — for example it says `command not found` — say so in the
+        box and skip it. That is useful information too.
+
+  - type: textarea
+    id: doctor
+    attributes:
+      label: What `codex-site-kit doctor` printed
+      description: Paste the whole thing, including the FIX section if there was one.
+      render: text
+    validations:
+      required: false
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What you were doing, and what happened instead
+      description: |
+        Plain English is perfect. "I asked Codex to build a site and it said the
+        tools weren't available" is a good report.
+      placeholder: I ran step 4 in the README and then...
+    validations:
+      required: true
+
+  - type: textarea
+    id: exact-text
+    attributes:
+      label: The exact text on screen, if there was an error
+      description: |
+        Paste it rather than describing it — the precise wording usually
+        identifies the cause on its own.
+      render: text
+    validations:
+      required: false
+
+  - type: input
+    id: macos
+    attributes:
+      label: Which macOS version
+      description: "Apple menu -> About This Mac. For example: Sequoia 15.3"
+    validations:
+      required: false

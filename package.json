@@ -1,0 +1,69 @@
+{
+  "name": "codex-site-kit",
+  "version": "2.0.0",
+  "description": "An MCP server for Codex that builds small, honest, framework-free websites and teaches the craft while you build. Every finding carries what it found, why it matters, who says so, and the better move.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=18.17"
+  },
+  "bin": {
+    "codex-site-kit": "bin/codex-site-kit.js"
+  },
+  "main": "src/server.js",
+  "exports": {
+    ".": "./src/server.js",
+    "./tools": "./src/tools/index.js",
+    "./rules": "./src/rules/index.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "scripts",
+    "README.md",
+    "LEARNING-PATH.md",
+    "RULES.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "start": "node bin/codex-site-kit.js",
+    "doctor": "node bin/codex-site-kit.js doctor",
+    "test": "node --test test/*.test.js",
+    "docs": "node scripts/build-docs.js",
+    "docs:check": "node scripts/build-docs.js --check",
+    "handshake": "node scripts/handshake.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "jpeg-js": "^0.4.4",
+    "pngjs": "^7.0.0",
+    "zod": "^4.6.5"
+  },
+  "peerDependenciesMeta": {
+    "playwright": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "playwright": "^1.63.0"
+  },
+  "keywords": [
+    "mcp",
+    "modelcontextprotocol",
+    "codex",
+    "website",
+    "static-site",
+    "design-review",
+    "linter",
+    "accessibility",
+    "wcag"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Javendean/codex-site-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Javendean/codex-site-kit/issues"
+  },
+  "homepage": "https://github.com/Javendean/codex-site-kit#readme"
+}
