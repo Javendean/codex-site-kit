@@ -1424,7 +1424,15 @@ function ledgerDetector(det, page, ctx) {
   const self = ctx.fingerprint;
   if (!self) return notRun('no fingerprint computed for this page');
   const others = comparisonSet(lg, self.id, det.window ?? DEFAULT_WINDOW);
-  if (!others.length) return fired([]);
+  // Nothing to compare against is NOT a pass. This file's own header says it:
+  // "A checker that quietly passes what it cannot test is worse than one that
+  // admits the gap." Returning fired([]) here reported the variety family as
+  // CLEAN over the 13-page previews corpus whose whole documented defect is
+  // that all 13 share one skeleton hash — an affirmative pass on the corpus the
+  // rule was written from.
+  if (!others.length) {
+    return notRun('nothing to compare against — no sibling pages in this run and no prior builds in the ledger');
+  }
 
   if (det.mode === 'exact_collision' || (!det.mode && det.facet)) {
     const key = det.facet;

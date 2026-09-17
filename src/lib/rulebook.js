@@ -158,10 +158,50 @@ export function review({
   const passed = new Map();
   const suppressed = new Map();
 
+  // TWO PASSES, and the first one is the whole point of the variety family.
+  //
+  // Previously review() looped pages once and compared each against the HOME
+  // ledger only, so pages read in the same call were never compared to each
+  // other. Pointed at the 13-page previews corpus — whose documented defect is
+  // that all 13 collapse to ONE skeleton hash — every variety rule reported
+  // CLEAN. The kit's own rules/fingerprint.js measured the collision correctly
+  // the whole time; the wiring simply never handed it the siblings.
+  //
+  // It also made results machine-dependent: a rule fired or not depending on
+  // whether the reviewer's ~/.codex-site-kit/ledger.json happened to hold that
+  // hash, so "0 findings" was not reproducible on another machine.
+  const prints = new Map();
   for (const page of pages) {
-    let print = null;
     try {
-      print = fingerprint(page);
+      const p = fingerprint(page);
+      if (selfId) p.id = `${selfId}:${p.facets.skeleton}`;
+      prints.set(page.path, p);
+    } catch {
+      prints.set(page.path, null);
+    }
+  }
+  // Sibling ids are keyed on the PATH, never on page.id. With selfId set, every
+  // same-skeleton page collapses to one id, and comparisonSet drops entries by
+  // id — so id-keyed siblings would all be filtered out as "self" and the fix
+  // would silently do nothing. The per-page exclusion below is by path instead,
+  // which is correct whatever the id scheme.
+  const siblings = [...prints.entries()]
+    .filter(([, p]) => p)
+    .map(([path, p]) => ({
+      id: `run:${path}`,
+      built_at: null,
+      label: path,
+      path_hint: path,
+      facets: p.facets,
+      vectors: p.vectors,
+      declared: p.declared || {},
+      from_this_run: true
+    }));
+
+  for (const page of pages) {
+    let print = prints.get(page.path) ?? null;
+    try {
+      if (!print) print = fingerprint(page);
       // The ledger identifies a build by folder and skeleton. Reviewing a site
       // that is already in the ledger must not report the site as a copy of
       // ITSELF, so the id is constructed the same way here as it is when
@@ -171,10 +211,16 @@ export function review({
       print = null;
     }
 
+    // Siblings go last: comparisonSet takes the LAST N entries, and the pages in
+    // this same run are the most relevant comparison a page has.
+    const pageLedger = lg
+      ? { ...lg, entries: [...(lg.entries || []), ...siblings.filter((s) => s.path_hint !== page.path)] }
+      : lg;
+
     const results = checkAll(active, page, {
       now,
       project,
-      ledger: lg,
+      ledger: pageLedger,
       fingerprint: print,
       paletteOptions
     });

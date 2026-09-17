@@ -210,25 +210,25 @@
 
 | id | Who | What it contributes | Confidence |
 |---|---|---|---|
-| `gesso` | undefined | undefined | — |
-| `hallmark` | undefined | undefined | — |
-| `krebs` | undefined | undefined | — |
-| `kowalski` | undefined | undefined | — |
-| `comeau` | undefined | undefined | — |
-| `citrous_oyster` | undefined | undefined | — |
-| `febbhav` | undefined | undefined | — |
-| `freiberg` | undefined | undefined | — |
-| `impeccable` | undefined | undefined | — |
-| `chess_tee_forge` | undefined | undefined | — |
-| `research_08` | undefined | undefined | — |
-| `research_08a` | undefined | undefined | — |
-| `research_04` | undefined | undefined | — |
-| `research_11` | undefined | undefined | — |
-| `research_11a` | undefined | undefined | — |
-| `research_05_synthesis` | undefined | undefined | — |
-| `govuk` | undefined | undefined | — |
-| `wcag` | undefined | undefined | — |
-| `web_dev_cwv` | undefined | undefined | — |
-| `css_tricks_grain` | undefined | undefined | — |
-| `measured_here` | undefined | undefined | — |
+| `gesso` | Gesso Build — @gessobuild/anti-slop | A deterministic HTML/CSS design linter. | DEMONSTRATED |
+| `hallmark` | Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents | ~45 named anti-patterns each with a why and a fix, plus 58 numbered pass/fail gates. | ASSERTED |
+| `krebs` | Adrian Krebs — Design Slop | The only empirical study of AI-design tells in the corpus: 1,590 Show HN landing pages scored with Playwright plus deterministic DOM checks. | DEMONSTRATED |
+| `kowalski` | Emil Kowalski — design engineer at Linear, ex-Vercel; author of Sonner and Vaul | The strongest motion source in the corpus, and uniquely checkable: he publishes numeric rules in prose AND ships the libraries where you can read the CSS and confirm he follows them. | DEMONSTRATED |
+| `comeau` | Josh W. Comeau — independent educator, interactive CSS tutorials | Every claim sits next to a live control. | DEMONSTRATED |
+| `citrous_oyster` | Ryan / u/Citrous_Oyster — Oak Harbor Web Designs, founder of CodeStitch | The only practitioner school in the corpus that demonstrably owns the local-business market. | ASSERTED |
+| `febbhav` | febbhav — Signs of AI Design | A ~44 KB catalogue of AI tells across web, image, video and copy. | ASSERTED |
+| `freiberg` | Rauno Freiberg — design engineer at Vercel; Web Interface Guidelines | Framing and judgement rather than parameters. | ASSERTED |
+| `impeccable` | impeccable 4.3.1 — design skill and PostToolUse detector hook | An installed design skill with a craft floor (Verify / Refuse) and a binary detector that runs on every Edit/Write. | ASSERTED |
+| `chess_tee_forge` | chess-tee-forge storefront — DESIGN-SYSTEM.md and store/ | A real storefront whose design system encodes honesty rules, measured verification, and a single-source-of-truth discipline. | DEMONSTRATED |
+| `research_08` | local-site-forge research/08-craft.md | The 915-line craft reference: the ranked sourced AI-slop tell list, the motion budget, the performance floor, the detail catalogue, and an explicit coverage-gaps section. | MEASURED_HERE |
+| `research_08a` | local-site-forge research/08a-sitegen-spec.md | The work order derived from 08: KEEP / CHANGE / ADD / REJECT, the motion token set with locked parameters, the variation axes, and an implementation log with a corrected measurement. | MEASURED_HERE |
+| `research_04` | local-site-forge research/04-design-language.md | What reads modern vs dated in 2026, and the two-tier detector: Tier 1 technical age (parse the HTML) and Tier 2 aesthetic age (needs a screenshot and a vision model). | ASSERTED |
+| `research_11` | local-site-forge research/11-reference-tier.md | The reference set with counted hex frequencies, the document-tier ceiling, material quality in code with measured costs, the typography system, and the register problem. | MEASURED_HERE |
+| `research_11a` | local-site-forge research/11a-verity-build-spec.md | A rebuild spec that audits a real shipped site against the rest of the corpus, including its own author's detectors. | MEASURED_HERE |
+| `research_05_synthesis` | local-site-forge research/05-practitioner-corpus.md and corpus/SYNTHESIS.md | The epistemic frame for the whole corpus: harvest mechanics, discount outcomes, and treat convergence as shared incentive until proven otherwise. | ASSERTED |
+| `govuk` | GOV.UK Design System type scale | A tested type scale for the least technical audience in the English-speaking world. | DEMONSTRATED |
+| `wcag` | WCAG 2.1 / 2.2 AA | The contrast and target-size success criteria. | DEMONSTRATED |
+| `web_dev_cwv` | web.dev Core Web Vitals | LCP <= 2.5s, INP <= 200ms, CLS <= 0.1, all at p75 across mobile and desktop. | DEMONSTRATED |
+| `css_tricks_grain` | CSS-Tricks — Grainy Gradients (Jimmy Chion) | The feTurbulence grain recipe, with `stitchTiles='stitch'` as the part that makes it tile seamlessly. | DEMONSTRATED |
+| `measured_here` | Measured in this rulebook, 2026-09-17 | A number produced by running a detector over the thirteen generated pages in local-site-forge/previews/ on 2026-09-17, with the command recorded on the rule. | MEASURED_HERE |
 

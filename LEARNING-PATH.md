@@ -61,7 +61,7 @@ There is a short list of faults that make a page look BROKEN rather than cheap, 
 
 **Who says so.** local-site-forge research/04-design-language.md
 
-> ⚠ **undefined** — Its §3 'what reads as modern' list (bento, kinetic type, glassmorphism) is directional secondary-source consensus, and research/08 §4 later records that in 2026 'reads as 2026' and 'reads as AI-generated' are the same set. Where 04 and 08 conflict, 08 wins and the rule says so.
+> ⚠ **local-site-forge research/04-design-language.md** — Its §3 'what reads as modern' list (bento, kinetic type, glassmorphism) is directional secondary-source consensus, and research/08 §4 later records that in 2026 'reads as 2026' and 'reads as AI-generated' are the same set. Where 04 and 08 conflict, 08 wins and the rule says so.
 
 ### `F-VIEWPORT-LOCKED` ?? Zooming disabled
 
@@ -77,7 +77,7 @@ There is a short list of faults that make a page look BROKEN rather than cheap, 
 
 **Who says so.** local-site-forge research/04-design-language.md · WCAG 2.1 / 2.2 AA
 
-> ⚠ **undefined** — Its §3 'what reads as modern' list (bento, kinetic type, glassmorphism) is directional secondary-source consensus, and research/08 §4 later records that in 2026 'reads as 2026' and 'reads as AI-generated' are the same set. Where 04 and 08 conflict, 08 wins and the rule says so.
+> ⚠ **local-site-forge research/04-design-language.md** — Its §3 'what reads as modern' list (bento, kinetic type, glassmorphism) is directional secondary-source consensus, and research/08 §4 later records that in 2026 'reads as 2026' and 'reads as AI-generated' are the same set. Where 04 and 08 conflict, 08 wins and the rule says so.
 
 ### `F-OVERFLOW-CLIP` ? No horizontal-overflow guard, or the wrong one
 
@@ -93,7 +93,7 @@ There is a short list of faults that make a page look BROKEN rather than cheap, 
 
 **Who says so.** local-site-forge research/08-craft.md
 
-> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+> ⚠ **local-site-forge research/08-craft.md** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
 ### `F-BARE-1FR` ? Grid tracks written as bare 1fr
 
@@ -109,7 +109,7 @@ There is a short list of faults that make a page look BROKEN rather than cheap, 
 
 **Who says so.** local-site-forge research/08-craft.md
 
-> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+> ⚠ **local-site-forge research/08-craft.md** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
 ### `F-INPUT-16PX` ?? Form input text below 16px
 
@@ -125,9 +125,9 @@ There is a short list of faults that make a page look BROKEN rather than cheap, 
 
 **Who says so.** local-site-forge research/08-craft.md · Rauno Freiberg — design engineer at Vercel; Web Interface Guidelines
 
-> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+> ⚠ **local-site-forge research/08-craft.md** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
-> ⚠ **undefined** — He says himself: 'This essay is not a tutorial nor a collection of guidelines.'
+> ⚠ **Rauno Freiberg — design engineer at Vercel; Web Interface Guidelines** — He says himself: 'This essay is not a tutorial nor a collection of guidelines.'
 
 ### `F-TAP-TARGET` ? No minimum tap target on touch devices
 
@@ -143,7 +143,7 @@ There is a short list of faults that make a page look BROKEN rather than cheap, 
 
 **Who says so.** local-site-forge research/08-craft.md · WCAG 2.1 / 2.2 AA
 
-> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+> ⚠ **local-site-forge research/08-craft.md** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
 ### `T2-HERO-100VH` ? The full-screen centred hero
 
@@ -159,9 +159,9 @@ There is a short list of faults that make a page look BROKEN rather than cheap, 
 
 **Who says so.** Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents · local-site-forge research/08-craft.md
 
-> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
+> ⚠ **Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
 
-> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+> ⚠ **local-site-forge research/08-craft.md** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
 ### `T1-HSCROLL` ?? The page scrolls sideways
 
@@ -177,9 +177,9 @@ There is a short list of faults that make a page look BROKEN rather than cheap, 
 
 **Who says so.** Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents · chess-tee-forge storefront — DESIGN-SYSTEM.md and store/
 
-> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
+> ⚠ **Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
 
-> ⚠ **undefined** — Its own font delivery links fonts.googleapis.com, which research/11 §5.4 rejects. Take the honesty rules; do not take the font route.
+> ⚠ **chess-tee-forge storefront — DESIGN-SYSTEM.md and store/** — Its own font delivery links fonts.googleapis.com, which research/11 §5.4 rejects. Take the honesty rules; do not take the font route.
 
 ### `T1-BUTTON-WRAP` ?? A button label wrapping to two lines
 
@@ -195,7 +195,7 @@ There is a short list of faults that make a page look BROKEN rather than cheap, 
 
 **Who says so.** Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents
 
-> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
+> ⚠ **Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
 
 ### `A-IMG-ALT` ?? An image with no alt attribute
 
@@ -211,7 +211,7 @@ There is a short list of faults that make a page look BROKEN rather than cheap, 
 
 **Who says so.** local-site-forge research/08-craft.md · WCAG 2.1 / 2.2 AA
 
-> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+> ⚠ **local-site-forge research/08-craft.md** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
 ### `W-STALE-COPYRIGHT` ? An out-of-date copyright year
 
@@ -227,7 +227,7 @@ There is a short list of faults that make a page look BROKEN rather than cheap, 
 
 **Who says so.** local-site-forge research/04-design-language.md
 
-> ⚠ **undefined** — Its §3 'what reads as modern' list (bento, kinetic type, glassmorphism) is directional secondary-source consensus, and research/08 §4 later records that in 2026 'reads as 2026' and 'reads as AI-generated' are the same set. Where 04 and 08 conflict, 08 wins and the rule says so.
+> ⚠ **local-site-forge research/04-design-language.md** — Its §3 'what reads as modern' list (bento, kinetic type, glassmorphism) is directional secondary-source consensus, and research/08 §4 later records that in 2026 'reads as 2026' and 'reads as AI-generated' are the same set. Where 04 and 08 conflict, 08 wins and the rule says so.
 
 ---
 
@@ -257,11 +257,11 @@ Every palette on every page was either derived from something real or picked off
 
 **Who says so.** Gesso Build — @gessobuild/anti-slop · Adrian Krebs — Design Slop · Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents
 
-> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
+> ⚠ **Gesso Build — @gessobuild/anti-slop** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
 
-> ⚠ **undefined** — An HN commenter caught his own blog post wearing the cream/warm-oat trap. The study is sound; the author is not outside the trend he measured.
+> ⚠ **Adrian Krebs — Design Slop** — An HN commenter caught his own blog post wearing the cream/warm-oat trap. The study is sound; the author is not outside the trend he measured.
 
-> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
+> ⚠ **Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
 
 ### `T1-INDIGO-NEAR` ? An indigo that dodged the list
 
@@ -277,7 +277,7 @@ Every palette on every page was either derived from something real or picked off
 
 **Who says so.** Measured in this rulebook, 2026-09-17
 
-> ⚠ **undefined** — Thirteen pages from one generator across two verticals (tax/accounting and law) is a narrow sample. A threshold calibrated only against it is calibrated against one failure mode.
+> ⚠ **Measured in this rulebook, 2026-09-17** — Thirteen pages from one generator across two verticals (tax/accounting and law) is a narrow sample. A threshold calibrated only against it is calibrated against one failure mode.
 
 ### `T1-GRADIENT-3STOP` ?? The third gradient stop
 
@@ -293,9 +293,9 @@ Every palette on every page was either derived from something real or picked off
 
 **Who says so.** Gesso Build — @gessobuild/anti-slop · local-site-forge research/08-craft.md
 
-> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
+> ⚠ **Gesso Build — @gessobuild/anti-slop** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
 
-> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+> ⚠ **local-site-forge research/08-craft.md** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
 ### `T1-GRADIENT-CLICHE` ?? The three cliché gradient pairs
 
@@ -311,9 +311,9 @@ Every palette on every page was either derived from something real or picked off
 
 **Who says so.** Gesso Build — @gessobuild/anti-slop · local-site-forge research/11-reference-tier.md
 
-> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
+> ⚠ **Gesso Build — @gessobuild/anti-slop** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
 
-> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
+> ⚠ **local-site-forge research/11-reference-tier.md** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
 
 ### `T1-GRADIENT-TEXT` ?? Gradient text
 
@@ -329,9 +329,9 @@ Every palette on every page was either derived from something real or picked off
 
 **Who says so.** Gesso Build — @gessobuild/anti-slop · impeccable 4.3.1 — design skill and PostToolUse detector hook
 
-> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
+> ⚠ **Gesso Build — @gessobuild/anti-slop** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
 
-> ⚠ **undefined** — Its detector is a compiled binary, so its exact thresholds were not readable. Rules credited here are transcribed from the craft floor's prose, which states bans and defaults without numbers. Where this rulebook attaches a number to an impeccable ban, the number comes from Gesso or from measurement here, and says so.
+> ⚠ **impeccable 4.3.1 — design skill and PostToolUse detector hook** — Its detector is a compiled binary, so its exact thresholds were not readable. Rules credited here are transcribed from the craft floor's prose, which states bans and defaults without numbers. Where this rulebook attaches a number to an impeccable ban, the number comes from Gesso or from measurement here, and says so.
 
 ### `T2-PURE-BW` ? Pure black on pure white
 
@@ -347,9 +347,9 @@ Every palette on every page was either derived from something real or picked off
 
 **Who says so.** local-site-forge research/11-reference-tier.md · Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents
 
-> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
+> ⚠ **local-site-forge research/11-reference-tier.md** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
 
-> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
+> ⚠ **Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
 
 ### `T2-ZERO-CHROMA-GREY` ? Greys with no colour in them at all
 
@@ -365,9 +365,9 @@ Every palette on every page was either derived from something real or picked off
 
 **Who says so.** Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents · local-site-forge research/11-reference-tier.md
 
-> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
+> ⚠ **Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
 
-> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
+> ⚠ **local-site-forge research/11-reference-tier.md** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
 
 ### `A-CONTRAST-BODY` ?? Body text below 4.5:1 contrast
 
@@ -383,9 +383,9 @@ Every palette on every page was either derived from something real or picked off
 
 **Who says so.** WCAG 2.1 / 2.2 AA · local-site-forge research/08-craft.md · impeccable 4.3.1 — design skill and PostToolUse detector hook
 
-> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+> ⚠ **local-site-forge research/08-craft.md** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
-> ⚠ **undefined** — Its detector is a compiled binary, so its exact thresholds were not readable. Rules credited here are transcribed from the craft floor's prose, which states bans and defaults without numbers. Where this rulebook attaches a number to an impeccable ban, the number comes from Gesso or from measurement here, and says so.
+> ⚠ **impeccable 4.3.1 — design skill and PostToolUse detector hook** — Its detector is a compiled binary, so its exact thresholds were not readable. Rules credited here are transcribed from the craft floor's prose, which states bans and defaults without numbers. Where this rulebook attaches a number to an impeccable ban, the number comes from Gesso or from measurement here, and says so.
 
 ### `C-THEME-CONTRACT` ? The three-state theme pattern not followed
 
@@ -401,7 +401,7 @@ Every palette on every page was either derived from something real or picked off
 
 **Who says so.** chess-tee-forge storefront — DESIGN-SYSTEM.md and store/
 
-> ⚠ **undefined** — Its own font delivery links fonts.googleapis.com, which research/11 §5.4 rejects. Take the honesty rules; do not take the font route.
+> ⚠ **chess-tee-forge storefront — DESIGN-SYSTEM.md and store/** — Its own font delivery links fonts.googleapis.com, which research/11 §5.4 rejects. Take the honesty rules; do not take the font route.
 
 ### `C-OKLCH-LITERAL` ?! oklch() shipped without a hex fallback
 
@@ -417,7 +417,7 @@ Every palette on every page was either derived from something real or picked off
 
 **Who says so.** local-site-forge research/08-craft.md
 
-> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+> ⚠ **local-site-forge research/08-craft.md** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
 ---
 
@@ -448,9 +448,9 @@ This is the largest single improvement available and it costs nothing. Measured 
 
 **Who says so.** Gesso Build — @gessobuild/anti-slop · local-site-forge research/11-reference-tier.md
 
-> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
+> ⚠ **Gesso Build — @gessobuild/anti-slop** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
 
-> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
+> ⚠ **local-site-forge research/11-reference-tier.md** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
 
 ### `T2-BANNED-FONT` ? A typeface on the named-tell list
 
@@ -466,9 +466,9 @@ This is the largest single improvement available and it costs nothing. Measured 
 
 **Who says so.** Gesso Build — @gessobuild/anti-slop · local-site-forge research/11-reference-tier.md
 
-> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
+> ⚠ **Gesso Build — @gessobuild/anti-slop** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
 
-> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
+> ⚠ **local-site-forge research/11-reference-tier.md** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
 
 ### `T2-KICKER-H1` ?? The eyebrow badge above the main headline
 
@@ -484,7 +484,7 @@ This is the largest single improvement available and it costs nothing. Measured 
 
 **Who says so.** Gesso Build — @gessobuild/anti-slop
 
-> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
+> ⚠ **Gesso Build — @gessobuild/anti-slop** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
 
 ### `T1-EMOJI-ICON` ?? Emoji standing in for icons
 
@@ -500,11 +500,11 @@ This is the largest single improvement available and it costs nothing. Measured 
 
 **Who says so.** Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents · impeccable 4.3.1 — design skill and PostToolUse detector hook · local-site-forge research/08-craft.md
 
-> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
+> ⚠ **Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
 
-> ⚠ **undefined** — Its detector is a compiled binary, so its exact thresholds were not readable. Rules credited here are transcribed from the craft floor's prose, which states bans and defaults without numbers. Where this rulebook attaches a number to an impeccable ban, the number comes from Gesso or from measurement here, and says so.
+> ⚠ **impeccable 4.3.1 — design skill and PostToolUse detector hook** — Its detector is a compiled binary, so its exact thresholds were not readable. Rules credited here are transcribed from the craft floor's prose, which states bans and defaults without numbers. Where this rulebook attaches a number to an impeccable ban, the number comes from Gesso or from measurement here, and says so.
 
-> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+> ⚠ **local-site-forge research/08-craft.md** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
 ### `TRAP-ITALIC-IN-HEADING` ? An italic word inside an upright heading
 
@@ -520,7 +520,7 @@ This is the largest single improvement available and it costs nothing. Measured 
 
 **Who says so.** Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents
 
-> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
+> ⚠ **Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
 
 ### `TY-BODY-MEASURE` ?! Body text lines too long or too short
 
@@ -536,9 +536,9 @@ This is the largest single improvement available and it costs nothing. Measured 
 
 **Who says so.** impeccable 4.3.1 — design skill and PostToolUse detector hook · local-site-forge research/11-reference-tier.md
 
-> ⚠ **undefined** — Its detector is a compiled binary, so its exact thresholds were not readable. Rules credited here are transcribed from the craft floor's prose, which states bans and defaults without numbers. Where this rulebook attaches a number to an impeccable ban, the number comes from Gesso or from measurement here, and says so.
+> ⚠ **impeccable 4.3.1 — design skill and PostToolUse detector hook** — Its detector is a compiled binary, so its exact thresholds were not readable. Rules credited here are transcribed from the craft floor's prose, which states bans and defaults without numbers. Where this rulebook attaches a number to an impeccable ban, the number comes from Gesso or from measurement here, and says so.
 
-> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
+> ⚠ **local-site-forge research/11-reference-tier.md** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
 
 ### `TY-H1-MEASURE` ?! The headline runs too wide
 
@@ -554,7 +554,7 @@ This is the largest single improvement available and it costs nothing. Measured 
 
 **Who says so.** local-site-forge research/11-reference-tier.md
 
-> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
+> ⚠ **local-site-forge research/11-reference-tier.md** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
 
 ---
 
@@ -584,11 +584,11 @@ The test that runs through all of this: what job is this doing? A shadow modelli
 
 **Who says so.** Gesso Build — @gessobuild/anti-slop · Adrian Krebs — Design Slop · impeccable 4.3.1 — design skill and PostToolUse detector hook
 
-> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
+> ⚠ **Gesso Build — @gessobuild/anti-slop** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
 
-> ⚠ **undefined** — An HN commenter caught his own blog post wearing the cream/warm-oat trap. The study is sound; the author is not outside the trend he measured.
+> ⚠ **Adrian Krebs — Design Slop** — An HN commenter caught his own blog post wearing the cream/warm-oat trap. The study is sound; the author is not outside the trend he measured.
 
-> ⚠ **undefined** — Its detector is a compiled binary, so its exact thresholds were not readable. Rules credited here are transcribed from the craft floor's prose, which states bans and defaults without numbers. Where this rulebook attaches a number to an impeccable ban, the number comes from Gesso or from measurement here, and says so.
+> ⚠ **impeccable 4.3.1 — design skill and PostToolUse detector hook** — Its detector is a compiled binary, so its exact thresholds were not readable. Rules credited here are transcribed from the craft floor's prose, which states bans and defaults without numbers. Where this rulebook attaches a number to an impeccable ban, the number comes from Gesso or from measurement here, and says so.
 
 ### `T2-PUFFY-SHADOW` ?? Puffy stacked shadows
 
@@ -604,11 +604,11 @@ The test that runs through all of this: what job is this doing? A shadow modelli
 
 **Who says so.** Gesso Build — @gessobuild/anti-slop · local-site-forge research/11-reference-tier.md · impeccable 4.3.1 — design skill and PostToolUse detector hook
 
-> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
+> ⚠ **Gesso Build — @gessobuild/anti-slop** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
 
-> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
+> ⚠ **local-site-forge research/11-reference-tier.md** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
 
-> ⚠ **undefined** — Its detector is a compiled binary, so its exact thresholds were not readable. Rules credited here are transcribed from the craft floor's prose, which states bans and defaults without numbers. Where this rulebook attaches a number to an impeccable ban, the number comes from Gesso or from measurement here, and says so.
+> ⚠ **impeccable 4.3.1 — design skill and PostToolUse detector hook** — Its detector is a compiled binary, so its exact thresholds were not readable. Rules credited here are transcribed from the craft floor's prose, which states bans and defaults without numbers. Where this rulebook attaches a number to an impeccable ban, the number comes from Gesso or from measurement here, and says so.
 
 ### `T2-RADIUS-40` ? Corners rounded past the point of confidence
 
@@ -624,7 +624,7 @@ The test that runs through all of this: what job is this doing? A shadow modelli
 
 **Who says so.** Gesso Build — @gessobuild/anti-slop
 
-> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
+> ⚠ **Gesso Build — @gessobuild/anti-slop** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
 
 ### `T2-PILL-CTA` ?! The fully-rounded pill button
 
@@ -640,9 +640,9 @@ The test that runs through all of this: what job is this doing? A shadow modelli
 
 **Who says so.** local-site-forge research/08-craft.md · local-site-forge research/08a-sitegen-spec.md
 
-> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+> ⚠ **local-site-forge research/08-craft.md** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
-> ⚠ **undefined** — Its `--stagger: 45ms` has no practitioner source and the file says so. Do not attribute it to anyone.
+> ⚠ **local-site-forge research/08a-sitegen-spec.md** — Its `--stagger: 45ms` has no practitioner source and the file says so. Do not attribute it to anyone.
 
 ### `T2-BACKDROP-BLUR` ?? backdrop-filter: blur()
 
@@ -658,11 +658,11 @@ The test that runs through all of this: what job is this doing? A shadow modelli
 
 **Who says so.** local-site-forge research/08-craft.md · impeccable 4.3.1 — design skill and PostToolUse detector hook · local-site-forge research/11-reference-tier.md
 
-> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+> ⚠ **local-site-forge research/08-craft.md** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
-> ⚠ **undefined** — Its detector is a compiled binary, so its exact thresholds were not readable. Rules credited here are transcribed from the craft floor's prose, which states bans and defaults without numbers. Where this rulebook attaches a number to an impeccable ban, the number comes from Gesso or from measurement here, and says so.
+> ⚠ **impeccable 4.3.1 — design skill and PostToolUse detector hook** — Its detector is a compiled binary, so its exact thresholds were not readable. Rules credited here are transcribed from the craft floor's prose, which states bans and defaults without numbers. Where this rulebook attaches a number to an impeccable ban, the number comes from Gesso or from measurement here, and says so.
 
-> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
+> ⚠ **local-site-forge research/11-reference-tier.md** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
 
 ### `T1-UNIFORM-CARDS` ? Identical icon-topped cards as the page structure
 
@@ -678,9 +678,9 @@ The test that runs through all of this: what job is this doing? A shadow modelli
 
 **Who says so.** Adrian Krebs — Design Slop · impeccable 4.3.1 — design skill and PostToolUse detector hook
 
-> ⚠ **undefined** — An HN commenter caught his own blog post wearing the cream/warm-oat trap. The study is sound; the author is not outside the trend he measured.
+> ⚠ **Adrian Krebs — Design Slop** — An HN commenter caught his own blog post wearing the cream/warm-oat trap. The study is sound; the author is not outside the trend he measured.
 
-> ⚠ **undefined** — Its detector is a compiled binary, so its exact thresholds were not readable. Rules credited here are transcribed from the craft floor's prose, which states bans and defaults without numbers. Where this rulebook attaches a number to an impeccable ban, the number comes from Gesso or from measurement here, and says so.
+> ⚠ **impeccable 4.3.1 — design skill and PostToolUse detector hook** — Its detector is a compiled binary, so its exact thresholds were not readable. Rules credited here are transcribed from the craft floor's prose, which states bans and defaults without numbers. Where this rulebook attaches a number to an impeccable ban, the number comes from Gesso or from measurement here, and says so.
 
 ### `T1-FAKE-CHROME` ? A drawn browser window, phone frame or terminal
 
@@ -696,9 +696,9 @@ The test that runs through all of this: what job is this doing? A shadow modelli
 
 **Who says so.** Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents · febbhav — Signs of AI Design
 
-> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
+> ⚠ **Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
 
-> ⚠ **undefined** — Catalogues rather than demonstrates.
+> ⚠ **febbhav — Signs of AI Design** — Catalogues rather than demonstrates.
 
 ### `T2-AI-FOOTER` ? The four-column Product / Company / Resources / Legal footer
 
@@ -714,7 +714,7 @@ The test that runs through all of this: what job is this doing? A shadow modelli
 
 **Who says so.** Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents
 
-> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
+> ⚠ **Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
 
 ### `T1-PLACEHOLDER-SRC` ?? A placeholder image service in a shipped page
 
@@ -730,7 +730,7 @@ The test that runs through all of this: what job is this doing? A shadow modelli
 
 **Who says so.** local-site-forge research/08-craft.md
 
-> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+> ⚠ **local-site-forge research/08-craft.md** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
 ### `T1-NO-IMAGES` ? No photographs at all
 
@@ -746,7 +746,7 @@ The test that runs through all of this: what job is this doing? A shadow modelli
 
 **Who says so.** local-site-forge research/08-craft.md · local-site-forge research/11a-verity-build-spec.md
 
-> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+> ⚠ **local-site-forge research/08-craft.md** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
 ---
 
@@ -777,9 +777,9 @@ You get to animate about two things. A generated page typically spends its whole
 
 **Who says so.** Emil Kowalski — design engineer at Linear, ex-Vercel; author of Sonner and Vaul · local-site-forge research/08a-sitegen-spec.md
 
-> ⚠ **undefined** — His own Sonner ships close to the `prefers-reduced-motion` nuclear reset that Comeau argues against. Practitioners genuinely disagree there.
+> ⚠ **Emil Kowalski — design engineer at Linear, ex-Vercel; author of Sonner and Vaul** — His own Sonner ships close to the `prefers-reduced-motion` nuclear reset that Comeau argues against. Practitioners genuinely disagree there.
 
-> ⚠ **undefined** — Its `--stagger: 45ms` has no practitioner source and the file says so. Do not attribute it to anyone.
+> ⚠ **local-site-forge research/08a-sitegen-spec.md** — Its `--stagger: 45ms` has no practitioner source and the file says so. Do not attribute it to anyone.
 
 ### `F-HOVER-UNGUARDED` ? A hover effect with no touch guard
 
@@ -795,7 +795,7 @@ You get to animate about two things. A generated page typically spends its whole
 
 **Who says so.** local-site-forge research/08a-sitegen-spec.md
 
-> ⚠ **undefined** — Its `--stagger: 45ms` has no practitioner source and the file says so. Do not attribute it to anyone.
+> ⚠ **local-site-forge research/08a-sitegen-spec.md** — Its `--stagger: 45ms` has no practitioner source and the file says so. Do not attribute it to anyone.
 
 ### `T2-DURATION-CEILING` ? Animations longer than 300 milliseconds
 
@@ -811,7 +811,7 @@ You get to animate about two things. A generated page typically spends its whole
 
 **Who says so.** Emil Kowalski — design engineer at Linear, ex-Vercel; author of Sonner and Vaul
 
-> ⚠ **undefined** — His own Sonner ships close to the `prefers-reduced-motion` nuclear reset that Comeau argues against. Practitioners genuinely disagree there.
+> ⚠ **Emil Kowalski — design engineer at Linear, ex-Vercel; author of Sonner and Vaul** — His own Sonner ships close to the `prefers-reduced-motion` nuclear reset that Comeau argues against. Practitioners genuinely disagree there.
 
 ### `T2-PLAIN-EASE-ENTRANCE` ? The sluggish entrance curve
 
@@ -827,7 +827,7 @@ You get to animate about two things. A generated page typically spends its whole
 
 **Who says so.** Josh W. Comeau — independent educator, interactive CSS tutorials · local-site-forge research/11-reference-tier.md
 
-> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
+> ⚠ **local-site-forge research/11-reference-tier.md** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
 
 ### `T2-AOS-TRAVEL` ? Elements travelling too far on entry
 
@@ -843,9 +843,9 @@ You get to animate about two things. A generated page typically spends its whole
 
 **Who says so.** Emil Kowalski — design engineer at Linear, ex-Vercel; author of Sonner and Vaul · local-site-forge research/11-reference-tier.md
 
-> ⚠ **undefined** — His own Sonner ships close to the `prefers-reduced-motion` nuclear reset that Comeau argues against. Practitioners genuinely disagree there.
+> ⚠ **Emil Kowalski — design engineer at Linear, ex-Vercel; author of Sonner and Vaul** — His own Sonner ships close to the `prefers-reduced-motion` nuclear reset that Comeau argues against. Practitioners genuinely disagree there.
 
-> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
+> ⚠ **local-site-forge research/11-reference-tier.md** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
 
 ### `T2-TRANSITION-ALL` ? transition: all
 
@@ -861,7 +861,7 @@ You get to animate about two things. A generated page typically spends its whole
 
 **Who says so.** local-site-forge research/08-craft.md · Josh W. Comeau — independent educator, interactive CSS tutorials
 
-> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+> ⚠ **local-site-forge research/08-craft.md** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
 ### `T2-UNIVERSAL-FADEUP` ? Every section fading up on scroll
 
@@ -877,9 +877,9 @@ You get to animate about two things. A generated page typically spends its whole
 
 **Who says so.** Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents · Rauno Freiberg — design engineer at Vercel; Web Interface Guidelines
 
-> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
+> ⚠ **Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
 
-> ⚠ **undefined** — He says himself: 'This essay is not a tutorial nor a collection of guidelines.'
+> ⚠ **Rauno Freiberg — design engineer at Vercel; Web Interface Guidelines** — He says himself: 'This essay is not a tutorial nor a collection of guidelines.'
 
 ### `T2-HERO-REVEAL` ?? The biggest thing on the page is hidden until JavaScript runs
 
@@ -895,7 +895,7 @@ You get to animate about two things. A generated page typically spends its whole
 
 **Who says so.** local-site-forge research/08a-sitegen-spec.md
 
-> ⚠ **undefined** — Its `--stagger: 45ms` has no practitioner source and the file says so. Do not attribute it to anyone.
+> ⚠ **local-site-forge research/08a-sitegen-spec.md** — Its `--stagger: 45ms` has no practitioner source and the file says so. Do not attribute it to anyone.
 
 ### `T2-NESTED-REVEAL` ? A reveal inside a reveal
 
@@ -911,7 +911,7 @@ You get to animate about two things. A generated page typically spends its whole
 
 **Who says so.** local-site-forge research/08a-sitegen-spec.md
 
-> ⚠ **undefined** — Its `--stagger: 45ms` has no practitioner source and the file says so. Do not attribute it to anyone.
+> ⚠ **local-site-forge research/08a-sitegen-spec.md** — Its `--stagger: 45ms` has no practitioner source and the file says so. Do not attribute it to anyone.
 
 ### `F-STICKY-COLLISION` ? Two sticky elements that will overlap
 
@@ -927,7 +927,7 @@ You get to animate about two things. A generated page typically spends its whole
 
 **Who says so.** local-site-forge research/08-craft.md
 
-> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+> ⚠ **local-site-forge research/08-craft.md** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
 ---
 
@@ -958,7 +958,7 @@ The most useful editing tool in the whole corpus, and it is free. "Search your m
 
 **Who says so.** Gesso Build — @gessobuild/anti-slop
 
-> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
+> ⚠ **Gesso Build — @gessobuild/anti-slop** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
 
 ### `W-NOT-X-BUT-Y` ? The 'not just X, it's Y' cadence
 
@@ -974,7 +974,7 @@ The most useful editing tool in the whole corpus, and it is free. "Search your m
 
 **Who says so.** Gesso Build — @gessobuild/anti-slop
 
-> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
+> ⚠ **Gesso Build — @gessobuild/anti-slop** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
 
 ### `W-EM-DASH` ? An em dash in short interface copy
 
@@ -990,7 +990,7 @@ The most useful editing tool in the whole corpus, and it is free. "Search your m
 
 **Who says so.** Gesso Build — @gessobuild/anti-slop
 
-> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
+> ⚠ **Gesso Build — @gessobuild/anti-slop** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
 
 ### `W-FABRICATED-PRECISION` ?? Fabricated precision
 
@@ -1006,7 +1006,7 @@ The most useful editing tool in the whole corpus, and it is free. "Search your m
 
 **Who says so.** Gesso Build — @gessobuild/anti-slop
 
-> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
+> ⚠ **Gesso Build — @gessobuild/anti-slop** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
 
 ### `W-BANNED-STAT-94` ?? The 94% first-impressions statistic
 
@@ -1022,9 +1022,9 @@ The most useful editing tool in the whole corpus, and it is free. "Search your m
 
 **Who says so.** local-site-forge research/04-design-language.md · local-site-forge research/11-reference-tier.md
 
-> ⚠ **undefined** — Its §3 'what reads as modern' list (bento, kinetic type, glassmorphism) is directional secondary-source consensus, and research/08 §4 later records that in 2026 'reads as 2026' and 'reads as AI-generated' are the same set. Where 04 and 08 conflict, 08 wins and the rule says so.
+> ⚠ **local-site-forge research/04-design-language.md** — Its §3 'what reads as modern' list (bento, kinetic type, glassmorphism) is directional secondary-source consensus, and research/08 §4 later records that in 2026 'reads as 2026' and 'reads as AI-generated' are the same set. Where 04 and 08 conflict, 08 wins and the rule says so.
 
-> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
+> ⚠ **local-site-forge research/11-reference-tier.md** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
 
 ### `W-WEASEL-TRUST` ? Unearned trust language
 
@@ -1040,9 +1040,9 @@ The most useful editing tool in the whole corpus, and it is free. "Search your m
 
 **Who says so.** Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents · local-site-forge research/08-craft.md
 
-> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
+> ⚠ **Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
 
-> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+> ⚠ **local-site-forge research/08-craft.md** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
 ### `W-FALSIFIABILITY` ? A sentence that cannot be true or false
 
@@ -1058,9 +1058,9 @@ The most useful editing tool in the whole corpus, and it is free. "Search your m
 
 **Who says so.** Gesso Build — @gessobuild/anti-slop · local-site-forge research/11-reference-tier.md
 
-> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
+> ⚠ **Gesso Build — @gessobuild/anti-slop** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
 
-> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
+> ⚠ **local-site-forge research/11-reference-tier.md** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
 
 ### `W-RULE-OF-THREE` ?! Every list is exactly three items
 
@@ -1076,7 +1076,7 @@ The most useful editing tool in the whole corpus, and it is free. "Search your m
 
 **Who says so.** local-site-forge research/08-craft.md
 
-> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+> ⚠ **local-site-forge research/08-craft.md** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
 ---
 
@@ -1107,9 +1107,9 @@ This is the only thing on the whole list that cannot be recovered from once it i
 
 **Who says so.** local-site-forge research/08-craft.md · chess-tee-forge storefront — DESIGN-SYSTEM.md and store/
 
-> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+> ⚠ **local-site-forge research/08-craft.md** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
-> ⚠ **undefined** — Its own font delivery links fonts.googleapis.com, which research/11 §5.4 rejects. Take the honesty rules; do not take the font route.
+> ⚠ **chess-tee-forge storefront — DESIGN-SYSTEM.md and store/** — Its own font delivery links fonts.googleapis.com, which research/11 §5.4 rejects. Take the honesty rules; do not take the font route.
 
 ### `H-QUOTE-ATTRIBUTION` ?? A name set under a quotation
 
@@ -1125,7 +1125,7 @@ This is the only thing on the whole list that cannot be recovered from once it i
 
 **Who says so.** chess-tee-forge storefront — DESIGN-SYSTEM.md and store/
 
-> ⚠ **undefined** — Its own font delivery links fonts.googleapis.com, which research/11 §5.4 rejects. Take the honesty rules; do not take the font route.
+> ⚠ **chess-tee-forge storefront — DESIGN-SYSTEM.md and store/** — Its own font delivery links fonts.googleapis.com, which research/11 §5.4 rejects. Take the honesty rules; do not take the font route.
 
 ### `H-INVENTED-BRAND` ? A brand name or logo that does not exist
 
@@ -1141,7 +1141,7 @@ This is the only thing on the whole list that cannot be recovered from once it i
 
 **Who says so.** chess-tee-forge storefront — DESIGN-SYSTEM.md and store/
 
-> ⚠ **undefined** — Its own font delivery links fonts.googleapis.com, which research/11 §5.4 rejects. Take the honesty rules; do not take the font route.
+> ⚠ **chess-tee-forge storefront — DESIGN-SYSTEM.md and store/** — Its own font delivery links fonts.googleapis.com, which research/11 §5.4 rejects. Take the honesty rules; do not take the font route.
 
 ### `H-PRESS-LOGOS` ? A logo wall or 'as seen in' strip
 
@@ -1157,7 +1157,7 @@ This is the only thing on the whole list that cannot be recovered from once it i
 
 **Who says so.** local-site-forge research/11-reference-tier.md
 
-> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
+> ⚠ **local-site-forge research/11-reference-tier.md** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
 
 ### `W-PLACEHOLDER-TEXT` ?? Placeholder text shipped
 
@@ -1173,7 +1173,7 @@ This is the only thing on the whole list that cannot be recovered from once it i
 
 **Who says so.** chess-tee-forge storefront — DESIGN-SYSTEM.md and store/
 
-> ⚠ **undefined** — Its own font delivery links fonts.googleapis.com, which research/11 §5.4 rejects. Take the honesty rules; do not take the font route.
+> ⚠ **chess-tee-forge storefront — DESIGN-SYSTEM.md and store/** — Its own font delivery links fonts.googleapis.com, which research/11 §5.4 rejects. Take the honesty rules; do not take the font route.
 
 ### `H-SINGLE-SOURCE` ?? The same value written in two places
 
@@ -1189,7 +1189,7 @@ This is the only thing on the whole list that cannot be recovered from once it i
 
 **Who says so.** chess-tee-forge storefront — DESIGN-SYSTEM.md and store/
 
-> ⚠ **undefined** — Its own font delivery links fonts.googleapis.com, which research/11 §5.4 rejects. Take the honesty rules; do not take the font route.
+> ⚠ **chess-tee-forge storefront — DESIGN-SYSTEM.md and store/** — Its own font delivery links fonts.googleapis.com, which research/11 §5.4 rejects. Take the honesty rules; do not take the font route.
 
 ### `H-UNSOURCED-METRIC` ? A number with no method and no date
 
@@ -1205,11 +1205,11 @@ This is the only thing on the whole list that cannot be recovered from once it i
 
 **Who says so.** local-site-forge research/11-reference-tier.md · Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents · chess-tee-forge storefront — DESIGN-SYSTEM.md and store/
 
-> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
+> ⚠ **local-site-forge research/11-reference-tier.md** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
 
-> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
+> ⚠ **Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
 
-> ⚠ **undefined** — Its own font delivery links fonts.googleapis.com, which research/11 §5.4 rejects. Take the honesty rules; do not take the font route.
+> ⚠ **chess-tee-forge storefront — DESIGN-SYSTEM.md and store/** — Its own font delivery links fonts.googleapis.com, which research/11 §5.4 rejects. Take the honesty rules; do not take the font route.
 
 ### `H-EMPTY-PROOF-SECTION` ? A proof section with nothing in it
 
@@ -1225,9 +1225,9 @@ This is the only thing on the whole list that cannot be recovered from once it i
 
 **Who says so.** local-site-forge research/11-reference-tier.md · Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents
 
-> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
+> ⚠ **local-site-forge research/11-reference-tier.md** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
 
-> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
+> ⚠ **Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
 
 ---
 
@@ -1257,7 +1257,7 @@ The hardest idea here, and the reason the problem cannot be solved once. Every e
 
 **Who says so.** Gesso Build — @gessobuild/anti-slop
 
-> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
+> ⚠ **Gesso Build — @gessobuild/anti-slop** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
 
 ### `TRAP-CREAM-PACKAGE` ? The full cream-and-serif package
 
@@ -1273,7 +1273,7 @@ The hardest idea here, and the reason the problem cannot be solved once. Every e
 
 **Who says so.** local-site-forge research/11-reference-tier.md
 
-> ⚠ **undefined** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
+> ⚠ **local-site-forge research/11-reference-tier.md** — Its §9.2 is explicit that not one datum in the sweep concerns how any human read any page. Every claim about what a buyer PERCEIVES is inference. Rules derived from the register argument are tagged INFERRED, never DEMONSTRATED.
 
 ### `TRAP-SAFE-GREEN` ?! Emerald as the not-purple accent
 
@@ -1289,7 +1289,7 @@ The hardest idea here, and the reason the problem cannot be solved once. Every e
 
 **Who says so.** Gesso Build — @gessobuild/anti-slop · local-site-forge research/11a-verity-build-spec.md
 
-> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
+> ⚠ **Gesso Build — @gessobuild/anti-slop** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
 
 ### `TRAP-SECTION-NUMBERS` ?! Editorial section numbering
 
@@ -1305,9 +1305,9 @@ The hardest idea here, and the reason the problem cannot be solved once. Every e
 
 **Who says so.** Gesso Build — @gessobuild/anti-slop · impeccable 4.3.1 — design skill and PostToolUse detector hook
 
-> ⚠ **undefined** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
+> ⚠ **Gesso Build — @gessobuild/anti-slop** — An anti-slop tool whose author has an interest in the problem seeming large and solvable. Its core tells agree with Krebs's independent empirical run, which is why the core is trusted here.
 
-> ⚠ **undefined** — Its detector is a compiled binary, so its exact thresholds were not readable. Rules credited here are transcribed from the craft floor's prose, which states bans and defaults without numbers. Where this rulebook attaches a number to an impeccable ban, the number comes from Gesso or from measurement here, and says so.
+> ⚠ **impeccable 4.3.1 — design skill and PostToolUse detector hook** — Its detector is a compiled binary, so its exact thresholds were not readable. Rules credited here are transcribed from the craft floor's prose, which states bans and defaults without numbers. Where this rulebook attaches a number to an impeccable ban, the number comes from Gesso or from measurement here, and says so.
 
 ### `TRAP-BENTO` ?! The bento grid as the default layout
 
@@ -1323,9 +1323,9 @@ The hardest idea here, and the reason the problem cannot be solved once. Every e
 
 **Who says so.** local-site-forge research/04-design-language.md · local-site-forge research/08-craft.md
 
-> ⚠ **undefined** — Its §3 'what reads as modern' list (bento, kinetic type, glassmorphism) is directional secondary-source consensus, and research/08 §4 later records that in 2026 'reads as 2026' and 'reads as AI-generated' are the same set. Where 04 and 08 conflict, 08 wins and the rule says so.
+> ⚠ **local-site-forge research/04-design-language.md** — Its §3 'what reads as modern' list (bento, kinetic type, glassmorphism) is directional secondary-source consensus, and research/08 §4 later records that in 2026 'reads as 2026' and 'reads as AI-generated' are the same set. Where 04 and 08 conflict, 08 wins and the rule says so.
 
-> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+> ⚠ **local-site-forge research/08-craft.md** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
 ### `TRAP-GLASSMORPHISM` ?! Glassmorphism as a design language
 
@@ -1341,9 +1341,9 @@ The hardest idea here, and the reason the problem cannot be solved once. Every e
 
 **Who says so.** local-site-forge research/04-design-language.md · local-site-forge research/08-craft.md
 
-> ⚠ **undefined** — Its §3 'what reads as modern' list (bento, kinetic type, glassmorphism) is directional secondary-source consensus, and research/08 §4 later records that in 2026 'reads as 2026' and 'reads as AI-generated' are the same set. Where 04 and 08 conflict, 08 wins and the rule says so.
+> ⚠ **local-site-forge research/04-design-language.md** — Its §3 'what reads as modern' list (bento, kinetic type, glassmorphism) is directional secondary-source consensus, and research/08 §4 later records that in 2026 'reads as 2026' and 'reads as AI-generated' are the same set. Where 04 and 08 conflict, 08 wins and the rule says so.
 
-> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+> ⚠ **local-site-forge research/08-craft.md** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
 ### `TRAP-LUCIDE-FIVE` ?! The five predictable icon glyphs
 
@@ -1359,7 +1359,7 @@ The hardest idea here, and the reason the problem cannot be solved once. Every e
 
 **Who says so.** febbhav — Signs of AI Design
 
-> ⚠ **undefined** — Catalogues rather than demonstrates.
+> ⚠ **febbhav — Signs of AI Design** — Catalogues rather than demonstrates.
 
 ### `TRAP-MODERN-BY-LIST` ? A design chosen from a what-is-modern list
 
@@ -1375,7 +1375,7 @@ The hardest idea here, and the reason the problem cannot be solved once. Every e
 
 **Who says so.** local-site-forge research/08-craft.md
 
-> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+> ⚠ **local-site-forge research/08-craft.md** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
 ---
 
@@ -1406,9 +1406,9 @@ You cannot see this one by looking at the page. It is that every page you ship s
 
 **Who says so.** local-site-forge research/08-craft.md · Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents
 
-> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+> ⚠ **local-site-forge research/08-craft.md** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
-> ⚠ **undefined** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
+> ⚠ **Hallmark — Hassan El Mghari (Nutlope), anti-slop design skill for coding agents** — Design opinion with a commercial context. The elaborate parts (21 themes, 42,000 fingerprints) are unvalidated and are tagged ASSERTED wherever cited. Its numbered gates are treated as DEMONSTRATED only where the corpus confirms the gate is executable.
 
 ### `V-STYLE-SKELETON` ?? This stylesheet is a previous one with different values
 
@@ -1424,7 +1424,7 @@ You cannot see this one by looking at the page. It is that every page you ship s
 
 **Who says so.** local-site-forge research/08a-sitegen-spec.md
 
-> ⚠ **undefined** — Its `--stagger: 45ms` has no practitioner source and the file says so. Do not attribute it to anyone.
+> ⚠ **local-site-forge research/08a-sitegen-spec.md** — Its `--stagger: 45ms` has no practitioner source and the file says so. Do not attribute it to anyone.
 
 ### `V-AGGREGATE-SIMILARITY` ? This page is a near-copy of one you already shipped
 
@@ -1440,7 +1440,7 @@ You cannot see this one by looking at the page. It is that every page you ship s
 
 **Who says so.** Measured in this rulebook, 2026-09-17
 
-> ⚠ **undefined** — Thirteen pages from one generator across two verticals (tax/accounting and law) is a narrow sample. A threshold calibrated only against it is calibrated against one failure mode.
+> ⚠ **Measured in this rulebook, 2026-09-17** — Thirteen pages from one generator across two verticals (tax/accounting and law) is a narrow sample. A threshold calibrated only against it is calibrated against one failure mode.
 
 ### `V-PALETTE-MODE-COLLAPSE` ? One palette used far more often than the others, or options never used at all
 
@@ -1456,7 +1456,7 @@ You cannot see this one by looking at the page. It is that every page you ship s
 
 **Who says so.** local-site-forge research/08a-sitegen-spec.md
 
-> ⚠ **undefined** — Its `--stagger: 45ms` has no practitioner source and the file says so. Do not attribute it to anyone.
+> ⚠ **local-site-forge research/08a-sitegen-spec.md** — Its `--stagger: 45ms` has no practitioner source and the file says so. Do not attribute it to anyone.
 
 ### `V-NO-LEDGER` ? Building repeatedly with no ledger
 
@@ -1472,7 +1472,7 @@ You cannot see this one by looking at the page. It is that every page you ship s
 
 **Who says so.** local-site-forge research/08-craft.md
 
-> ⚠ **undefined** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
+> ⚠ **local-site-forge research/08-craft.md** — Its own §9 records that the WebSearch budget was exhausted before the sweep started, so discovery was pull-based, not search-based. YouTube, X, Reddit-direct, CodePen, Discord and Webflow/Framer forums produced zero content. Treat the source mix as blog-and-repo, not community.
 
 ### `S-SECTION-INVENTORY` ? The same section inventory regardless of trade
 
@@ -1488,9 +1488,9 @@ You cannot see this one by looking at the page. It is that every page you ship s
 
 **Who says so.** Ryan / u/Citrous_Oyster — Oak Harbor Web Designs, founder of CodeStitch · local-site-forge research/08a-sitegen-spec.md
 
-> ⚠ **undefined** — His revenue claims are self-reported with no ledger and are not relied on anywhere. His accessibility advice contains a real error: he says contrast 'should be at least 3:1'. WCAG 2.x AA requires 4.5:1 for normal-size body text. Do not copy that number. Section-order claims are DEMONSTRATED as 'this is what these people shipped' and ASSERTED as to why.
+> ⚠ **Ryan / u/Citrous_Oyster — Oak Harbor Web Designs, founder of CodeStitch** — His revenue claims are self-reported with no ledger and are not relied on anywhere. His accessibility advice contains a real error: he says contrast 'should be at least 3:1'. WCAG 2.x AA requires 4.5:1 for normal-size body text. Do not copy that number. Section-order claims are DEMONSTRATED as 'this is what these people shipped' and ASSERTED as to why.
 
-> ⚠ **undefined** — Its `--stagger: 45ms` has no practitioner source and the file says so. Do not attribute it to anyone.
+> ⚠ **local-site-forge research/08a-sitegen-spec.md** — Its `--stagger: 45ms` has no practitioner source and the file says so. Do not attribute it to anyone.
 
 ### `S-BOILERPLATE-IDENTICAL` ?! Required boilerplate that is byte-identical across every build
 
@@ -1506,7 +1506,7 @@ You cannot see this one by looking at the page. It is that every page you ship s
 
 **Who says so.** local-site-forge research/08a-sitegen-spec.md
 
-> ⚠ **undefined** — Its `--stagger: 45ms` has no practitioner source and the file says so. Do not attribute it to anyone.
+> ⚠ **local-site-forge research/08a-sitegen-spec.md** — Its `--stagger: 45ms` has no practitioner source and the file says so. Do not attribute it to anyone.
 
 ---
 

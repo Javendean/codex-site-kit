@@ -102,9 +102,15 @@ function learningPathMarkdown() {
         }
         out.push(`**Who says so.** ${sourceNames(rule).map((w) => SOURCES[w]?.full_name ?? w).join(' · ')}`);
         out.push('');
-        const caveats = sourceNames(rule).map((w) => SOURCES[w]).filter((src) => src && src.caveat);
+        // Entries in rules/sources.json carry `full_name`, not `label`. Reading the wrong
+        // key rendered every caveat as "**undefined**" — 141 times across the two generated
+        // documents — while docs:check still reported them up to date, because the check
+        // compares the output against a regeneration that makes the identical mistake.
+        const caveats = sourceNames(rule)
+          .map((w) => (SOURCES[w] ? { ...SOURCES[w], key: w } : null))
+          .filter((src) => src && src.caveat);
         for (const src of caveats) {
-          out.push(`> ⚠ **${src.label}** — ${src.caveat}`);
+          out.push(`> ⚠ **${src.full_name ?? src.key}** — ${src.caveat}`);
           out.push('');
         }
       }
@@ -173,7 +179,9 @@ function rulesMarkdown() {
   out.push('| id | Who | What it contributes | Confidence |');
   out.push('|---|---|---|---|');
   for (const [id, s] of Object.entries(SOURCES)) {
-    out.push(`| \`${id}\` | ${escapeCell(s.label)} | ${escapeCell(firstSentence(s.what))} | ${s.confidence ?? '—'} |`);
+    // Same wrong-key bug as the caveat line: sources.json uses full_name / what_it_is /
+    // default_confidence. All three read as undefined, so the whole source table was blank.
+    out.push(`| \`${id}\` | ${escapeCell(s.full_name ?? id)} | ${escapeCell(firstSentence(s.what_it_is))} | ${s.default_confidence ?? '—'} |`);
   }
   out.push('');
   return out.join('\n');
